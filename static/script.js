@@ -75,7 +75,11 @@ function displayResults(results) {
     const selectedOption = referenceSelect.options[referenceSelect.selectedIndex].text;
     document.getElementById('reference-note').textContent = `Using ${selectedOption} growth reference`;
 
-    document.getElementById('age').textContent = `${results.age_years} years`;
+    // Format calendar age display
+    const calendarAge = results.age_calendar;
+    let ageText = `${calendarAge.years}y ${calendarAge.months}m ${calendarAge.days}d`;
+    ageText += ` (${results.age_years} years)`;
+    document.getElementById('age').textContent = ageText;
 
     document.getElementById('weight-value').textContent = `${results.weight.value} kg`;
     document.getElementById('weight-centile').textContent = results.weight.centile !== null ? `${results.weight.centile}%` : 'N/A';

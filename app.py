@@ -7,7 +7,11 @@ import math
 app = Flask(__name__)
 
 def calculate_age_in_years(birth_date, measurement_date):
-    """Calculate age in decimal years"""
+    """Calculate age in decimal years and calendar age
+
+    Returns:
+        tuple: (decimal_years, calendar_age_dict)
+    """
     delta = relativedelta(measurement_date, birth_date)
     years = delta.years
     months = delta.months
@@ -15,7 +19,15 @@ def calculate_age_in_years(birth_date, measurement_date):
 
     # Convert to decimal years
     decimal_years = years + (months / 12.0) + (days / 365.25)
-    return decimal_years
+
+    # Calendar age
+    calendar_age = {
+        'years': years,
+        'months': months,
+        'days': days
+    }
+
+    return decimal_years, calendar_age
 
 def calculate_boyd_bsa(weight_kg, height_cm):
     """Calculate Body Surface Area using Boyd formula"""
@@ -111,7 +123,7 @@ def calculate():
         ofc = float(data.get('ofc', 0)) if data.get('ofc') else None
 
         # Calculate age
-        age_decimal = calculate_age_in_years(birth_date, measurement_date)
+        age_decimal, calendar_age = calculate_age_in_years(birth_date, measurement_date)
 
         # Create measurement objects using selected reference
         weight_measurement = Measurement(
@@ -233,6 +245,7 @@ def calculate():
         # Prepare results
         results = {
             'age_years': round(age_decimal, 2),
+            'age_calendar': calendar_age,
             'weight': {
                 'value': weight,
                 'centile': round(float(weight_calc['corrected_centile']), 2) if weight_calc['corrected_centile'] else None,
