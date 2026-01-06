@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Growth Parameters Calculator</title>
+    <meta name="description" content="Paediatric growth parameters calculator using UK-WHO growth charts with support for Turner syndrome and Trisomy 21">
+
+    <!-- Favicons -->
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon-32x32.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='apple-touch-icon.png') }}">
+
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="{{ url_for('static', filename='site.webmanifest') }}">
+
+    <!-- Theme colour for mobile browsers -->
+    <meta name="theme-color" content="#667eea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Growth Calc">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Growth Parameters Calculator</h1>
+
+        <div class="disclaimer">
+            <strong>⚠️ Disclaimer:</strong> This is an experimental web application and should <strong>NOT</strong> be used for clinical decision-making. All calculations must be verified independently before any clinical use. This tool is for educational and research purposes only.
+        </div>
+
+        <form id="growthForm">
+            <div class="form-group full-width">
+                <label>Sex:</label>
+                <div class="radio-group">
+                    <label class="radio-label">
+                        <input type="radio" id="sex-male" name="sex" value="male" required>
+                        <span>Male</span>
+                    </label>
+                    <label class="radio-label">
+                        <input type="radio" id="sex-female" name="sex" value="female" required>
+                        <span>Female</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group full-width">
+                <label for="reference">Growth Reference:</label>
+                <select id="reference" name="reference">
+                    <option value="uk-who" selected>UK-WHO (Standard)</option>
+                    <option value="turners-syndrome">Turner Syndrome</option>
+                    <option value="trisomy-21">Trisomy 21 (Down Syndrome)</option>
+                </select>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="birth_date">Date of Birth:</label>
+                    <input type="date" id="birth_date" name="birth_date" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="measurement_date">Measurement Date:</label>
+                    <input type="date" id="measurement_date" name="measurement_date" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="weight">Weight (kg):</label>
+                    <input type="number" id="weight" name="weight" step="0.01" min="0" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="height">Height (cm):</label>
+                    <input type="number" id="height" name="height" step="0.1" min="0" required>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="ofc">Head Circumference / OFC (cm):</label>
+                    <input type="number" id="ofc" name="ofc" step="0.1" min="0">
+                </div>
+            </div>
+
+            <div class="section-header">Previous Measurement (Optional)</div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="previous_date">Previous Measurement Date:</label>
+                    <input type="date" id="previous_date" name="previous_date">
+                </div>
+
+                <div class="form-group">
+                    <label for="previous_height">Previous Height (cm):</label>
+                    <input type="number" id="previous_height" name="previous_height" step="0.1" min="0">
+                </div>
+            </div>
+
+            <div class="section-header">Parental Heights (Optional)</div>
+
+            <div class="form-group full-width">
+                <label>Height Units:</label>
+                <div class="radio-group">
+                    <label class="radio-label">
+                        <input type="radio" name="height_units" value="cm" checked>
+                        <span>cm</span>
+                    </label>
+                    <label class="radio-label">
+                        <input type="radio" name="height_units" value="ft_in">
+                        <span>ft/in</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-grid">
+                <div id="maternal-height-cm" class="form-group">
+                    <label for="maternal_height">Maternal Height (cm):</label>
+                    <input type="number" id="maternal_height" name="maternal_height" step="0.1" min="0">
+                </div>
+
+                <div id="maternal-height-ft" class="form-group" style="display: none;">
+                    <label>Maternal Height:</label>
+                    <div class="height-ft-in">
+                        <div class="height-input-group">
+                            <input type="number" id="maternal_height_ft" min="0" max="8" placeholder="ft">
+                            <span class="unit-label">ft</span>
+                        </div>
+                        <div class="height-input-group">
+                            <input type="number" id="maternal_height_in" min="0" max="11" step="0.1" placeholder="in">
+                            <span class="unit-label">in</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="paternal-height-cm" class="form-group">
+                    <label for="paternal_height">Paternal Height (cm):</label>
+                    <input type="number" id="paternal_height" name="paternal_height" step="0.1" min="0">
+                </div>
+
+                <div id="paternal-height-ft" class="form-group" style="display: none;">
+                    <label>Paternal Height:</label>
+                    <div class="height-ft-in">
+                        <div class="height-input-group">
+                            <input type="number" id="paternal_height_ft" min="0" max="8" placeholder="ft">
+                            <span class="unit-label">ft</span>
+                        </div>
+                        <div class="height-input-group">
+                            <input type="number" id="paternal_height_in" min="0" max="11" step="0.1" placeholder="in">
+                            <span class="unit-label">in</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button type="submit" class="btn-submit">Calculate</button>
+                <button type="button" class="btn-reset" id="resetBtn">Reset</button>
+            </div>
+        </form>
+
+        <div id="error" class="error"></div>
+
+        <div id="results" class="results">
+            <h2>Results</h2>
+            <div class="reference-note" id="reference-note"></div>
+            <div class="result-grid">
+                <div class="result-item">
+                    <div class="result-label">Age</div>
+                    <div class="result-value" id="age"></div>
+                </div>
+
+                <div class="result-item">
+                    <div class="result-label">Weight</div>
+                    <div class="result-value" id="weight-value"></div>
+                    <div class="result-sub">Centile: <span id="weight-centile"></span></div>
+                    <div class="result-sub">SDS: <span id="weight-sds"></span></div>
+                </div>
+
+                <div class="result-item">
+                    <div class="result-label">Height</div>
+                    <div class="result-value" id="height-value"></div>
+                    <div class="result-sub">Centile: <span id="height-centile"></span></div>
+                    <div class="result-sub">SDS: <span id="height-sds"></span></div>
+                </div>
+
+                <div class="result-item">
+                    <div class="result-label">BMI</div>
+                    <div class="result-value" id="bmi-value"></div>
+                    <div class="result-sub">Centile: <span id="bmi-centile"></span></div>
+                    <div class="result-sub">SDS: <span id="bmi-sds"></span></div>
+                </div>
+
+                <div class="result-item" id="ofc-item">
+                    <div class="result-label">Head Circumference (OFC)</div>
+                    <div class="result-value" id="ofc-value"></div>
+                    <div class="result-sub">Centile: <span id="ofc-centile"></span></div>
+                    <div class="result-sub">SDS: <span id="ofc-sds"></span></div>
+                </div>
+
+                <div class="result-item" id="height-velocity-item">
+                    <div class="result-label">Height Velocity</div>
+                    <div class="result-value" id="height-velocity"></div>
+                </div>
+
+                <div class="result-item">
+                    <div class="result-label">Body Surface Area (Boyd)</div>
+                    <div class="result-value" id="bsa"></div>
+                </div>
+
+                <div class="result-item" id="gh-dose-item">
+                    <div class="result-label">GH Dose Calculator</div>
+                    <div class="gh-dose-adjuster">
+                        <div class="dose-input-group">
+                            <button type="button" class="dose-btn dose-btn-minus" id="gh-dose-minus">−</button>
+                            <input type="number" id="gh-dose-input" step="0.1" min="0" value="0" readonly>
+                            <button type="button" class="dose-btn dose-btn-plus" id="gh-dose-plus">+</button>
+                            <span class="dose-unit">mg/day</span>
+                        </div>
+                        <div class="dose-equivalent" id="gh-dose-equivalent">
+                            = <span id="gh-dose-mg-m2-week">0.0</span> mg/m²/week
+                        </div>
+                    </div>
+                </div>
+
+                <div class="result-item" id="mph-item">
+                    <div class="result-label">Mid-Parental Height</div>
+                    <div class="result-value" id="mph-value"></div>
+                    <div class="result-sub">Centile: <span id="mph-centile"></span></div>
+                    <div class="result-sub">Target Range: <span id="mph-range"></span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
