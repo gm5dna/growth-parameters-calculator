@@ -14,7 +14,7 @@ This application was "vibe-coded" using Claude AI (Anthropic) as an experimental
 
 ### Core Calculations
 
-- **Age** - Calculated in decimal years from date of birth
+- **Age** - Calendar age (years, months, days) and decimal years from date of birth
 - **Weight** - Centile and SDS (z-score) using selected growth reference
 - **Height** - Centile and SDS (z-score) using selected growth reference
 - **BMI** - Body Mass Index with centile and SDS
@@ -22,6 +22,15 @@ This application was "vibe-coded" using Claude AI (Anthropic) as an experimental
 - **Height Velocity** - Annualised growth rate (requires minimum 4-month interval between measurements)
 - **Body Surface Area** - Calculated using Boyd formula
 - **Mid-Parental Height** - Target height with centile and expected adult height range (requires parental heights)
+
+### Data Quality and Safety Features
+
+- **SDS Validation** - Automatic validation of measurement accuracy:
+  - **Advisory warnings** at ±4 SDS for height, weight, BMI, and OFC - calculation proceeds with prominent warning
+  - **Hard cut-offs** rejecting calculations:
+    - ±8 SDS for height, weight, and OFC
+    - ±15 SDS for BMI (higher threshold accommodates clinical conditions like severe obesity or anorexia nervosa)
+  - Encourages users to verify measurements and consider remeasuring when values are extreme
 
 ### Interactive GH Dose Calculator
 
@@ -103,10 +112,12 @@ Or use the provided run script:
 ### Results
 
 The application displays:
-- **Basic Parameters**: Age, weight, height, and BMI with centiles and SDS values
+- **Age**: Calendar format (e.g., "5y 3m 12d") with decimal years in parentheses
+- **Basic Parameters**: Weight, height, and BMI with centiles and SDS values
+- **Validation Warnings**: Advisory alerts for extreme SDS values (>±4) encouraging measurement verification
 - **Height Velocity**: Annualised growth rate (cm/year) if previous height data provided
 - **Body Surface Area**: Calculated using Boyd formula
-- **GH Dose Calculator**: Interactive dose adjuster starting at 7 mg/m²/week with variable increment sizing
+- **GH Dose Calculator**: Interactive dose adjuster starting at 7 mg/m²/week with variable increment sizing, showing both mg/m²/week and mcg/kg/day
 - **Mid-Parental Height**: Target height with centile and expected adult height range
 - **OFC**: Head circumference centile and SDS if provided
 
@@ -133,8 +144,10 @@ All growth references are provided by the Royal College of Paediatrics and Child
 - **Server-side calculations**: All growth calculations performed securely on the server
 - **Responsive design**: Optimised for mobile phones, tablets, and desktop computers
 - **Progressive Web App**: Can be installed on iOS and Android devices like a native app
+- **Data quality safeguards**: SDS-based validation with advisory warnings (±4 SDS) and hard limits (±8/±15 SDS)
 - **Intelligent validation**: Clear error messages and requirement explanations (e.g., 4-month minimum for height velocity)
 - **Interactive tools**: Real-time GH dose adjustment with automatic unit conversion
+- **Clinical age display**: Calendar age format (years, months, days) alongside decimal years
 - **Open source**: Full source code available on GitHub
 
 ## Disclaimer (Important)

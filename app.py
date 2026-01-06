@@ -232,14 +232,63 @@ def calculate():
         bmi_calc = bmi_measurement.measurement['measurement_calculated_values']
         bmi_value = bmi_measurement.measurement['child_observation_value']['observation_value']
 
-        # Extract OFC values if calculated
+        # Get SDS values for validation
+        weight_sds = float(weight_calc['corrected_sds']) if weight_calc['corrected_sds'] else None
+        height_sds = float(height_calc['corrected_sds']) if height_calc['corrected_sds'] else None
+        bmi_sds = float(bmi_calc['corrected_sds']) if bmi_calc['corrected_sds'] else None
+
+        # Validate SDS values - Height, Weight, OFC
+        # Hard cut-off at +/-8 SDS (reject)
+        # Advisory warning at +/-4 SDS
+        validation_messages = []
+
+        if weight_sds is not None:
+            if abs(weight_sds) > 8:
+                return jsonify({
+                    'success': False,
+                    'error': f'Weight SDS ({weight_sds:.2f}) exceeds acceptable range (±8 SDS). Please check measurement accuracy.'
+                }), 400
+            elif abs(weight_sds) > 4:
+                validation_messages.append(f'Weight SDS ({weight_sds:.2f}) is very extreme (>±4 SDS). Please verify measurement accuracy and consider remeasuring.')
+
+        if height_sds is not None:
+            if abs(height_sds) > 8:
+                return jsonify({
+                    'success': False,
+                    'error': f'Height SDS ({height_sds:.2f}) exceeds acceptable range (±8 SDS). Please check measurement accuracy.'
+                }), 400
+            elif abs(height_sds) > 4:
+                validation_messages.append(f'Height SDS ({height_sds:.2f}) is very extreme (>±4 SDS). Please verify measurement accuracy and consider remeasuring.')
+
+        # BMI validation - advisory at +/-4, hard cut-off at +/-15
+        if bmi_sds is not None:
+            if abs(bmi_sds) > 15:
+                return jsonify({
+                    'success': False,
+                    'error': f'BMI SDS ({bmi_sds:.2f}) exceeds acceptable range (±15 SDS). Please check measurement accuracy.'
+                }), 400
+            elif abs(bmi_sds) > 4:
+                validation_messages.append(f'BMI SDS ({bmi_sds:.2f}) is very extreme (>±4 SDS). Please verify measurement accuracy and consider remeasuring.')
+
+        # Extract OFC values if calculated and validate
         ofc_data = None
         if ofc_measurement:
             ofc_calc = ofc_measurement.measurement['measurement_calculated_values']
+            ofc_sds = float(ofc_calc['corrected_sds']) if ofc_calc['corrected_sds'] else None
+
+            if ofc_sds is not None:
+                if abs(ofc_sds) > 8:
+                    return jsonify({
+                        'success': False,
+                        'error': f'OFC SDS ({ofc_sds:.2f}) exceeds acceptable range (±8 SDS). Please check measurement accuracy.'
+                    }), 400
+                elif abs(ofc_sds) > 4:
+                    validation_messages.append(f'OFC SDS ({ofc_sds:.2f}) is very extreme (>±4 SDS). Please verify measurement accuracy and consider remeasuring.')
+
             ofc_data = {
                 'value': ofc,
                 'centile': round(float(ofc_calc['corrected_centile']), 2) if ofc_calc['corrected_centile'] else None,
-                'sds': round(float(ofc_calc['corrected_sds']), 2) if ofc_calc['corrected_sds'] else None
+                'sds': round(ofc_sds, 2) if ofc_sds else None
             }
 
         # Prepare results
@@ -249,23 +298,24 @@ def calculate():
             'weight': {
                 'value': weight,
                 'centile': round(float(weight_calc['corrected_centile']), 2) if weight_calc['corrected_centile'] else None,
-                'sds': round(float(weight_calc['corrected_sds']), 2) if weight_calc['corrected_sds'] else None
+                'sds': round(weight_sds, 2) if weight_sds else None
             },
             'height': {
                 'value': height,
                 'centile': round(float(height_calc['corrected_centile']), 2) if height_calc['corrected_centile'] else None,
-                'sds': round(float(height_calc['corrected_sds']), 2) if height_calc['corrected_sds'] else None
+                'sds': round(height_sds, 2) if height_sds else None
             },
             'bmi': {
                 'value': round(float(bmi_value), 2),
                 'centile': round(float(bmi_calc['corrected_centile']), 2) if bmi_calc['corrected_centile'] else None,
-                'sds': round(float(bmi_calc['corrected_sds']), 2) if bmi_calc['corrected_sds'] else None
+                'sds': round(bmi_sds, 2) if bmi_sds else None
             },
             'ofc': ofc_data,
             'height_velocity': height_velocity,
             'bsa': bsa,
             'gh_dose': gh_dose,
-            'mid_parental_height': mph_data
+            'mid_parental_height': mph_data,
+            'validation_messages': validation_messages
         }
 
         return jsonify({'success': True, 'results': results})

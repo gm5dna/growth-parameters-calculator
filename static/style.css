@@ -304,6 +304,32 @@ select:focus {
     font-weight: 500;
 }
 
+.validation-warnings {
+    display: none;
+    background: #fff3cd;
+    border: 2px solid #ffc107;
+    border-left: 4px solid #ff9800;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    color: #856404;
+    line-height: 1.6;
+}
+
+.validation-warnings.show {
+    display: block;
+}
+
+.validation-warnings ul {
+    margin: 10px 0 0 20px;
+    padding: 0;
+}
+
+.validation-warnings li {
+    margin: 5px 0;
+}
+
 .result-grid {
     display: grid;
     grid-template-columns: 1fr;

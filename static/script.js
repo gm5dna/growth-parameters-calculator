@@ -75,6 +75,21 @@ function displayResults(results) {
     const selectedOption = referenceSelect.options[referenceSelect.selectedIndex].text;
     document.getElementById('reference-note').textContent = `Using ${selectedOption} growth reference`;
 
+    // Display validation warnings if any
+    const validationWarnings = document.getElementById('validation-warnings');
+    if (results.validation_messages && results.validation_messages.length > 0) {
+        let warningHTML = '<strong>⚠️ Advisory Warnings:</strong>';
+        warningHTML += '<ul>';
+        results.validation_messages.forEach(msg => {
+            warningHTML += `<li>${msg}</li>`;
+        });
+        warningHTML += '</ul>';
+        validationWarnings.innerHTML = warningHTML;
+        validationWarnings.classList.add('show');
+    } else {
+        validationWarnings.classList.remove('show');
+    }
+
     // Format calendar age display
     const calendarAge = results.age_calendar;
     let ageText = `${calendarAge.years}y ${calendarAge.months}m ${calendarAge.days}d`;
