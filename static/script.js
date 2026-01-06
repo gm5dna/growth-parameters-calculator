@@ -108,9 +108,11 @@ function displayResults(results) {
         if (results.height_velocity.value !== null) {
             heightVelocityValue.textContent = `${results.height_velocity.value} cm/year`;
             heightVelocityMessage.textContent = '';
+            heightVelocityMessage.style.display = 'none';
         } else if (results.height_velocity.message) {
             heightVelocityValue.textContent = 'Not calculated';
             heightVelocityMessage.textContent = results.height_velocity.message;
+            heightVelocityMessage.style.display = 'block';
         }
         heightVelocityItem.style.display = 'block';
     } else {
