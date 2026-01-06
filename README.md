@@ -1,5 +1,7 @@
 # Growth Parameters Calculator
 
+**🌐 Live App: [https://growth-parameters-calculator.onrender.com](https://growth-parameters-calculator.onrender.com)**
+
 **⚠️ DISCLAIMER: This is an experimental web application created using Claude AI. It should NOT be used for clinical decision-making. All calculations must be verified independently before any clinical use. This tool is for educational and research purposes only.**
 
 A mobile-compatible web application for calculating paediatric growth parameters using the rcpchgrowth library from the Royal College of Paediatrics and Child Health.
