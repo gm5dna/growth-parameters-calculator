@@ -122,8 +122,9 @@ function displayResults(results) {
     // Display GH dose with interactive adjuster
     const ghDoseItem = document.getElementById('gh-dose-item');
     if (results.gh_dose !== null && results.bsa !== null) {
-        // Store BSA for recalculation
+        // Store BSA and weight for recalculation
         window.currentBSA = results.bsa;
+        window.currentWeight = results.weight.value;
 
         // Set initial dose value with appropriate decimal places
         const ghDoseInput = document.getElementById('gh-dose-input');
@@ -137,7 +138,7 @@ function displayResults(results) {
 
         ghDoseInput.value = initialDose.toFixed(decimalPlaces);
 
-        // Update the mg/m²/week display
+        // Update the mg/m²/week and mcg/kg/day displays
         updateGHDoseEquivalent(initialDose);
 
         ghDoseItem.style.display = 'block';
@@ -202,12 +203,17 @@ document.getElementById('measurement_date').valueAsDate = new Date();
 
 // GH Dose adjustment functions
 function updateGHDoseEquivalent(mgPerDay) {
-    if (!window.currentBSA) return;
+    if (!window.currentBSA || !window.currentWeight) return;
 
+    // Calculate mg/m²/week
     const mgPerWeek = mgPerDay * 7;
     const mgM2Week = mgPerWeek / window.currentBSA;
-
     document.getElementById('gh-dose-mg-m2-week').textContent = mgM2Week.toFixed(1);
+
+    // Calculate mcg/kg/day
+    const mcgPerDay = mgPerDay * 1000;  // Convert mg to mcg
+    const mcgKgDay = mcgPerDay / window.currentWeight;
+    document.getElementById('gh-dose-mcg-kg-day').textContent = mcgKgDay.toFixed(1);
 }
 
 function getIncrementForDose(dose) {

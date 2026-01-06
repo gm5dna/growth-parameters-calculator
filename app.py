@@ -56,9 +56,9 @@ def calculate_height_velocity(current_height, previous_height, current_date, pre
     velocity = (height_diff / time_diff_days) * 365.25
     return {'value': round(velocity, 2), 'message': None}
 
-def calculate_gh_dose(bsa):
+def calculate_gh_dose(bsa, weight_kg):
     """Calculate GH dose in mg/day for 7 mg/m2/week"""
-    if not bsa:
+    if not bsa or not weight_kg:
         return None
 
     # Calculate for 7 mg/m2/week
@@ -72,9 +72,14 @@ def calculate_gh_dose(bsa):
     mg_per_week_actual = mg_per_day_rounded * 7
     mg_m2_week_actual = mg_per_week_actual / bsa
 
+    # Calculate mcg/kg/day
+    mcg_per_day = mg_per_day_rounded * 1000  # Convert mg to mcg
+    mcg_kg_day = mcg_per_day / weight_kg
+
     return {
         'mg_per_day': mg_per_day_rounded,
-        'mg_m2_week': round(mg_m2_week_actual, 1)
+        'mg_m2_week': round(mg_m2_week_actual, 1),
+        'mcg_kg_day': round(mcg_kg_day, 1)
     }
 
 @app.route('/')
@@ -157,7 +162,7 @@ def calculate():
         bsa = calculate_boyd_bsa(weight, height)
 
         # Calculate GH dose for 7 mg/m2/week
-        gh_dose = calculate_gh_dose(bsa)
+        gh_dose = calculate_gh_dose(bsa, weight)
 
         # Calculate mid-parental height if parental heights provided
         mph_data = None
