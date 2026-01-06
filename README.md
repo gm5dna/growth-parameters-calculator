@@ -10,16 +10,33 @@ This application was "vibe-coded" using Claude AI (Anthropic) as an experimental
 
 ## Features
 
-The application calculates the following parameters:
+### Core Calculations
 
-- **Age** (in years)
-- **Weight** Centile / SDS
-- **Height** Centile / SDS
-- **BMI** / BMI Centile / BMI SDS
-- **Height Velocity** (yearly derived, requires previous height measurement)
-- **Body Surface Area** (using Boyd formula)
-- **Growth Hormone Doses** (in mg/day for 5, 7, and 10 mg/m²/week dose options)
-- **Mid-Parental Height** with centile and target range (requires parental heights)
+- **Age** - Calculated in decimal years from date of birth
+- **Weight** - Centile and SDS (z-score) using selected growth reference
+- **Height** - Centile and SDS (z-score) using selected growth reference
+- **BMI** - Body Mass Index with centile and SDS
+- **OFC** - Occipitofrontal circumference (head circumference) with centile and SDS
+- **Height Velocity** - Annualised growth rate (requires minimum 4-month interval between measurements)
+- **Body Surface Area** - Calculated using Boyd formula
+- **Mid-Parental Height** - Target height with centile and expected adult height range (requires parental heights)
+
+### Interactive GH Dose Calculator
+
+- Initial dose calculated for 7 mg/m²/week based on patient's BSA
+- Adjustable dose with intelligent increment sizing:
+  - **0.025 mg** increments for doses 0-0.25 mg
+  - **0.05 mg** increments for doses 0.25-1.5 mg
+  - **0.1 mg** increments for doses above 1.5 mg
+- Real-time recalculation of mg/m²/week equivalent
+
+### User Interface
+
+- **Responsive Design** - Optimised layouts for mobile, tablet, and desktop
+- **Progressive Web App** - Can be installed on mobile devices and used like a native app
+- **Parental Height Units** - Toggle between cm and feet/inches for parental heights
+- **Clear Error Messages** - Informative feedback for validation issues and calculation requirements
+- **Growth Reference Selection** - Choose between UK-WHO, Turner Syndrome, or Trisomy 21 charts
 
 ## Installation
 
@@ -59,44 +76,64 @@ Or use the provided run script:
 ## Usage
 
 ### Required Inputs
-1. Select the patient's sex (male/female)
-2. Enter the date of birth
-3. Enter the current measurement date
-4. Enter weight (kg)
-5. Enter height (cm)
+1. **Sex** - Select male or female
+2. **Date of Birth** - Patient's date of birth
+3. **Measurement Date** - Date of current measurements (defaults to today)
+4. **Weight** - Current weight in kg
+5. **Height** - Current height in cm
+6. **Growth Reference** - UK-WHO (Standard), Turner Syndrome, or Trisomy 21
 
 ### Optional Inputs
-6. **Previous Height Data**: Enter previous measurement date and height for height velocity calculation
-7. **Parental Heights**: Enter maternal and paternal heights (cm) for mid-parental height and target range calculation
+
+**Previous Height Data** (for height velocity):
+- Previous measurement date
+- Previous height in cm
+- *Note: Requires minimum 4-month interval between measurements*
+
+**Parental Heights** (for mid-parental height):
+- Maternal height
+- Paternal height
+- Can be entered in cm or feet/inches
+
+**Head Circumference**:
+- OFC (Occipitofrontal Circumference) in cm
 
 ### Results
-Click "Calculate" to see:
-- Age, weight, height, and BMI with centiles and SDS values
-- Height velocity (if previous data provided)
-- Body Surface Area (Boyd formula)
-- GH doses in mg/day for three standard dose options (5, 7, and 10 mg/m²/week)
-- Mid-parental height with centile and target range (if parental heights provided)
+
+The application displays:
+- **Basic Parameters**: Age, weight, height, and BMI with centiles and SDS values
+- **Height Velocity**: Annualised growth rate (cm/year) if previous height data provided
+- **Body Surface Area**: Calculated using Boyd formula
+- **GH Dose Calculator**: Interactive dose adjuster starting at 7 mg/m²/week with variable increment sizing
+- **Mid-Parental Height**: Target height with centile and expected adult height range
+- **OFC**: Head circumference centile and SDS if provided
 
 ## Technology Stack
 
-- **Backend**: Flask (Python)
-- **Growth Calculations**: rcpchgrowth library
-- **Frontend**: HTML5, CSS3, JavaScript
-- **Responsive Design**: Mobile-first approach
+- **Backend**: Flask 3.0.0 (Python web framework)
+- **Growth Calculations**: rcpchgrowth 4.3.8 (RCPCH validated library)
+- **Frontend**: HTML5, CSS3, vanilla JavaScript
+- **Deployment**: Gunicorn WSGI server
+- **Design**: Mobile-first responsive approach with CSS Grid
 
 ## Growth References
 
-The application supports three growth references:
-- **UK-WHO (Standard)**: Standard growth charts for the general population
-- **Turner Syndrome**: Syndrome-specific growth charts
-- **Trisomy 21 (Down Syndrome)**: Syndrome-specific growth charts
+The application supports three validated growth references:
 
-## Notes
+- **UK-WHO (Standard)**: Combined UK90 and WHO growth charts - standard reference for the general UK paediatric population
+- **Turner Syndrome**: Syndrome-specific growth charts for girls with Turner syndrome
+- **Trisomy 21 (Down Syndrome)**: Syndrome-specific growth charts for children with Down syndrome
 
-- The application uses UK-WHO growth charts via the rcpchgrowth library
-- All calculations are performed server-side
-- The interface is optimised for both mobile and desktop devices
-- Includes progressive web app (PWA) support - can be added to home screen on mobile devices
+All growth references are provided by the Royal College of Paediatrics and Child Health (RCPCH) via the rcpchgrowth library.
+
+## Key Features
+
+- **Server-side calculations**: All growth calculations performed securely on the server
+- **Responsive design**: Optimised for mobile phones, tablets, and desktop computers
+- **Progressive Web App**: Can be installed on iOS and Android devices like a native app
+- **Intelligent validation**: Clear error messages and requirement explanations (e.g., 4-month minimum for height velocity)
+- **Interactive tools**: Real-time GH dose adjustment with automatic unit conversion
+- **Open source**: Full source code available on GitHub
 
 ## Disclaimer (Important)
 
