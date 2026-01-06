@@ -125,12 +125,20 @@ function displayResults(results) {
         // Store BSA for recalculation
         window.currentBSA = results.bsa;
 
-        // Set initial dose value
+        // Set initial dose value with appropriate decimal places
         const ghDoseInput = document.getElementById('gh-dose-input');
-        ghDoseInput.value = results.gh_dose.mg_per_day;
+        const initialDose = results.gh_dose.mg_per_day;
+
+        // Determine decimal places based on dose level
+        let decimalPlaces = 1;
+        const precision = getIncrementForDose(initialDose);
+        if (precision === 0.025) decimalPlaces = 3;
+        else if (precision === 0.05) decimalPlaces = 2;
+
+        ghDoseInput.value = initialDose.toFixed(decimalPlaces);
 
         // Update the mg/m²/week display
-        updateGHDoseEquivalent(results.gh_dose.mg_per_day);
+        updateGHDoseEquivalent(initialDose);
 
         ghDoseItem.style.display = 'block';
     } else {
@@ -202,28 +210,53 @@ function updateGHDoseEquivalent(mgPerDay) {
     document.getElementById('gh-dose-mg-m2-week').textContent = mgM2Week.toFixed(1);
 }
 
-function adjustGHDose(increment) {
+function getIncrementForDose(dose) {
+    // Variable increments based on dose level
+    if (dose < 0.25) {
+        return 0.025;  // 0.025 mg increments for 0-0.25 mg
+    } else if (dose < 1.5) {
+        return 0.05;   // 0.05 mg increments for 0.25-1.5 mg
+    } else {
+        return 0.1;    // 0.1 mg increments above 1.5 mg
+    }
+}
+
+function roundToPrecision(value, precision) {
+    // Round to the specified precision (e.g., 0.025, 0.05, 0.1)
+    return Math.round(value / precision) * precision;
+}
+
+function adjustGHDose(direction) {
     const input = document.getElementById('gh-dose-input');
     let currentValue = parseFloat(input.value) || 0;
 
-    // Adjust by 0.1 mg
-    currentValue += increment;
+    // Get appropriate increment for current dose level
+    const increment = getIncrementForDose(currentValue);
 
-    // Round to 1 decimal place to avoid floating point errors
-    currentValue = Math.round(currentValue * 10) / 10;
+    // Adjust by increment
+    currentValue += direction * increment;
 
     // Ensure non-negative
     if (currentValue < 0) currentValue = 0;
 
-    input.value = currentValue.toFixed(1);
+    // Round to appropriate precision
+    const precision = getIncrementForDose(currentValue);
+    currentValue = roundToPrecision(currentValue, precision);
+
+    // Determine decimal places needed
+    let decimalPlaces = 1;
+    if (precision === 0.025) decimalPlaces = 3;
+    else if (precision === 0.05) decimalPlaces = 2;
+
+    input.value = currentValue.toFixed(decimalPlaces);
     updateGHDoseEquivalent(currentValue);
 }
 
 // GH Dose button event listeners
 document.getElementById('gh-dose-minus').addEventListener('click', () => {
-    adjustGHDose(-0.1);
+    adjustGHDose(-1);
 });
 
 document.getElementById('gh-dose-plus').addEventListener('click', () => {
-    adjustGHDose(0.1);
+    adjustGHDose(1);
 });
