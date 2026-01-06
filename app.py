@@ -29,7 +29,11 @@ def calculate_boyd_bsa(weight_kg, height_cm):
     return round(bsa, 3)
 
 def calculate_height_velocity(current_height, previous_height, current_date, previous_date):
-    """Calculate yearly derived height velocity"""
+    """Calculate yearly derived height velocity
+
+    Returns:
+        dict with 'value' and optional 'message', or None
+    """
     if not all([current_height, previous_height, current_date, previous_date]):
         return None
 
@@ -37,11 +41,20 @@ def calculate_height_velocity(current_height, previous_height, current_date, pre
     time_diff_days = (current_date - previous_date).days
 
     if time_diff_days <= 0:
-        return None
+        return {'value': None, 'message': 'Previous measurement date must be before current measurement date'}
+
+    # Check if interval is at least 4 months (approximately 122 days)
+    min_days = 122  # ~4 months
+    if time_diff_days < min_days:
+        months = round(time_diff_days / 30.44, 1)  # Convert to months for display
+        return {
+            'value': None,
+            'message': f'Height velocity requires at least 4 months between measurements (current interval: {months} months)'
+        }
 
     # Convert to cm per year
     velocity = (height_diff / time_diff_days) * 365.25
-    return round(velocity, 2)
+    return {'value': round(velocity, 2), 'message': None}
 
 def calculate_gh_dose(bsa):
     """Calculate GH dose in mg/day for 7 mg/m2/week"""

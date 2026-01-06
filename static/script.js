@@ -101,8 +101,17 @@ function displayResults(results) {
     }
 
     const heightVelocityItem = document.getElementById('height-velocity-item');
+    const heightVelocityValue = document.getElementById('height-velocity');
+    const heightVelocityMessage = document.getElementById('height-velocity-message');
+
     if (results.height_velocity !== null) {
-        document.getElementById('height-velocity').textContent = `${results.height_velocity} cm/year`;
+        if (results.height_velocity.value !== null) {
+            heightVelocityValue.textContent = `${results.height_velocity.value} cm/year`;
+            heightVelocityMessage.textContent = '';
+        } else if (results.height_velocity.message) {
+            heightVelocityValue.textContent = 'Not calculated';
+            heightVelocityMessage.textContent = results.height_velocity.message;
+        }
         heightVelocityItem.style.display = 'block';
     } else {
         heightVelocityItem.style.display = 'none';
