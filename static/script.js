@@ -92,9 +92,8 @@ function displayResults(results) {
 
     // Format calendar age display
     const calendarAge = results.age_calendar;
-    let ageText = `${calendarAge.years}y ${calendarAge.months}m ${calendarAge.days}d`;
-    ageText += ` (${results.age_years} years)`;
-    document.getElementById('age').textContent = ageText;
+    const ageElement = document.getElementById('age');
+    ageElement.innerHTML = `${calendarAge.years}y ${calendarAge.months}m ${calendarAge.days}d<br><span style="font-size: 0.8em; color: #666;">(${results.age_years} years)</span>`;
 
     document.getElementById('weight-value').textContent = `${results.weight.value} kg`;
     document.getElementById('weight-centile').textContent = results.weight.centile !== null ? `${results.weight.centile}%` : 'N/A';
