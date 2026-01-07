@@ -4,9 +4,20 @@
 
 **⚠️ DISCLAIMER: This is an experimental web application created using Claude AI. It should NOT be used for clinical decision-making. All calculations must be verified independently before any clinical use. This tool is for educational and research purposes only.**
 
-A mobile-compatible web application for calculating paediatric growth parameters using the [rcpchgrowth library](https://growth.rcpch.ac.uk/developer/rcpchgrowth/) from the Royal College of Paediatrics and Child Health.
+A mobile-compatible web application for calculating paediatric growth parameters using the [rcpchgrowth library](https://growth.rcpch.ac.uk/developer/rcpchgrowth/) from the Royal College of Paediatrics and Child Health (RCPCH).
 
-This application was "vibe-coded" using Claude AI (Anthropic) as an experimental project to explore rapid application development for paediatric tools. Whilst the underlying calculations use the validated [rcpchgrowth library](https://growth.rcpch.ac.uk/developer/rcpchgrowth/), the application itself has not been clinically validated or formally tested.
+## Overview
+
+This calculator provides comprehensive growth assessment tools including:
+- Growth measurements (weight, height, BMI, head circumference) with centiles and SDS scores
+- Interactive growth charts with enhanced tooltips showing detailed measurement data
+- Height velocity calculation with support for previous measurements
+- Body surface area calculation using Boyd formula or cBNF lookup tables
+- Growth hormone dose calculator with adjustable dosing
+- Mid-parental height prediction with target ranges
+- Support for multiple growth references including UK-WHO, CDC, Turner syndrome, and Trisomy 21
+
+This application was "vibe-coded" using Claude AI (Anthropic) as an experimental project to explore rapid application development for paediatric tools. While the underlying calculations use the validated [rcpchgrowth library](https://growth.rcpch.ac.uk/developer/rcpchgrowth/), the application itself has not been clinically validated or formally tested.
 
 ## Features
 
@@ -58,9 +69,15 @@ All growth references are provided by the Royal College of Paediatrics and Child
 - **Centile curves** from 0.4th to 99.6th percentile (solid lines for 2nd, 25th, 50th, 75th, 98th; dotted for 0.4th, 9th, 91st, 99.6th)
 - **Sex-specific colours** - Blue for boys, pink for girls
 - **Patient data overlay** - Current and previous measurements plotted as small dots
+- **Enhanced tooltips** - Hover over patient measurements to view:
+  - Age at measurement (in years)
+  - Measurement value with units
+  - Centile percentage
+  - SDS (Standard Deviation Score)
+  - Available for both current and previous measurements
+- **Dynamic x-axis** - Automatically adjusts to data range, accommodating preterm measurements (negative ages) while displaying tick labels from 0 onwards
+- **Intelligent tick spacing** - One-year intervals with integer labels for clarity
 - **Tabbed interface** - Easy switching between different measurement types
-- **Extended x-axis** - Starts at -2 weeks
-- **Hover tooltips** - Interactive details on patient measurements only
 - **Fully responsive** - Optimized viewing on mobile, tablet, and desktop devices
 - **Powered by Chart.js** - Smooth, interactive charts
 - **Reference-specific** - Charts match the selected growth reference (UK-WHO, CDC, Turner, Trisomy 21)
@@ -122,8 +139,8 @@ The application displays:
 - **Validation Warnings**: Advisory alerts for extreme SDS values (>±4) encouraging measurement verification
 - **Height Velocity**: Annualised growth rate (cm/year) if height and previous height data provided
 - **Body Surface Area**:
-  - Calculated using **Boyd formula** if both weight and height provided (displayed as "BSA (Boyd)")
-  - Calculated using **cBNF lookup table** if only weight provided (displayed as "BSA (cBNF)")
+  - Calculated using **Boyd formula** if both weight and height provided (label shows "Body Surface Area (Boyd)")
+  - Calculated using **cBNF lookup table** if only weight provided (label shows "Body Surface Area (cBNF)")
   - See [Body Surface Area Calculation Methods](#body-surface-area-calculation-methods) for details
 - **GH Dose Calculator**: Interactive dose adjuster starting at 7 mg/m²/week (requires BSA, which needs at least weight)
 - **Mid-Parental Height**: Target height with centile and expected adult height range (if parental heights provided)
@@ -138,8 +155,14 @@ After calculating growth parameters:
 4. **Centile lines** are color-coded: blue for boys, pink for girls
 5. **50th centile** is shown with a heavier line weight
 6. **Extreme centiles** (0.4th, 9th, 91st, 99.6th) are shown as dotted lines
-7. Hover over **patient measurements** (small dots) to see detailed tooltips
-8. Click **"Close Charts"** to collapse back to results view
+7. **Hover over patient measurements** (small dots) to see detailed tooltips showing:
+   - Age at measurement
+   - Measurement value
+   - Centile percentage
+   - SDS score
+   - Works for both current and previous measurements
+8. **X-axis** automatically adjusts to accommodate all data, including preterm measurements
+9. Click **"Close Charts"** to collapse back to results view
 
 **Note**: Chart tabs will only be enabled for measurements that were provided:
 - **Height tab**: Enabled only if height was provided
@@ -163,7 +186,7 @@ BSA = 0.0003207 × (height_cm^0.3) × (weight_g^(0.7285 - (0.0188 × log10(weigh
 
 This is the preferred method and provides the most accurate BSA estimation for children.
 
-**Display**: Results show as "BSA (Boyd)"
+**Display**: Label shows "Body Surface Area (Boyd)"
 
 ### cBNF Lookup Table (Fallback)
 
@@ -178,7 +201,7 @@ When height is not provided, the application uses lookup tables from the British
 - Linear interpolation between table values
 - Linear extrapolation for weights outside the table range
 
-**Display**: Results show as "BSA (cBNF)"
+**Display**: Label shows "Body Surface Area (cBNF)"
 
 **Note**: While the cBNF method is convenient when height is unavailable, the Boyd formula with both weight and height is more accurate and should be used whenever possible.
 

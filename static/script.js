@@ -168,13 +168,19 @@ function displayResults(results) {
         heightVelocityItem.style.display = 'none';
     }
 
-    // Display BSA with method indicator
+    // Display BSA with method in label, not value
     if (results.bsa !== null) {
-        const bsaText = `${results.bsa} m²`;
-        const methodText = results.bsa_method ? ` (${results.bsa_method})` : '';
-        document.getElementById('bsa').textContent = bsaText + methodText;
+        document.getElementById('bsa').textContent = `${results.bsa} m²`;
+        // Update label to show method used
+        const bsaLabel = document.getElementById('bsa-label');
+        if (results.bsa_method) {
+            bsaLabel.textContent = `Body Surface Area (${results.bsa_method})`;
+        } else {
+            bsaLabel.textContent = 'Body Surface Area (Boyd)';
+        }
     } else {
         document.getElementById('bsa').textContent = 'N/A';
+        document.getElementById('bsa-label').textContent = 'Body Surface Area (Boyd)';
     }
 
     // Display GH dose with interactive adjuster
