@@ -41,6 +41,77 @@ def calculate_boyd_bsa(weight_kg, height_cm):
     bsa = 0.0003207 * (height_cm ** 0.3) * (weight_g ** (0.7285 - (0.0188 * log_weight)))
     return round(bsa, 2)
 
+def calculate_cbnf_bsa(weight_kg):
+    """Calculate Body Surface Area from weight alone using cBNF lookup tables
+
+    Based on tables from British National Formulary for Children (BNFc)
+    Adapted from Sharkey I et al., British Journal of Cancer 2001; 85 (1): 23–28
+    Values are calculated using the Boyd equation
+
+    Args:
+        weight_kg: Body weight in kilograms
+
+    Returns:
+        BSA in m² (rounded to 2 decimal places), or None if weight is invalid
+    """
+    if weight_kg <= 0:
+        return None
+
+    # cBNF lookup table: weight (kg) -> BSA (m²)
+    # Combined data from both under 40kg and over 40kg tables
+    lookup_table = {
+        1: 0.10, 1.5: 0.13, 2: 0.16, 2.5: 0.19, 3: 0.21, 3.5: 0.24,
+        4: 0.26, 4.5: 0.28, 5: 0.30, 5.5: 0.32, 6: 0.34, 6.5: 0.36,
+        7: 0.38, 7.5: 0.40, 8: 0.42, 8.5: 0.44, 9: 0.46, 9.5: 0.47,
+        10: 0.49, 11: 0.53, 12: 0.56, 13: 0.59, 14: 0.62, 15: 0.65,
+        16: 0.68, 17: 0.71, 18: 0.74, 19: 0.77, 20: 0.79, 21: 0.82,
+        22: 0.85, 23: 0.87, 24: 0.90, 25: 0.92, 26: 0.95, 27: 0.97,
+        28: 1.0, 29: 1.0, 30: 1.1, 31: 1.1, 32: 1.1, 33: 1.1,
+        34: 1.1, 35: 1.2, 36: 1.2, 37: 1.2, 38: 1.2, 39: 1.3, 40: 1.3,
+        41: 1.3, 42: 1.3, 43: 1.3, 44: 1.4, 45: 1.4, 46: 1.4,
+        47: 1.4, 48: 1.4, 49: 1.5, 50: 1.5, 51: 1.5, 52: 1.5,
+        53: 1.5, 54: 1.6, 55: 1.6, 56: 1.6, 57: 1.6, 58: 1.6,
+        59: 1.7, 60: 1.7, 61: 1.7, 62: 1.7, 63: 1.7, 64: 1.7,
+        65: 1.8, 66: 1.8, 67: 1.8, 68: 1.8, 69: 1.8, 70: 1.9,
+        71: 1.9, 72: 1.9, 73: 1.9, 74: 1.9, 75: 1.9, 76: 2.0,
+        77: 2.0, 78: 2.0, 79: 2.0, 80: 2.0, 81: 2.0, 82: 2.1,
+        83: 2.1, 84: 2.1, 85: 2.1, 86: 2.1, 87: 2.1, 88: 2.2,
+        89: 2.2, 90: 2.2
+    }
+
+    # If exact weight is in the table, return it
+    if weight_kg in lookup_table:
+        return lookup_table[weight_kg]
+
+    # For weights below 1 kg or above 90 kg, or between table values,
+    # use linear interpolation between nearest values
+    weights = sorted(lookup_table.keys())
+
+    if weight_kg < weights[0]:
+        # Extrapolate below minimum (use first two points)
+        w1, w2 = weights[0], weights[1]
+        bsa1, bsa2 = lookup_table[w1], lookup_table[w2]
+        slope = (bsa2 - bsa1) / (w2 - w1)
+        bsa = bsa1 + slope * (weight_kg - w1)
+    elif weight_kg > weights[-1]:
+        # Extrapolate above maximum (use last two points)
+        w1, w2 = weights[-2], weights[-1]
+        bsa1, bsa2 = lookup_table[w1], lookup_table[w2]
+        slope = (bsa2 - bsa1) / (w2 - w1)
+        bsa = bsa2 + slope * (weight_kg - w2)
+    else:
+        # Interpolate between two nearest values
+        for i in range(len(weights) - 1):
+            if weights[i] < weight_kg < weights[i + 1]:
+                w1, w2 = weights[i], weights[i + 1]
+                bsa1, bsa2 = lookup_table[w1], lookup_table[w2]
+                # Linear interpolation
+                slope = (bsa2 - bsa1) / (w2 - w1)
+                bsa = bsa1 + slope * (weight_kg - w1)
+                break
+
+    return round(bsa, 2)
+
 def calculate_height_velocity(current_height, previous_height, current_date, previous_date):
     """Calculate yearly derived height velocity
 
@@ -206,10 +277,17 @@ def calculate():
                 'sds': round(previous_height_sds, 2) if previous_height_sds is not None else None
             }
 
-        # Calculate BSA (requires both weight and height)
+        # Calculate BSA
+        # Use Boyd formula if both weight and height available
+        # Use cBNF lookup table if only weight available
         bsa = None
+        bsa_method = None
         if weight and height:
             bsa = calculate_boyd_bsa(weight, height)
+            bsa_method = 'Boyd'
+        elif weight:
+            bsa = calculate_cbnf_bsa(weight)
+            bsa_method = 'cBNF'
 
         # Calculate GH dose for 7 mg/m2/week (requires BSA and weight)
         gh_dose = None
@@ -362,6 +440,7 @@ def calculate():
             'height_velocity': height_velocity,
             'previous_height': previous_height_data,
             'bsa': bsa,
+            'bsa_method': bsa_method,
             'gh_dose': gh_dose,
             'mid_parental_height': mph_data,
             'validation_messages': validation_messages

@@ -168,7 +168,14 @@ function displayResults(results) {
         heightVelocityItem.style.display = 'none';
     }
 
-    document.getElementById('bsa').textContent = results.bsa !== null ? `${results.bsa} m²` : 'N/A';
+    // Display BSA with method indicator
+    if (results.bsa !== null) {
+        const bsaText = `${results.bsa} m²`;
+        const methodText = results.bsa_method ? ` (${results.bsa_method})` : '';
+        document.getElementById('bsa').textContent = bsaText + methodText;
+    } else {
+        document.getElementById('bsa').textContent = 'N/A';
+    }
 
     // Display GH dose with interactive adjuster
     const ghDoseItem = document.getElementById('gh-dose-item');
