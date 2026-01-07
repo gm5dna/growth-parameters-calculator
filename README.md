@@ -52,12 +52,14 @@ All growth references are provided by the Royal College of Paediatrics and Child
 ### Interactive Growth Charts
 
 - **Visual centile charts** for height, weight, BMI, and head circumference (OFC)
-- **Centile curves** from 0.4th to 99.6th percentile displayed in distinct colors
-- **Patient data overlay** - Current and previous measurements plotted on charts
-- **Growth trajectory** - Visual line connecting previous and current measurements (for height)
+- **Centile curves** from 0.4th to 99.6th percentile (solid lines for 2nd, 25th, 50th, 75th, 98th; dotted for 0.4th, 9th, 91st, 99.6th)
+- **Sex-specific colours** - Blue for boys, pink for girls
+- **Patient data overlay** - Current and previous measurements plotted as small dots
 - **Tabbed interface** - Easy switching between different measurement types
+- **Extended x-axis** - Starts at -20 weeks for preterm measurements
+- **Hover tooltips** - Interactive details on patient measurements only
 - **Fully responsive** - Optimized viewing on mobile, tablet, and desktop devices
-- **Powered by Chart.js** - Smooth, interactive charts with hover tooltips
+- **Powered by Chart.js** - Smooth, interactive charts
 - **Reference-specific** - Charts match the selected growth reference (UK-WHO, Turner, Trisomy 21)
 
 ### User Interface
@@ -111,10 +113,10 @@ After calculating growth parameters:
 1. Click the **"Show Growth Charts"** button below the results
 2. Charts section opens with the height chart displayed by default
 3. Click tabs to switch between **Height**, **Weight**, **BMI**, and **OFC** charts
-4. Hover over chart elements to see detailed tooltips with age and measurement values
-5. **Blue dot** represents your current measurement
-6. **Orange dot** represents previous measurement (if height velocity data provided)
-7. **Dashed line** shows growth trajectory between measurements
+4. **Centile lines** are color-coded: blue for boys, pink for girls
+5. **50th centile** is shown with a heavier line weight
+6. **Extreme centiles** (0.4th, 9th, 91st, 99.6th) are shown as dotted lines
+7. Hover over **patient measurements** (small dots) to see detailed tooltips
 8. Click **"Close Charts"** to collapse back to results view
 
 **Note**: The OFC tab will be disabled if head circumference was not provided in the calculation.

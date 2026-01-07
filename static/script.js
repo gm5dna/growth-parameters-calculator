@@ -561,30 +561,22 @@ function preparePatientData(measurementMethod) {
 function renderGrowthChart(canvas, centiles, patientData, measurementMethod) {
     const datasets = [];
 
-    // Define colors for each centile curve
-    const centileColors = {
-        0.4: '#e53e3e',    // Red (extreme low)
-        2: '#dd6b20',      // Dark orange
-        9: '#d69e2e',      // Orange-yellow
-        25: '#38a169',     // Green
-        50: '#3182ce',     // Blue (median - most important)
-        75: '#38a169',     // Green
-        91: '#d69e2e',     // Orange-yellow
-        98: '#dd6b20',     // Dark orange
-        99.6: '#e53e3e'    // Red (extreme high)
-    };
+    // Determine color based on sex (blue for boys, pink for girls)
+    const sex = currentPatientData.sex;
+    const centileColor = sex === 'male' ? '#3182ce' : '#ec4899'; // Blue for boys, pink for girls
 
     // Add centile curve datasets
     centiles.forEach(centile => {
-        const color = centileColors[centile.centile] || '#999999';
         const isMedian = centile.centile === 50;
+        const isDotted = [0.4, 9, 91, 99.6].includes(centile.centile);
 
         datasets.push({
             label: `${centile.centile}th centile`,
             data: centile.data.map(point => ({x: point.x, y: point.y})),
-            borderColor: color,
+            borderColor: centileColor,
             backgroundColor: 'transparent',
-            borderWidth: isMedian ? 2.5 : 1.5,
+            borderWidth: isMedian ? 2 : 1.5,
+            borderDash: isDotted ? [5, 5] : [],
             pointRadius: 0,
             pointHoverRadius: 0,
             tension: 0.4,
@@ -603,11 +595,11 @@ function renderGrowthChart(canvas, centiles, patientData, measurementMethod) {
             datasets.push({
                 label: 'Current Measurement',
                 data: currentPoints.map(p => ({x: p.x, y: p.y})),
-                backgroundColor: '#667eea',
+                backgroundColor: centileColor,
                 borderColor: '#ffffff',
                 borderWidth: 2,
-                pointRadius: 8,
-                pointHoverRadius: 10,
+                pointRadius: 5,
+                pointHoverRadius: 7,
                 showLine: false
             });
         }
@@ -620,27 +612,10 @@ function renderGrowthChart(canvas, centiles, patientData, measurementMethod) {
                 backgroundColor: '#f6ad55',
                 borderColor: '#ffffff',
                 borderWidth: 2,
-                pointRadius: 8,
-                pointHoverRadius: 10,
+                pointRadius: 5,
+                pointHoverRadius: 7,
                 showLine: false
             });
-
-            // Add connecting line if we have both current and previous
-            if (currentPoints.length > 0) {
-                datasets.push({
-                    label: 'Growth Trajectory',
-                    data: [
-                        {x: previousPoints[0].x, y: previousPoints[0].y},
-                        {x: currentPoints[0].x, y: currentPoints[0].y}
-                    ],
-                    borderColor: '#667eea',
-                    backgroundColor: 'transparent',
-                    borderWidth: 2,
-                    borderDash: [5, 5],
-                    pointRadius: 0,
-                    tension: 0
-                });
-            }
         }
     }
 
@@ -681,27 +656,17 @@ function renderGrowthChart(canvas, centiles, patientData, measurementMethod) {
             },
             plugins: {
                 legend: {
-                    display: true,
-                    position: 'bottom',
-                    labels: {
-                        usePointStyle: true,
-                        padding: 15,
-                        font: {
-                            size: 12
-                        },
-                        filter: function(legendItem, chartData) {
-                            // Only show patient measurements and median in legend
-                            return legendItem.text.includes('Measurement') ||
-                                   legendItem.text.includes('Trajectory') ||
-                                   legendItem.text === '50th centile';
-                        }
-                    }
+                    display: false
                 },
                 tooltip: {
                     backgroundColor: 'rgba(0, 0, 0, 0.8)',
                     padding: 12,
                     titleFont: { size: 14, weight: 'bold' },
                     bodyFont: { size: 13 },
+                    filter: function(tooltipItem) {
+                        // Only show tooltips for patient measurements
+                        return tooltipItem.dataset.label.includes('Measurement');
+                    },
                     callbacks: {
                         title: function(context) {
                             return context[0].dataset.label;
@@ -724,6 +689,7 @@ function renderGrowthChart(canvas, centiles, patientData, measurementMethod) {
             scales: {
                 x: {
                     type: 'linear',
+                    min: -0.3846,  // -20 weeks
                     title: {
                         display: true,
                         text: labels.x,
