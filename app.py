@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, jsonify
 from rcpchgrowth import Measurement, mid_parental_height, mid_parental_height_z, lower_and_upper_limits_of_expected_height_z, measurement_from_sds
+from rcpchgrowth.chart_functions import create_chart
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 import math
@@ -322,6 +323,85 @@ def calculate():
 
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 400
+
+@app.route('/chart-data', methods=['POST'])
+def get_chart_data():
+    """
+    Return centile curve data for plotting growth charts
+
+    Expected POST data:
+    {
+        'reference': 'uk-who' | 'turners-syndrome' | 'trisomy-21',
+        'measurement_method': 'height' | 'weight' | 'bmi' | 'ofc',
+        'sex': 'male' | 'female'
+    }
+
+    Returns:
+    {
+        'success': True,
+        'centiles': [
+            {
+                'centile': 0.4,
+                'sds': -2.67,
+                'data': [{'x': age, 'y': value}, ...]
+            },
+            ... (9 centile bands total)
+        ]
+    }
+    """
+    try:
+        data = request.json
+        reference = data.get('reference', 'uk-who')
+        measurement_method = data.get('measurement_method')
+        sex = data.get('sex')
+
+        # Validate required parameters
+        if not measurement_method or not sex:
+            return jsonify({
+                'success': False,
+                'error': 'Missing required parameters: measurement_method or sex'
+            }), 400
+
+        # Validate measurement_method
+        valid_methods = ['height', 'weight', 'bmi', 'ofc']
+        if measurement_method not in valid_methods:
+            return jsonify({
+                'success': False,
+                'error': f'Invalid measurement_method. Must be one of: {", ".join(valid_methods)}'
+            }), 400
+
+        # Get chart data from rcpchgrowth library
+        chart_data = create_chart(
+            reference=reference,
+            measurement_method=measurement_method,
+            sex=sex
+        )
+
+        # Extract and flatten centile data from nested structure
+        # chart_data is a list of dicts, each with a reference dataset name as key
+        centile_curves = []
+
+        for dataset in chart_data:
+            for ref_key, ref_data in dataset.items():
+                # Navigate: ref_data[sex][measurement_method] = list of centile objects
+                if sex in ref_data and measurement_method in ref_data[sex]:
+                    for centile_obj in ref_data[sex][measurement_method]:
+                        centile_curves.append({
+                            'centile': centile_obj.get('centile'),
+                            'sds': centile_obj.get('sds'),
+                            'data': centile_obj.get('data', [])
+                        })
+
+        return jsonify({
+            'success': True,
+            'centiles': centile_curves
+        })
+
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': f'Chart data error: {str(e)}'
+        }), 400
 
 if __name__ == '__main__':
     import os

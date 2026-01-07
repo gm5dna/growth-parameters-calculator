@@ -49,6 +49,17 @@ The application supports three validated growth references:
 
 All growth references are provided by the Royal College of Paediatrics and Child Health (RCPCH) via the [rcpchgrowth library](https://growth.rcpch.ac.uk/developer/rcpchgrowth/).
 
+### Interactive Growth Charts
+
+- **Visual centile charts** for height, weight, BMI, and head circumference (OFC)
+- **Centile curves** from 0.4th to 99.6th percentile displayed in distinct colors
+- **Patient data overlay** - Current and previous measurements plotted on charts
+- **Growth trajectory** - Visual line connecting previous and current measurements (for height)
+- **Tabbed interface** - Easy switching between different measurement types
+- **Fully responsive** - Optimized viewing on mobile, tablet, and desktop devices
+- **Powered by Chart.js** - Smooth, interactive charts with hover tooltips
+- **Reference-specific** - Charts match the selected growth reference (UK-WHO, Turner, Trisomy 21)
+
 ### User Interface
 
 - **Responsive Design** - Optimised layouts for mobile, tablet, and desktop
@@ -92,6 +103,21 @@ The application displays:
 - **GH Dose Calculator**: Interactive dose adjuster starting at 7 mg/m²/week with variable increment sizing, showing both mg/m²/week and mcg/kg/day
 - **Mid-Parental Height**: Target height with centile and expected adult height range
 - **OFC**: Head circumference centile and SDS if provided
+
+### Viewing Growth Charts
+
+After calculating growth parameters:
+
+1. Click the **"Show Growth Charts"** button below the results
+2. Charts section opens with the height chart displayed by default
+3. Click tabs to switch between **Height**, **Weight**, **BMI**, and **OFC** charts
+4. Hover over chart elements to see detailed tooltips with age and measurement values
+5. **Blue dot** represents your current measurement
+6. **Orange dot** represents previous measurement (if height velocity data provided)
+7. **Dashed line** shows growth trajectory between measurements
+8. Click **"Close Charts"** to collapse back to results view
+
+**Note**: The OFC tab will be disabled if head circumference was not provided in the calculation.
 
 ## Technology Stack
 

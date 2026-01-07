@@ -21,6 +21,9 @@
     <meta name="apple-mobile-web-app-title" content="Growth Calc">
 
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <!-- Chart.js Library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -232,6 +235,49 @@
                     <div class="result-sub">Centile: <span id="mph-centile"></span></div>
                     <div class="result-sub">Target Range: <span id="mph-range"></span></div>
                 </div>
+            </div>
+        </div>
+
+        <!-- Show Charts Button (appears after calculation results) -->
+        <div id="show-charts-container" class="show-charts-container">
+            <button type="button" class="btn-show-charts" id="showChartsBtn">
+                Show Growth Charts
+            </button>
+        </div>
+
+        <!-- Growth Charts Section -->
+        <div id="charts-section" class="charts-section">
+            <!-- Header with Close Button -->
+            <div class="charts-header">
+                <h2>Growth Charts</h2>
+                <button type="button" class="btn-close-charts" id="closeChartsBtn">Close Charts</button>
+            </div>
+
+            <!-- Chart Type Selector (Tabs) -->
+            <div class="chart-tabs" id="chartTabs">
+                <button class="chart-tab active" data-measurement="height">Height</button>
+                <button class="chart-tab" data-measurement="weight">Weight</button>
+                <button class="chart-tab" data-measurement="bmi">BMI</button>
+                <button class="chart-tab" data-measurement="ofc">OFC</button>
+            </div>
+
+            <!-- Chart Canvas Container -->
+            <div class="chart-container">
+                <canvas id="growthChart"></canvas>
+            </div>
+
+            <!-- Loading Indicator -->
+            <div class="chart-loading" id="chartLoading">
+                <div class="spinner"></div>
+                <p>Loading chart data...</p>
+            </div>
+
+            <!-- Chart Info/Legend -->
+            <div class="chart-info">
+                <p><strong>How to read this chart:</strong></p>
+                <p>• Colored lines represent centile curves (0.4th, 2nd, 9th, 25th, 50th, 75th, 91st, 98th, 99.6th)</p>
+                <p>• Blue dot: Current measurement | Orange dot: Previous measurement (if provided)</p>
+                <p>• Dashed line: Growth trajectory between measurements</p>
             </div>
         </div>
     </div>

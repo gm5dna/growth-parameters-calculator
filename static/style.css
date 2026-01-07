@@ -525,3 +525,262 @@ select:focus {
 .footer a:hover {
     border-bottom-color: #ffffff;
 }
+
+/* =====================================
+   GROWTH CHARTS SECTION
+   ===================================== */
+
+/* Show Charts Button Container */
+.show-charts-container {
+    display: none;
+    text-align: center;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 2px solid #e0e0e0;
+}
+
+.show-charts-container.show {
+    display: block;
+}
+
+.btn-show-charts {
+    padding: 15px 40px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.btn-show-charts:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.btn-show-charts:active {
+    transform: translateY(0);
+}
+
+/* Charts Section Container */
+.charts-section {
+    display: none;
+    margin-top: 40px;
+    padding: 30px;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+}
+
+.charts-section.show {
+    display: block;
+}
+
+/* Charts Header */
+.charts-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.charts-header h2 {
+    margin: 0;
+    color: #667eea;
+}
+
+.btn-close-charts {
+    padding: 8px 20px;
+    background: #e0e0e0;
+    color: #555;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-close-charts:hover {
+    background: #d0d0d0;
+    transform: translateY(-1px);
+}
+
+.btn-close-charts:active {
+    transform: translateY(0);
+}
+
+/* Chart Type Tabs */
+.chart-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+}
+
+.chart-tab {
+    flex: 1;
+    min-width: 80px;
+    padding: 12px 20px;
+    background: #f5f7fa;
+    color: #555;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.chart-tab:hover:not(:disabled) {
+    background: #eef1f7;
+    border-color: #667eea;
+}
+
+.chart-tab.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-color: #667eea;
+}
+
+.chart-tab:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    background: #f5f5f5;
+}
+
+/* Chart Canvas Container */
+.chart-container {
+    position: relative;
+    width: 100%;
+    height: 500px;
+    margin-bottom: 20px;
+}
+
+.chart-container canvas {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+/* Loading Indicator */
+.chart-loading {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 10;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.1);
+}
+
+.chart-loading.show {
+    display: block;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    margin: 0 auto 15px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.chart-loading p {
+    margin: 0;
+    color: #555;
+    font-weight: 600;
+}
+
+/* Chart Info Box */
+.chart-info {
+    background: #f0f4ff;
+    border-left: 4px solid #667eea;
+    padding: 15px 20px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    color: #555;
+    line-height: 1.6;
+}
+
+.chart-info p {
+    margin: 5px 0;
+}
+
+.chart-info strong {
+    color: #667eea;
+}
+
+/* Tablet Responsiveness */
+@media (min-width: 768px) {
+    .chart-container {
+        height: 600px;
+    }
+
+    .charts-section {
+        padding: 40px;
+    }
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 600px) {
+    .show-charts-container {
+        margin-top: 20px;
+        padding-top: 15px;
+    }
+
+    .btn-show-charts {
+        padding: 12px 30px;
+        font-size: 15px;
+        width: 100%;
+    }
+
+    .charts-section {
+        padding: 20px;
+        margin-top: 30px;
+    }
+
+    .charts-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .btn-close-charts {
+        align-self: stretch;
+        padding: 10px;
+    }
+
+    .chart-tabs {
+        gap: 8px;
+    }
+
+    .chart-tab {
+        padding: 10px 15px;
+        font-size: 14px;
+        min-width: calc(50% - 4px);
+    }
+
+    .chart-container {
+        height: 400px;
+    }
+
+    .chart-info {
+        font-size: 0.85rem;
+        padding: 12px 15px;
+    }
+}
