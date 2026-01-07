@@ -4,9 +4,9 @@
 
 **⚠️ DISCLAIMER: This is an experimental web application created using Claude AI. It should NOT be used for clinical decision-making. All calculations must be verified independently before any clinical use. This tool is for educational and research purposes only.**
 
-A mobile-compatible web application for calculating paediatric growth parameters using the rcpchgrowth library from the Royal College of Paediatrics and Child Health.
+A mobile-compatible web application for calculating paediatric growth parameters using the [rcpchgrowth library](https://growth.rcpch.ac.uk/developer/rcpchgrowth/) from the Royal College of Paediatrics and Child Health.
 
-This application was "vibe-coded" using Claude AI (Anthropic) as an experimental project to explore rapid application development for paediatric tools. Whilst the underlying calculations use the validated rcpchgrowth library, the application itself has not been clinically validated or formally tested.
+This application was "vibe-coded" using Claude AI (Anthropic) as an experimental project to explore rapid application development for paediatric tools. Whilst the underlying calculations use the validated [rcpchgrowth library](https://growth.rcpch.ac.uk/developer/rcpchgrowth/), the application itself has not been clinically validated or formally tested.
 
 ## Features
 
@@ -47,7 +47,7 @@ The application supports three validated growth references:
 - **Turner Syndrome**: Syndrome-specific growth charts for girls with Turner syndrome
 - **Trisomy 21 (Down Syndrome)**: Syndrome-specific growth charts for children with Down syndrome
 
-All growth references are provided by the Royal College of Paediatrics and Child Health (RCPCH) via the rcpchgrowth library.
+All growth references are provided by the Royal College of Paediatrics and Child Health (RCPCH) via the [rcpchgrowth library](https://growth.rcpch.ac.uk/developer/rcpchgrowth/).
 
 ### User Interface
 
@@ -96,7 +96,7 @@ The application displays:
 ## Technology Stack
 
 - **Backend**: Flask 3.0.0 (Python web framework)
-- **Growth Calculations**: rcpchgrowth 4.3.8 (RCPCH validated library)
+- **Growth Calculations**: [rcpchgrowth](https://growth.rcpch.ac.uk/developer/rcpchgrowth/) 4.3.8 (RCPCH validated library)
 - **Frontend**: HTML5, CSS3, vanilla JavaScript
 - **Deployment**: Gunicorn WSGI server
 - **Design**: Mobile-first responsive approach with CSS Grid
