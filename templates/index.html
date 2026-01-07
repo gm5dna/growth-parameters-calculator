@@ -29,8 +29,13 @@
     <div class="container">
         <h1>Growth Parameters Calculator</h1>
 
-        <div class="disclaimer">
-            <strong>⚠️ Disclaimer:</strong> This is an experimental web application and should <strong>NOT</strong> be used for clinical decision-making. All calculations must be verified independently before any clinical use. This tool is for educational and research purposes only.
+        <div class="disclaimer" id="disclaimer">
+            <div style="display: flex; justify-content: space-between; align-items: start;">
+                <div>
+                    <strong>⚠️ Disclaimer:</strong> This is an experimental web application and should <strong>NOT</strong> be used for clinical decision-making. All calculations must be verified independently before any clinical use. This tool is for educational and research purposes only.
+                </div>
+                <button type="button" id="dismiss-disclaimer" style="margin-left: 10px; padding: 2px 8px; font-size: 12px; cursor: pointer; background: transparent; border: 1px solid rgba(0,0,0,0.2); border-radius: 3px; color: inherit;">Dismiss</button>
+            </div>
         </div>
 
         <form id="growthForm">

@@ -278,6 +278,12 @@ document.getElementById('resetBtn').addEventListener('click', () => {
     // Reset measurement date to today
     document.getElementById('measurement_date').valueAsDate = new Date();
 
+    // Reset parental height unit toggles to cm (default)
+    document.getElementById('maternal-height-cm').style.display = 'block';
+    document.getElementById('maternal-height-ft').style.display = 'none';
+    document.getElementById('paternal-height-cm').style.display = 'block';
+    document.getElementById('paternal-height-ft').style.display = 'none';
+
     // Hide and reset charts
     document.getElementById('charts-section').classList.remove('show');
     document.getElementById('show-charts-container').classList.remove('show');
@@ -337,6 +343,21 @@ document.querySelectorAll('input[name="paternal_height_units"]').forEach(radio =
 
 // Set measurement date to today on page load
 document.getElementById('measurement_date').valueAsDate = new Date();
+
+// Disclaimer dismiss functionality
+const disclaimerElement = document.getElementById('disclaimer');
+const dismissButton = document.getElementById('dismiss-disclaimer');
+
+// Check if disclaimer was previously dismissed
+if (localStorage.getItem('disclaimerDismissed') === 'true') {
+    disclaimerElement.style.display = 'none';
+}
+
+// Handle dismiss button click
+dismissButton.addEventListener('click', () => {
+    disclaimerElement.style.display = 'none';
+    localStorage.setItem('disclaimerDismissed', 'true');
+});
 
 // GH Dose adjustment functions
 function updateGHDoseEquivalent(mgPerDay) {
