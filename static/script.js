@@ -644,6 +644,50 @@ function renderGrowthChart(canvas, centiles, patientData, measurementMethod) {
         word.charAt(0).toUpperCase() + word.slice(1)
     ).join(' ');
 
+    // Custom plugin to draw centile labels
+    const centileLabelsPlugin = {
+        id: 'centileLabels',
+        afterDatasetsDraw: function(chart) {
+            const ctx = chart.ctx;
+            const xScale = chart.scales.x;
+            const yScale = chart.scales.y;
+
+            // Get the rightmost x position (near the right edge)
+            const xMax = xScale.max;
+            const labelX = xScale.getPixelForValue(xMax);
+
+            // Draw labels for each centile line
+            chart.data.datasets.forEach((dataset) => {
+                // Only label centile lines (not patient measurements)
+                if (!dataset.label.includes('Measurement')) {
+                    // Get the last point of the line
+                    const data = dataset.data;
+                    if (data && data.length > 0) {
+                        const lastPoint = data[data.length - 1];
+                        const yPos = yScale.getPixelForValue(lastPoint.y);
+
+                        // Extract centile number from label
+                        const centileMatch = dataset.label.match(/([\d.]+)th/);
+                        if (centileMatch) {
+                            const centileText = centileMatch[1];
+
+                            // Set text style
+                            ctx.save();
+                            ctx.font = 'bold 11px sans-serif';
+                            ctx.fillStyle = centileColor;
+                            ctx.textAlign = 'left';
+                            ctx.textBaseline = 'middle';
+
+                            // Draw label slightly to the right of the line
+                            ctx.fillText(centileText, labelX + 5, yPos);
+                            ctx.restore();
+                        }
+                    }
+                }
+            });
+        }
+    };
+
     // Create Chart.js chart
     const chart = new Chart(canvas, {
         type: 'line',
@@ -688,6 +732,7 @@ function renderGrowthChart(canvas, centiles, patientData, measurementMethod) {
                     padding: { top: 10, bottom: 20 }
                 }
             },
+            plugins: [centileLabelsPlugin],
             scales: {
                 x: {
                     type: 'linear',
