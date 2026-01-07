@@ -41,9 +41,10 @@ This application was "vibe-coded" using Claude AI (Anthropic) as an experimental
 
 ### Growth References
 
-The application supports three validated growth references:
+The application supports four validated growth references:
 
 - **UK-WHO (Standard)**: Combined UK90 and WHO growth charts - standard reference for the general UK paediatric population
+- **CDC (US)**: Centers for Disease Control and Prevention growth charts - standard reference for the US paediatric population
 - **Turner Syndrome**: Syndrome-specific growth charts for girls with Turner syndrome
 - **Trisomy 21 (Down Syndrome)**: Syndrome-specific growth charts for children with Down syndrome
 
@@ -60,7 +61,7 @@ All growth references are provided by the Royal College of Paediatrics and Child
 - **Hover tooltips** - Interactive details on patient measurements only
 - **Fully responsive** - Optimized viewing on mobile, tablet, and desktop devices
 - **Powered by Chart.js** - Smooth, interactive charts
-- **Reference-specific** - Charts match the selected growth reference (UK-WHO, Turner, Trisomy 21)
+- **Reference-specific** - Charts match the selected growth reference (UK-WHO, CDC, Turner, Trisomy 21)
 
 ### User Interface
 
@@ -75,9 +76,22 @@ All growth references are provided by the Royal College of Paediatrics and Child
 1. **Sex** - Select male or female
 2. **Date of Birth** - Patient's date of birth
 3. **Measurement Date** - Date of current measurements (defaults to today)
-4. **Weight** - Current weight in kg
-5. **Height** - Current height in cm
-6. **Growth Reference** - UK-WHO (Standard), Turner Syndrome, or Trisomy 21
+4. **Growth Reference** - UK-WHO (Standard), CDC (US), Turner Syndrome, or Trisomy 21
+5. **At least one measurement** - Weight, height, or OFC (see below)
+
+### Measurements
+
+**At least one of the following measurements is required:**
+
+- **Weight** - Current weight in kg
+- **Height** - Current height in cm
+- **OFC (Head Circumference)** - Occipitofrontal circumference in cm
+
+**Notes:**
+- The calculator will perform calculations and display results only for the measurements provided
+- BMI calculation requires both weight and height
+- Body Surface Area (BSA) and GH dose calculator require both weight and height
+- Growth charts will only show tabs for measurements that were provided
 
 ### Optional Inputs
 
@@ -91,27 +105,27 @@ All growth references are provided by the Royal College of Paediatrics and Child
 - Paternal height
 - Can be entered in cm or feet/inches
 
-**Head Circumference**:
-- OFC (Occipitofrontal Circumference) in cm
-
 ### Results
 
 The application displays:
 - **Age**: Calendar format (e.g., "5y 3m 12d") with decimal years in parentheses
-- **Basic Parameters**: Weight, height, and BMI with centiles and SDS values
+- **Measurements Provided**: Only the measurements that were entered will be displayed with their centiles and SDS values:
+  - Weight (kg) - if provided
+  - Height (cm) - if provided
+  - BMI (kg/m²) - if both weight and height provided
+  - OFC / Head circumference (cm) - if provided
 - **Validation Warnings**: Advisory alerts for extreme SDS values (>±4) encouraging measurement verification
-- **Height Velocity**: Annualised growth rate (cm/year) if previous height data provided
-- **Body Surface Area**: Calculated using Boyd formula
-- **GH Dose Calculator**: Interactive dose adjuster starting at 7 mg/m²/week with variable increment sizing, showing both mg/m²/week and mcg/kg/day
-- **Mid-Parental Height**: Target height with centile and expected adult height range
-- **OFC**: Head circumference centile and SDS if provided
+- **Height Velocity**: Annualised growth rate (cm/year) if height and previous height data provided
+- **Body Surface Area**: Calculated using Boyd formula if both weight and height provided
+- **GH Dose Calculator**: Interactive dose adjuster starting at 7 mg/m²/week (requires both weight and height)
+- **Mid-Parental Height**: Target height with centile and expected adult height range (if parental heights provided)
 
 ### Viewing Growth Charts
 
 After calculating growth parameters:
 
 1. Click the **"Show Growth Charts"** button below the results
-2. Charts section opens with the height chart displayed by default
+2. Charts section opens with the first available chart displayed
 3. Click tabs to switch between **Height**, **Weight**, **BMI**, and **OFC** charts
 4. **Centile lines** are color-coded: blue for boys, pink for girls
 5. **50th centile** is shown with a heavier line weight
@@ -119,7 +133,11 @@ After calculating growth parameters:
 7. Hover over **patient measurements** (small dots) to see detailed tooltips
 8. Click **"Close Charts"** to collapse back to results view
 
-**Note**: The OFC tab will be disabled if head circumference was not provided in the calculation.
+**Note**: Chart tabs will only be enabled for measurements that were provided:
+- **Height tab**: Enabled only if height was provided
+- **Weight tab**: Enabled only if weight was provided
+- **BMI tab**: Enabled only if both height and weight were provided
+- **OFC tab**: Enabled only if head circumference was provided
 
 ## Technology Stack
 

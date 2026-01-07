@@ -34,13 +34,23 @@ document.getElementById('growthForm').addEventListener('submit', async (e) => {
     const maternalHeightCm = getParentalHeightInCm('maternal');
     const paternalHeightCm = getParentalHeightInCm('paternal');
 
+    const weight = document.getElementById('weight').value;
+    const height = document.getElementById('height').value;
+    const ofc = document.getElementById('ofc').value;
+
+    // Validate that at least one measurement is provided
+    if (!weight && !height && !ofc) {
+        showError('At least one measurement (weight, height, or OFC) is required.');
+        return;
+    }
+
     const formData = {
         sex: document.querySelector('input[name="sex"]:checked')?.value,
         birth_date: document.getElementById('birth_date').value,
         measurement_date: document.getElementById('measurement_date').value,
-        weight: document.getElementById('weight').value,
-        height: document.getElementById('height').value,
-        ofc: document.getElementById('ofc').value,
+        weight: weight,
+        height: height,
+        ofc: ofc,
         previous_date: document.getElementById('previous_date').value,
         previous_height: document.getElementById('previous_height').value,
         maternal_height: maternalHeightCm,
@@ -95,17 +105,38 @@ function displayResults(results) {
     const ageElement = document.getElementById('age');
     ageElement.innerHTML = `${calendarAge.years}y ${calendarAge.months}m ${calendarAge.days}d<br><span style="font-size: 0.8em; color: #666;">(${results.age_years} years)</span>`;
 
-    document.getElementById('weight-value').textContent = `${results.weight.value} kg`;
-    document.getElementById('weight-centile').textContent = results.weight.centile !== null ? `${results.weight.centile}%` : 'N/A';
-    document.getElementById('weight-sds').textContent = results.weight.sds !== null ? results.weight.sds : 'N/A';
+    // Display weight if provided
+    const weightItem = document.getElementById('weight-item');
+    if (results.weight !== null) {
+        document.getElementById('weight-value').textContent = `${results.weight.value} kg`;
+        document.getElementById('weight-centile').textContent = results.weight.centile !== null ? `${results.weight.centile}%` : 'N/A';
+        document.getElementById('weight-sds').textContent = results.weight.sds !== null ? results.weight.sds : 'N/A';
+        weightItem.style.display = 'block';
+    } else {
+        weightItem.style.display = 'none';
+    }
 
-    document.getElementById('height-value').textContent = `${results.height.value} cm`;
-    document.getElementById('height-centile').textContent = results.height.centile !== null ? `${results.height.centile}%` : 'N/A';
-    document.getElementById('height-sds').textContent = results.height.sds !== null ? results.height.sds : 'N/A';
+    // Display height if provided
+    const heightItem = document.getElementById('height-item');
+    if (results.height !== null) {
+        document.getElementById('height-value').textContent = `${results.height.value} cm`;
+        document.getElementById('height-centile').textContent = results.height.centile !== null ? `${results.height.centile}%` : 'N/A';
+        document.getElementById('height-sds').textContent = results.height.sds !== null ? results.height.sds : 'N/A';
+        heightItem.style.display = 'block';
+    } else {
+        heightItem.style.display = 'none';
+    }
 
-    document.getElementById('bmi-value').textContent = `${results.bmi.value} kg/m²`;
-    document.getElementById('bmi-centile').textContent = results.bmi.centile !== null ? `${results.bmi.centile}%` : 'N/A';
-    document.getElementById('bmi-sds').textContent = results.bmi.sds !== null ? results.bmi.sds : 'N/A';
+    // Display BMI if calculated
+    const bmiItem = document.getElementById('bmi-item');
+    if (results.bmi !== null) {
+        document.getElementById('bmi-value').textContent = `${results.bmi.value} kg/m²`;
+        document.getElementById('bmi-centile').textContent = results.bmi.centile !== null ? `${results.bmi.centile}%` : 'N/A';
+        document.getElementById('bmi-sds').textContent = results.bmi.sds !== null ? results.bmi.sds : 'N/A';
+        bmiItem.style.display = 'block';
+    } else {
+        bmiItem.style.display = 'none';
+    }
 
     // Display OFC if provided
     const ofcItem = document.getElementById('ofc-item');
@@ -141,7 +172,7 @@ function displayResults(results) {
 
     // Display GH dose with interactive adjuster
     const ghDoseItem = document.getElementById('gh-dose-item');
-    if (results.gh_dose !== null && results.bsa !== null) {
+    if (results.gh_dose !== null && results.bsa !== null && results.weight !== null) {
         // Store BSA and weight for recalculation
         window.currentBSA = results.bsa;
         window.currentWeight = results.weight.value;
@@ -386,8 +417,40 @@ document.getElementById('showChartsBtn').addEventListener('click', () => {
     // Hide the show charts button
     document.getElementById('show-charts-container').style.display = 'none';
 
-    // Disable OFC tab if OFC not provided
+    // Disable tabs for measurements that were not provided
+    const heightTab = document.querySelector('.chart-tab[data-measurement="height"]');
+    const weightTab = document.querySelector('.chart-tab[data-measurement="weight"]');
+    const bmiTab = document.querySelector('.chart-tab[data-measurement="bmi"]');
     const ofcTab = document.querySelector('.chart-tab[data-measurement="ofc"]');
+
+    // Height tab
+    if (!currentPatientData.measurements.height || currentPatientData.measurements.height.value === null) {
+        heightTab.disabled = true;
+        heightTab.title = 'Height not provided in calculation';
+    } else {
+        heightTab.disabled = false;
+        heightTab.title = '';
+    }
+
+    // Weight tab
+    if (!currentPatientData.measurements.weight || currentPatientData.measurements.weight.value === null) {
+        weightTab.disabled = true;
+        weightTab.title = 'Weight not provided in calculation';
+    } else {
+        weightTab.disabled = false;
+        weightTab.title = '';
+    }
+
+    // BMI tab (requires both height and weight)
+    if (!currentPatientData.measurements.bmi || currentPatientData.measurements.bmi.value === null) {
+        bmiTab.disabled = true;
+        bmiTab.title = 'BMI requires both height and weight';
+    } else {
+        bmiTab.disabled = false;
+        bmiTab.title = '';
+    }
+
+    // OFC tab
     if (!currentPatientData.measurements.ofc || currentPatientData.measurements.ofc.value === null) {
         ofcTab.disabled = true;
         ofcTab.title = 'OFC not provided in calculation';
@@ -396,12 +459,13 @@ document.getElementById('showChartsBtn').addEventListener('click', () => {
         ofcTab.title = '';
     }
 
-    // Reset to height tab
-    document.querySelectorAll('.chart-tab').forEach(t => t.classList.remove('active'));
-    document.querySelector('.chart-tab[data-measurement="height"]').classList.add('active');
-
-    // Load height chart by default
-    loadChart('height');
+    // Find first enabled tab and load it by default
+    const firstEnabledTab = document.querySelector('.chart-tab:not([disabled])');
+    if (firstEnabledTab) {
+        document.querySelectorAll('.chart-tab').forEach(t => t.classList.remove('active'));
+        firstEnabledTab.classList.add('active');
+        loadChart(firstEnabledTab.dataset.measurement);
+    }
 
     // Scroll to charts section
     document.getElementById('charts-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -415,9 +479,13 @@ document.getElementById('closeChartsBtn').addEventListener('click', () => {
     // Show the show charts button again
     document.getElementById('show-charts-container').style.display = 'block';
 
-    // Destroy chart instance to free memory
+    // Destroy chart instance to free memory safely
     if (currentChartInstance) {
-        currentChartInstance.destroy();
+        try {
+            currentChartInstance.destroy();
+        } catch (e) {
+            console.error('Error destroying chart on close:', e);
+        }
         currentChartInstance = null;
     }
 
@@ -456,10 +524,20 @@ async function loadChart(measurementMethod) {
     loadingEl.classList.add('show');
 
     try {
-        // Destroy existing chart instance
+        // Destroy existing chart instance safely
         if (currentChartInstance) {
-            currentChartInstance.destroy();
+            try {
+                currentChartInstance.destroy();
+            } catch (e) {
+                console.error('Error destroying chart:', e);
+            }
             currentChartInstance = null;
+        }
+
+        // Clear the canvas
+        const ctx = canvasEl.getContext('2d');
+        if (ctx) {
+            ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
         }
 
         // Fetch chart data from backend
@@ -520,12 +598,14 @@ function preparePatientData(measurementMethod) {
         return patientPoints;
     }
 
-    // Add current measurement point
+    // Add current measurement point with centile and SDS
     patientPoints.push({
         x: currentPatientData.age,
         y: measurement.value,
         label: 'Current',
-        isCurrent: true
+        isCurrent: true,
+        centile: measurement.centile,
+        sds: measurement.sds
     });
 
     // Add previous measurement (currently only available for height)
@@ -544,7 +624,9 @@ function preparePatientData(measurementMethod) {
                 x: diffYears,
                 y: currentPatientData.previousMeasurements.height,
                 label: 'Previous',
-                isCurrent: false
+                isCurrent: false,
+                centile: null,  // Previous measurements don't have centile data
+                sds: null
             });
         }
     }
@@ -596,7 +678,12 @@ function renderGrowthChart(canvas, centiles, patientData, measurementMethod) {
         if (currentPoints.length > 0) {
             datasets.push({
                 label: 'Current Measurement',
-                data: currentPoints.map(p => ({x: p.x, y: p.y})),
+                data: currentPoints.map(p => ({
+                    x: p.x,
+                    y: p.y,
+                    centile: p.centile,
+                    sds: p.sds
+                })),
                 backgroundColor: centileColor,
                 borderColor: '#ffffff',
                 borderWidth: 2,
@@ -610,7 +697,12 @@ function renderGrowthChart(canvas, centiles, patientData, measurementMethod) {
         if (previousPoints.length > 0) {
             datasets.push({
                 label: 'Previous Measurement',
-                data: previousPoints.map(p => ({x: p.x, y: p.y})),
+                data: previousPoints.map(p => ({
+                    x: p.x,
+                    y: p.y,
+                    centile: p.centile,
+                    sds: p.sds
+                })),
                 backgroundColor: '#f6ad55',
                 borderColor: '#ffffff',
                 borderWidth: 2,
@@ -644,49 +736,6 @@ function renderGrowthChart(canvas, centiles, patientData, measurementMethod) {
         word.charAt(0).toUpperCase() + word.slice(1)
     ).join(' ');
 
-    // Custom plugin to draw centile labels
-    const centileLabelsPlugin = {
-        id: 'centileLabels',
-        afterDatasetsDraw: function(chart) {
-            const ctx = chart.ctx;
-            const xScale = chart.scales.x;
-            const yScale = chart.scales.y;
-
-            // Get the rightmost x position (near the right edge)
-            const xMax = xScale.max;
-            const labelX = xScale.getPixelForValue(xMax);
-
-            // Draw labels for each centile line
-            chart.data.datasets.forEach((dataset) => {
-                // Only label centile lines (not patient measurements)
-                if (!dataset.label.includes('Measurement')) {
-                    // Get the last point of the line
-                    const data = dataset.data;
-                    if (data && data.length > 0) {
-                        const lastPoint = data[data.length - 1];
-                        const yPos = yScale.getPixelForValue(lastPoint.y);
-
-                        // Extract centile number from label
-                        const centileMatch = dataset.label.match(/([\d.]+)th/);
-                        if (centileMatch) {
-                            const centileText = centileMatch[1];
-
-                            // Set text style
-                            ctx.save();
-                            ctx.font = 'bold 11px sans-serif';
-                            ctx.fillStyle = centileColor;
-                            ctx.textAlign = 'left';
-                            ctx.textBaseline = 'middle';
-
-                            // Draw label slightly to the right of the line
-                            ctx.fillText(centileText, labelX + 5, yPos);
-                            ctx.restore();
-                        }
-                    }
-                }
-            });
-        }
-    };
 
     // Create Chart.js chart
     const chart = new Chart(canvas, {
@@ -696,28 +745,37 @@ function renderGrowthChart(canvas, centiles, patientData, measurementMethod) {
             responsive: true,
             maintainAspectRatio: false,
             interaction: {
-                mode: 'nearest',
-                axis: 'x',
-                intersect: false
+                mode: 'point',
+                intersect: true
             },
             plugins: {
                 legend: {
                     display: false
                 },
                 tooltip: {
+                    enabled: true,
                     backgroundColor: 'rgba(0, 0, 0, 0.8)',
                     padding: 12,
                     titleFont: { size: 14, weight: 'bold' },
                     bodyFont: { size: 13 },
                     filter: function(tooltipItem) {
                         // Only show tooltips for patient measurements
+                        if (!tooltipItem || !tooltipItem.dataset || !tooltipItem.dataset.label) {
+                            return false;
+                        }
                         return tooltipItem.dataset.label.includes('Measurement');
                     },
                     callbacks: {
                         title: function(context) {
+                            if (!context || context.length === 0 || !context[0].dataset) {
+                                return '';
+                            }
                             return context[0].dataset.label;
                         },
                         label: function(context) {
+                            if (!context || !context.parsed) {
+                                return '';
+                            }
                             const age = context.parsed.x.toFixed(2);
                             const value = context.parsed.y.toFixed(1);
                             return `Age: ${age} years, ${labels.y}: ${value}`;
@@ -732,7 +790,6 @@ function renderGrowthChart(canvas, centiles, patientData, measurementMethod) {
                     padding: { top: 10, bottom: 20 }
                 }
             },
-            plugins: [centileLabelsPlugin],
             scales: {
                 x: {
                     type: 'linear',

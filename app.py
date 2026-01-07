@@ -104,13 +104,23 @@ def calculate():
     try:
         data = request.json
 
-        # Parse input data
-        weight = float(data['weight'])
-        height = float(data['height'])
+        # Parse required input data
         birth_date = datetime.strptime(data['birth_date'], '%Y-%m-%d').date()
         measurement_date = datetime.strptime(data['measurement_date'], '%Y-%m-%d').date()
         sex = data['sex']
         reference = data.get('reference', 'uk-who')
+
+        # Optional measurements - height, weight, OFC
+        weight = float(data['weight']) if data.get('weight') else None
+        height = float(data['height']) if data.get('height') else None
+        ofc = float(data.get('ofc', 0)) if data.get('ofc') else None
+
+        # Validate that at least one measurement is provided
+        if not any([weight, height, ofc]):
+            return jsonify({
+                'success': False,
+                'error': 'At least one measurement (weight, height, or OFC) is required.'
+            }), 400
 
         # Optional previous height data
         previous_height = float(data.get('previous_height', 0)) if data.get('previous_height') else None
@@ -120,42 +130,47 @@ def calculate():
         maternal_height = float(data.get('maternal_height', 0)) if data.get('maternal_height') else None
         paternal_height = float(data.get('paternal_height', 0)) if data.get('paternal_height') else None
 
-        # Optional OFC (head circumference)
-        ofc = float(data.get('ofc', 0)) if data.get('ofc') else None
-
         # Calculate age
         age_decimal, calendar_age = calculate_age_in_years(birth_date, measurement_date)
 
-        # Create measurement objects using selected reference
-        weight_measurement = Measurement(
-            sex=sex,
-            birth_date=birth_date,
-            observation_date=measurement_date,
-            measurement_method='weight',
-            observation_value=weight,
-            reference=reference
-        )
+        # Create measurement objects only for provided values
+        weight_measurement = None
+        height_measurement = None
+        bmi_measurement = None
+        ofc_measurement = None
 
-        height_measurement = Measurement(
-            sex=sex,
-            birth_date=birth_date,
-            observation_date=measurement_date,
-            measurement_method='height',
-            observation_value=height,
-            reference=reference
-        )
+        if weight:
+            weight_measurement = Measurement(
+                sex=sex,
+                birth_date=birth_date,
+                observation_date=measurement_date,
+                measurement_method='weight',
+                observation_value=weight,
+                reference=reference
+            )
 
-        bmi_measurement = Measurement(
-            sex=sex,
-            birth_date=birth_date,
-            observation_date=measurement_date,
-            measurement_method='bmi',
-            observation_value=weight / ((height / 100) ** 2),
-            reference=reference
-        )
+        if height:
+            height_measurement = Measurement(
+                sex=sex,
+                birth_date=birth_date,
+                observation_date=measurement_date,
+                measurement_method='height',
+                observation_value=height,
+                reference=reference
+            )
+
+        # BMI requires both weight and height
+        if weight and height:
+            bmi_measurement = Measurement(
+                sex=sex,
+                birth_date=birth_date,
+                observation_date=measurement_date,
+                measurement_method='bmi',
+                observation_value=weight / ((height / 100) ** 2),
+                reference=reference
+            )
 
         # Calculate OFC if provided
-        ofc_measurement = None
         if ofc:
             ofc_measurement = Measurement(
                 sex=sex,
@@ -166,16 +181,20 @@ def calculate():
                 reference=reference
             )
 
-        # Calculate height velocity if previous data available
+        # Calculate height velocity if height and previous data available
         height_velocity = None
-        if previous_height and previous_date:
+        if height and previous_height and previous_date:
             height_velocity = calculate_height_velocity(height, previous_height, measurement_date, previous_date)
 
-        # Calculate BSA
-        bsa = calculate_boyd_bsa(weight, height)
+        # Calculate BSA (requires both weight and height)
+        bsa = None
+        if weight and height:
+            bsa = calculate_boyd_bsa(weight, height)
 
-        # Calculate GH dose for 7 mg/m2/week
-        gh_dose = calculate_gh_dose(bsa, weight)
+        # Calculate GH dose for 7 mg/m2/week (requires BSA and weight)
+        gh_dose = None
+        if bsa and weight:
+            gh_dose = calculate_gh_dose(bsa, weight)
 
         # Calculate mid-parental height if parental heights provided
         mph_data = None
@@ -227,16 +246,24 @@ def calculate():
                 'target_range_upper': round(upper_height, 1)
             }
 
-        # Extract calculated values
-        weight_calc = weight_measurement.measurement['measurement_calculated_values']
-        height_calc = height_measurement.measurement['measurement_calculated_values']
-        bmi_calc = bmi_measurement.measurement['measurement_calculated_values']
-        bmi_value = bmi_measurement.measurement['child_observation_value']['observation_value']
+        # Extract calculated values only for measurements that were performed
+        weight_calc = None
+        height_calc = None
+        bmi_calc = None
+        bmi_value = None
+
+        if weight_measurement:
+            weight_calc = weight_measurement.measurement['measurement_calculated_values']
+        if height_measurement:
+            height_calc = height_measurement.measurement['measurement_calculated_values']
+        if bmi_measurement:
+            bmi_calc = bmi_measurement.measurement['measurement_calculated_values']
+            bmi_value = bmi_measurement.measurement['child_observation_value']['observation_value']
 
         # Get SDS values for validation
-        weight_sds = float(weight_calc['corrected_sds']) if weight_calc['corrected_sds'] else None
-        height_sds = float(height_calc['corrected_sds']) if height_calc['corrected_sds'] else None
-        bmi_sds = float(bmi_calc['corrected_sds']) if bmi_calc['corrected_sds'] else None
+        weight_sds = float(weight_calc['corrected_sds']) if weight_calc and weight_calc['corrected_sds'] else None
+        height_sds = float(height_calc['corrected_sds']) if height_calc and height_calc['corrected_sds'] else None
+        bmi_sds = float(bmi_calc['corrected_sds']) if bmi_calc and bmi_calc['corrected_sds'] else None
 
         # Validate SDS values - Height, Weight, OFC
         # Hard cut-off at +/-8 SDS (reject)
@@ -292,25 +319,25 @@ def calculate():
                 'sds': round(ofc_sds, 2) if ofc_sds else None
             }
 
-        # Prepare results
+        # Prepare results - only include data for measurements that were provided
         results = {
             'age_years': round(age_decimal, 2),
             'age_calendar': calendar_age,
             'weight': {
                 'value': weight,
-                'centile': round(float(weight_calc['corrected_centile']), 2) if weight_calc['corrected_centile'] else None,
-                'sds': round(weight_sds, 2) if weight_sds else None
-            },
+                'centile': round(float(weight_calc['corrected_centile']), 2) if weight_calc and weight_calc['corrected_centile'] else None,
+                'sds': round(weight_sds, 2) if weight_sds is not None else None
+            } if weight else None,
             'height': {
                 'value': height,
-                'centile': round(float(height_calc['corrected_centile']), 2) if height_calc['corrected_centile'] else None,
-                'sds': round(height_sds, 2) if height_sds else None
-            },
+                'centile': round(float(height_calc['corrected_centile']), 2) if height_calc and height_calc['corrected_centile'] else None,
+                'sds': round(height_sds, 2) if height_sds is not None else None
+            } if height else None,
             'bmi': {
-                'value': round(float(bmi_value), 1),
-                'centile': round(float(bmi_calc['corrected_centile']), 2) if bmi_calc['corrected_centile'] else None,
-                'sds': round(bmi_sds, 2) if bmi_sds else None
-            },
+                'value': round(float(bmi_value), 1) if bmi_value else None,
+                'centile': round(float(bmi_calc['corrected_centile']), 2) if bmi_calc and bmi_calc['corrected_centile'] else None,
+                'sds': round(bmi_sds, 2) if bmi_sds is not None else None
+            } if bmi_measurement else None,
             'ofc': ofc_data,
             'height_velocity': height_velocity,
             'bsa': bsa,
