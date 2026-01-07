@@ -4,9 +4,9 @@ function feetInchesToCm(feet, inches) {
     return totalInches * 2.54;
 }
 
-// Get parental height in cm based on selected units
+// Get parental height in cm based on selected units (independent for each parent)
 function getParentalHeightInCm(parent) {
-    const units = document.querySelector('input[name="height_units"]:checked')?.value;
+    const units = document.querySelector(`input[name="${parent}_height_units"]:checked`)?.value;
 
     if (units === 'ft_in') {
         const feet = document.getElementById(`${parent}_height_ft`).value;
@@ -309,23 +309,30 @@ document.getElementById('resetBtn').addEventListener('click', () => {
     };
 });
 
-// Toggle between cm and ft/in inputs for parental heights
-function toggleHeightUnits() {
-    const units = document.querySelector('input[name="height_units"]:checked')?.value;
+// Toggle between cm and ft/in inputs for parental heights (independent for each parent)
+function toggleMaternalHeightUnits() {
+    const units = document.querySelector('input[name="maternal_height_units"]:checked')?.value;
     const isCm = units === 'cm';
 
-    // Toggle maternal height inputs
     document.getElementById('maternal-height-cm').style.display = isCm ? 'block' : 'none';
     document.getElementById('maternal-height-ft').style.display = isCm ? 'none' : 'block';
+}
 
-    // Toggle paternal height inputs
+function togglePaternalHeightUnits() {
+    const units = document.querySelector('input[name="paternal_height_units"]:checked')?.value;
+    const isCm = units === 'cm';
+
     document.getElementById('paternal-height-cm').style.display = isCm ? 'block' : 'none';
     document.getElementById('paternal-height-ft').style.display = isCm ? 'none' : 'block';
 }
 
-// Add event listeners to height unit radio buttons
-document.querySelectorAll('input[name="height_units"]').forEach(radio => {
-    radio.addEventListener('change', toggleHeightUnits);
+// Add event listeners to height unit radio buttons for each parent
+document.querySelectorAll('input[name="maternal_height_units"]').forEach(radio => {
+    radio.addEventListener('change', toggleMaternalHeightUnits);
+});
+
+document.querySelectorAll('input[name="paternal_height_units"]').forEach(radio => {
+    radio.addEventListener('change', togglePaternalHeightUnits);
 });
 
 // Set measurement date to today on page load

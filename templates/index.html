@@ -101,55 +101,65 @@
 
             <div class="section-header">Parental Heights (Optional)</div>
 
-            <div class="form-group full-width">
-                <label>Height Units:</label>
-                <div class="radio-group">
-                    <label class="radio-label">
-                        <input type="radio" name="height_units" value="cm" checked>
-                        <span>cm</span>
-                    </label>
-                    <label class="radio-label">
-                        <input type="radio" name="height_units" value="ft_in">
-                        <span>ft/in</span>
-                    </label>
-                </div>
-            </div>
-
             <div class="form-grid">
-                <div id="maternal-height-cm" class="form-group">
-                    <label for="maternal_height">Maternal Height (cm):</label>
-                    <input type="number" id="maternal_height" name="maternal_height" step="0.1" min="0">
-                </div>
-
-                <div id="maternal-height-ft" class="form-group" style="display: none;">
-                    <label>Maternal Height:</label>
-                    <div class="height-ft-in">
-                        <div class="height-input-group">
-                            <input type="number" id="maternal_height_ft" min="0" max="8" placeholder="ft">
-                            <span class="unit-label">ft</span>
+                <div class="form-group">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <label for="maternal_height" style="margin-bottom: 0;">Maternal Height:</label>
+                        <div class="radio-group" style="margin: 0;">
+                            <label class="radio-label">
+                                <input type="radio" name="maternal_height_units" value="cm" checked>
+                                <span>cm</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="maternal_height_units" value="ft_in">
+                                <span>ft/in</span>
+                            </label>
                         </div>
-                        <div class="height-input-group">
-                            <input type="number" id="maternal_height_in" min="0" max="11" step="0.1" placeholder="in">
-                            <span class="unit-label">in</span>
+                    </div>
+                    <div id="maternal-height-cm">
+                        <input type="number" id="maternal_height" name="maternal_height" step="0.1" min="0">
+                    </div>
+                    <div id="maternal-height-ft" style="display: none;">
+                        <div class="height-ft-in">
+                            <div class="height-input-group">
+                                <input type="number" id="maternal_height_ft" min="0" max="8" placeholder="ft">
+                                <span class="unit-label">ft</span>
+                            </div>
+                            <div class="height-input-group">
+                                <input type="number" id="maternal_height_in" min="0" max="11" step="0.1" placeholder="in">
+                                <span class="unit-label">in</span>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div id="paternal-height-cm" class="form-group">
-                    <label for="paternal_height">Paternal Height (cm):</label>
-                    <input type="number" id="paternal_height" name="paternal_height" step="0.1" min="0">
-                </div>
-
-                <div id="paternal-height-ft" class="form-group" style="display: none;">
-                    <label>Paternal Height:</label>
-                    <div class="height-ft-in">
-                        <div class="height-input-group">
-                            <input type="number" id="paternal_height_ft" min="0" max="8" placeholder="ft">
-                            <span class="unit-label">ft</span>
+                <div class="form-group">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <label for="paternal_height" style="margin-bottom: 0;">Paternal Height:</label>
+                        <div class="radio-group" style="margin: 0;">
+                            <label class="radio-label">
+                                <input type="radio" name="paternal_height_units" value="cm" checked>
+                                <span>cm</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="paternal_height_units" value="ft_in">
+                                <span>ft/in</span>
+                            </label>
                         </div>
-                        <div class="height-input-group">
-                            <input type="number" id="paternal_height_in" min="0" max="11" step="0.1" placeholder="in">
-                            <span class="unit-label">in</span>
+                    </div>
+                    <div id="paternal-height-cm">
+                        <input type="number" id="paternal_height" name="paternal_height" step="0.1" min="0">
+                    </div>
+                    <div id="paternal-height-ft" style="display: none;">
+                        <div class="height-ft-in">
+                            <div class="height-input-group">
+                                <input type="number" id="paternal_height_ft" min="0" max="8" placeholder="ft">
+                                <span class="unit-label">ft</span>
+                            </div>
+                            <div class="height-input-group">
+                                <input type="number" id="paternal_height_in" min="0" max="11" step="0.1" placeholder="in">
+                                <span class="unit-label">in</span>
+                            </div>
                         </div>
                     </div>
                 </div>
