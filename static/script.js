@@ -206,7 +206,9 @@ function displayResults(results) {
     };
 
     // Show "Show Charts" button
-    document.getElementById('show-charts-container').classList.add('show');
+    const showChartsContainer = document.getElementById('show-charts-container');
+    showChartsContainer.classList.add('show');
+    showChartsContainer.style.display = '';  // Reset inline style
 
     // Hide charts section if it was previously open
     document.getElementById('charts-section').classList.remove('show');
