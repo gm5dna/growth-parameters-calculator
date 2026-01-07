@@ -766,6 +766,8 @@ function renderGrowthChart(canvas, centiles, patientData, measurementMethod) {
     if (measurementMethod === 'height' && calculationResults && calculationResults.mid_parental_height) {
         const mph = calculationResults.mid_parental_height;
         const targetAge = 18; // Adult height target at age 18
+        // Use complementary colors that stand out clearly (dark teal for boys, dark magenta for girls)
+        const mphColor = sex === 'male' ? '#059669' : '#a21caf';
 
         // Ensure all required values are present
         if (mph.target_range_lower && mph.target_range_upper && mph.mid_parental_height) {
@@ -776,14 +778,11 @@ function renderGrowthChart(canvas, centiles, patientData, measurementMethod) {
                     { x: targetAge, y: parseFloat(mph.target_range_lower) },
                     { x: targetAge, y: parseFloat(mph.target_range_upper) }
                 ],
-                borderColor: '#dc2626', // Red color for target range
+                borderColor: mphColor,
                 backgroundColor: 'transparent',
                 borderWidth: 2,
-                pointRadius: 3,
-                pointHoverRadius: 6,
-                pointBackgroundColor: '#dc2626',
-                pointBorderColor: '#ffffff',
-                pointBorderWidth: 1,
+                pointRadius: 0,
+                pointHoverRadius: 0,
                 showLine: true,
                 tension: 0
             });
@@ -797,12 +796,12 @@ function renderGrowthChart(canvas, centiles, patientData, measurementMethod) {
                     { x: targetAge, y: parseFloat(mph.mid_parental_height) },
                     { x: targetAge + 0.3, y: parseFloat(mph.mid_parental_height) }
                 ],
-                borderColor: '#dc2626', // Red color
+                borderColor: mphColor,
                 backgroundColor: 'transparent',
                 borderWidth: 2.5,
                 pointRadius: [0, 3, 0], // Only center point visible
                 pointHoverRadius: [0, 6, 0], // Only center point hoverable
-                pointBackgroundColor: '#dc2626',
+                pointBackgroundColor: mphColor,
                 pointBorderColor: '#ffffff',
                 pointBorderWidth: 1,
                 showLine: true,
