@@ -6,8 +6,6 @@
 
 A mobile-compatible web application for calculating paediatric growth parameters using the rcpchgrowth library from the Royal College of Paediatrics and Child Health.
 
-## Development Note
-
 This application was "vibe-coded" using Claude AI (Anthropic) as an experimental project to explore rapid application development for paediatric tools. Whilst the underlying calculations use the validated rcpchgrowth library, the application itself has not been clinically validated or formally tested.
 
 ## Features
@@ -39,7 +37,17 @@ This application was "vibe-coded" using Claude AI (Anthropic) as an experimental
   - **0.025 mg** increments for doses 0-0.25 mg
   - **0.05 mg** increments for doses 0.25-1.5 mg
   - **0.1 mg** increments for doses above 1.5 mg
-- Real-time recalculation of mg/m²/week equivalent
+- Real-time recalculation of mg/m²/week and mcg/kg/day equivalents
+
+### Growth References
+
+The application supports three validated growth references:
+
+- **UK-WHO (Standard)**: Combined UK90 and WHO growth charts - standard reference for the general UK paediatric population
+- **Turner Syndrome**: Syndrome-specific growth charts for girls with Turner syndrome
+- **Trisomy 21 (Down Syndrome)**: Syndrome-specific growth charts for children with Down syndrome
+
+All growth references are provided by the Royal College of Paediatrics and Child Health (RCPCH) via the rcpchgrowth library.
 
 ### User Interface
 
@@ -47,42 +55,6 @@ This application was "vibe-coded" using Claude AI (Anthropic) as an experimental
 - **Progressive Web App** - Can be installed on mobile devices and used like a native app
 - **Parental Height Units** - Toggle between cm and feet/inches for parental heights
 - **Clear Error Messages** - Informative feedback for validation issues and calculation requirements
-- **Growth Reference Selection** - Choose between UK-WHO, Turner Syndrome, or Trisomy 21 charts
-
-## Installation
-
-1. Create a virtual environment:
-```bash
-python3 -m venv venv
-source venv/bin/activate
-```
-
-2. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
-
-## Running the Application
-
-1. Activate the virtual environment:
-```bash
-source venv/bin/activate
-```
-
-2. Run the Flask application:
-```bash
-python app.py
-```
-
-3. Open your browser and navigate to:
-```
-http://localhost:8080
-```
-
-Or use the provided run script:
-```bash
-./run.sh
-```
 
 ## Usage
 
@@ -129,27 +101,41 @@ The application displays:
 - **Deployment**: Gunicorn WSGI server
 - **Design**: Mobile-first responsive approach with CSS Grid
 
-## Growth References
+## Installation
 
-The application supports three validated growth references:
+1. Create a virtual environment:
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
 
-- **UK-WHO (Standard)**: Combined UK90 and WHO growth charts - standard reference for the general UK paediatric population
-- **Turner Syndrome**: Syndrome-specific growth charts for girls with Turner syndrome
-- **Trisomy 21 (Down Syndrome)**: Syndrome-specific growth charts for children with Down syndrome
+2. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
 
-All growth references are provided by the Royal College of Paediatrics and Child Health (RCPCH) via the rcpchgrowth library.
+## Running the Application
 
-## Key Features
+1. Activate the virtual environment:
+```bash
+source venv/bin/activate
+```
 
-- **Server-side calculations**: All growth calculations performed securely on the server
-- **Responsive design**: Optimised for mobile phones, tablets, and desktop computers
-- **Progressive Web App**: Can be installed on iOS and Android devices like a native app
-- **Data quality safeguards**: SDS-based validation with advisory warnings (±4 SDS) and hard limits (±8/±15 SDS)
-- **Intelligent validation**: Clear error messages and requirement explanations (e.g., 4-month minimum for height velocity)
-- **Interactive tools**: Real-time GH dose adjustment with automatic unit conversion
-- **Clinical age display**: Calendar age format (years, months, days) alongside decimal years
-- **Open source**: Full source code available on GitHub
+2. Run the Flask application:
+```bash
+python app.py
+```
 
-## Disclaimer (Important)
+3. Open your browser and navigate to:
+```
+http://localhost:8080
+```
 
-This is an experimental, AI-generated tool created for educational purposes. It has not undergone clinical validation or testing. **Do not use this application for clinical decision-making.** Always verify calculations independently and use established clinical tools for patient care.
+Or use the provided run script:
+```bash
+./run.sh
+```
+
+## Open Source
+
+Full source code available on [GitHub](https://github.com/gm5dna/growth-parameters-calculator).
