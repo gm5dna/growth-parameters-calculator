@@ -776,9 +776,28 @@ function renderGrowthChart(canvas, centiles, patientData, measurementMethod) {
                             if (!context || !context.parsed) {
                                 return '';
                             }
+
+                            // Get data from the raw data point
+                            const dataPoint = context.raw;
                             const age = context.parsed.x.toFixed(2);
                             const value = context.parsed.y.toFixed(1);
-                            return `Age: ${age} years, ${labels.y}: ${value}`;
+
+                            // Build tooltip lines
+                            const lines = [];
+                            lines.push(`Age: ${age} years`);
+                            lines.push(`${labels.y}: ${value}`);
+
+                            // Add centile if available
+                            if (dataPoint.centile !== null && dataPoint.centile !== undefined) {
+                                lines.push(`Centile: ${dataPoint.centile.toFixed(2)}%`);
+                            }
+
+                            // Add SDS if available
+                            if (dataPoint.sds !== null && dataPoint.sds !== undefined) {
+                                lines.push(`SDS: ${dataPoint.sds.toFixed(2)}`);
+                            }
+
+                            return lines;
                         }
                     }
                 },
