@@ -181,10 +181,30 @@ def calculate():
                 reference=reference
             )
 
-        # Calculate height velocity if height and previous data available
+        # Calculate height velocity and previous height centile/SDS if previous data available
         height_velocity = None
+        previous_height_data = None
         if height and previous_height and previous_date:
             height_velocity = calculate_height_velocity(height, previous_height, measurement_date, previous_date)
+
+            # Calculate centile and SDS for previous height measurement
+            previous_height_measurement = Measurement(
+                sex=sex,
+                birth_date=birth_date,
+                observation_date=previous_date,
+                measurement_method='height',
+                observation_value=previous_height,
+                reference=reference
+            )
+
+            previous_height_calc = previous_height_measurement.measurement['measurement_calculated_values']
+            previous_height_sds = float(previous_height_calc['corrected_sds']) if previous_height_calc['corrected_sds'] else None
+
+            previous_height_data = {
+                'value': previous_height,
+                'centile': round(float(previous_height_calc['corrected_centile']), 2) if previous_height_calc['corrected_centile'] else None,
+                'sds': round(previous_height_sds, 2) if previous_height_sds is not None else None
+            }
 
         # Calculate BSA (requires both weight and height)
         bsa = None
@@ -340,6 +360,7 @@ def calculate():
             } if bmi_measurement else None,
             'ofc': ofc_data,
             'height_velocity': height_velocity,
+            'previous_height': previous_height_data,
             'bsa': bsa,
             'gh_dose': gh_dose,
             'mid_parental_height': mph_data,

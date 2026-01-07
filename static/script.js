@@ -228,12 +228,14 @@ function displayResults(results) {
         ofc: results.ofc
     };
 
-    // Store previous measurements (currently only height)
+    // Store previous measurements (currently only height) with centile/SDS from backend
     const previousHeight = document.getElementById('previous_height').value;
     const previousDate = document.getElementById('previous_date').value;
     currentPatientData.previousMeasurements = {
         height: previousHeight ? parseFloat(previousHeight) : null,
-        date: previousDate || null
+        date: previousDate || null,
+        centile: results.previous_height ? results.previous_height.centile : null,
+        sds: results.previous_height ? results.previous_height.sds : null
     };
 
     // Show "Show Charts" button
@@ -625,8 +627,8 @@ function preparePatientData(measurementMethod) {
                 y: currentPatientData.previousMeasurements.height,
                 label: 'Previous',
                 isCurrent: false,
-                centile: null,  // Previous measurements don't have centile data
-                sds: null
+                centile: currentPatientData.previousMeasurements.centile,
+                sds: currentPatientData.previousMeasurements.sds
             });
         }
     }
@@ -732,10 +734,44 @@ function renderGrowthChart(canvas, centiles, patientData, measurementMethod) {
     };
 
     const measurementTitle = titles[measurementMethod] || measurementMethod.toUpperCase();
-    const referenceTitle = currentPatientData.reference.split('-').map(word =>
-        word.charAt(0).toUpperCase() + word.slice(1)
-    ).join(' ');
 
+    // Format reference title with proper capitalization
+    let referenceTitle;
+    if (currentPatientData.reference === 'uk-who') {
+        referenceTitle = 'UK-WHO';
+    } else if (currentPatientData.reference === 'cdc') {
+        referenceTitle = 'CDC';
+    } else {
+        referenceTitle = currentPatientData.reference.split('-').map(word =>
+            word.charAt(0).toUpperCase() + word.slice(1)
+        ).join(' ');
+    }
+
+    // Calculate x-axis min and max from centile data
+    let minX = Infinity;
+    let maxX = -Infinity;
+
+    centiles.forEach(centile => {
+        if (centile.data && centile.data.length > 0) {
+            centile.data.forEach(point => {
+                if (point.x < minX) minX = point.x;
+                if (point.x > maxX) maxX = point.x;
+            });
+        }
+    });
+
+    // If no valid range found, use defaults
+    if (minX === Infinity || maxX === -Infinity) {
+        minX = 0;
+        maxX = 20;
+    }
+
+    // Generate explicit tick values - only integers from 0 to max
+    const tickValues = [];
+    const maxTick = Math.ceil(maxX);
+    for (let i = 0; i <= maxTick; i++) {
+        tickValues.push(i);
+    }
 
     // Create Chart.js chart
     const chart = new Chart(canvas, {
@@ -758,6 +794,7 @@ function renderGrowthChart(canvas, centiles, patientData, measurementMethod) {
                     padding: 12,
                     titleFont: { size: 14, weight: 'bold' },
                     bodyFont: { size: 13 },
+                    displayColors: false,  // Remove colored box from tooltip
                     filter: function(tooltipItem) {
                         // Only show tooltips for patient measurements
                         if (!tooltipItem || !tooltipItem.dataset || !tooltipItem.dataset.label) {
@@ -812,7 +849,8 @@ function renderGrowthChart(canvas, centiles, patientData, measurementMethod) {
             scales: {
                 x: {
                     type: 'linear',
-                    min: -0.0385,  // -2 weeks
+                    min: minX,
+                    max: maxX,
                     title: {
                         display: true,
                         text: labels.x,
@@ -823,9 +861,16 @@ function renderGrowthChart(canvas, centiles, patientData, measurementMethod) {
                         color: 'rgba(0, 0, 0, 0.05)',
                         drawBorder: true
                     },
+                    afterBuildTicks: function(axis) {
+                        // Replace auto-generated ticks with our custom integer ticks
+                        axis.ticks = tickValues.map(value => ({ value }));
+                    },
                     ticks: {
                         font: { size: 12 },
-                        color: '#666'
+                        color: '#666',
+                        autoSkip: false,
+                        maxRotation: 0,
+                        minRotation: 0
                     }
                 },
                 y: {
