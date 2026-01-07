@@ -34,8 +34,8 @@ This application was "vibe-coded" using Claude AI (Anthropic) as an experimental
 
 - Initial dose calculated for 7 mg/m²/week based on patient's BSA
 - Adjustable dose with intelligent increment sizing:
-  - **0.025 mg** increments for doses 0-0.25 mg
-  - **0.05 mg** increments for doses 0.25-1.5 mg
+  - **0.025 mg** increments for doses 0-0.5 mg
+  - **0.05 mg** increments for doses 0.5-1.5 mg
   - **0.1 mg** increments for doses above 1.5 mg
 - Real-time recalculation of mg/m²/week and mcg/kg/day equivalents
 

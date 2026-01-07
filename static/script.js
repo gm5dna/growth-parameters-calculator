@@ -238,10 +238,10 @@ function updateGHDoseEquivalent(mgPerDay) {
 
 function getIncrementForDose(dose) {
     // Variable increments based on dose level
-    if (dose < 0.25) {
-        return 0.025;  // 0.025 mg increments for 0-0.25 mg
+    if (dose < 0.5) {
+        return 0.025;  // 0.025 mg increments for 0-0.5 mg
     } else if (dose < 1.5) {
-        return 0.05;   // 0.05 mg increments for 0.25-1.5 mg
+        return 0.05;   // 0.05 mg increments for 0.5-1.5 mg
     } else {
         return 0.1;    // 0.1 mg increments above 1.5 mg
     }
