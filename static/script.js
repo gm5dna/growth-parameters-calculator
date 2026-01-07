@@ -103,7 +103,7 @@ function displayResults(results) {
     document.getElementById('height-centile').textContent = results.height.centile !== null ? `${results.height.centile}%` : 'N/A';
     document.getElementById('height-sds').textContent = results.height.sds !== null ? results.height.sds : 'N/A';
 
-    document.getElementById('bmi-value').textContent = results.bmi.value;
+    document.getElementById('bmi-value').textContent = `${results.bmi.value} kg/m²`;
     document.getElementById('bmi-centile').textContent = results.bmi.centile !== null ? `${results.bmi.centile}%` : 'N/A';
     document.getElementById('bmi-sds').textContent = results.bmi.sds !== null ? results.bmi.sds : 'N/A';
 

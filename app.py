@@ -38,7 +38,7 @@ def calculate_boyd_bsa(weight_kg, height_cm):
     weight_g = weight_kg * 1000
     log_weight = math.log10(weight_g)
     bsa = 0.0003207 * (height_cm ** 0.3) * (weight_g ** (0.7285 - (0.0188 * log_weight)))
-    return round(bsa, 3)
+    return round(bsa, 2)
 
 def calculate_height_velocity(current_height, previous_height, current_date, previous_date):
     """Calculate yearly derived height velocity
@@ -66,7 +66,7 @@ def calculate_height_velocity(current_height, previous_height, current_date, pre
 
     # Convert to cm per year
     velocity = (height_diff / time_diff_days) * 365.25
-    return {'value': round(velocity, 2), 'message': None}
+    return {'value': round(velocity, 1), 'message': None}
 
 def calculate_gh_dose(bsa, weight_kg):
     """Calculate GH dose in mg/day for 7 mg/m2/week"""
@@ -306,7 +306,7 @@ def calculate():
                 'sds': round(height_sds, 2) if height_sds else None
             },
             'bmi': {
-                'value': round(float(bmi_value), 2),
+                'value': round(float(bmi_value), 1),
                 'centile': round(float(bmi_calc['corrected_centile']), 2) if bmi_calc['corrected_centile'] else None,
                 'sds': round(bmi_sds, 2) if bmi_sds else None
             },

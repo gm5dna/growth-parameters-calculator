@@ -435,6 +435,14 @@ select:focus {
     text-align: center;
     color: #333;
     background: white;
+    -moz-appearance: textfield; /* Firefox */
+}
+
+/* Remove spinner arrows in Chrome, Safari, Edge, Opera */
+#gh-dose-input::-webkit-outer-spin-button,
+#gh-dose-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
 }
 
 .dose-unit {
