@@ -697,9 +697,15 @@ function renderGrowthChart(canvas, centiles, patientData, measurementMethod) {
         const isMedian = centile.centile === 50;
         const isDotted = [0.4, 9, 91, 99.6].includes(centile.centile);
 
+        // Filter centile data to only show up to 18 years for height charts
+        let centileData = centile.data.map(point => ({x: point.x, y: point.y}));
+        if (measurementMethod === 'height') {
+            centileData = centileData.filter(point => point.x <= 18);
+        }
+
         datasets.push({
             label: `${centile.centile}th centile`,
-            data: centile.data.map(point => ({x: point.x, y: point.y})),
+            data: centileData,
             borderColor: centileColor,
             backgroundColor: 'transparent',
             borderWidth: isMedian ? 2 : 1.5,
@@ -756,6 +762,55 @@ function renderGrowthChart(canvas, centiles, patientData, measurementMethod) {
         }
     }
 
+    // Add mid-parental height target range (only for height charts)
+    if (measurementMethod === 'height' && calculationResults && calculationResults.mid_parental_height) {
+        const mph = calculationResults.mid_parental_height;
+        const targetAge = 18; // Adult height target at age 18
+
+        // Ensure all required values are present
+        if (mph.target_range_lower && mph.target_range_upper && mph.mid_parental_height) {
+            // Add vertical line showing target range
+            datasets.push({
+                label: 'Mid-Parental Height Target Range',
+                data: [
+                    { x: targetAge, y: parseFloat(mph.target_range_lower) },
+                    { x: targetAge, y: parseFloat(mph.target_range_upper) }
+                ],
+                borderColor: '#dc2626', // Red color for target range
+                backgroundColor: 'transparent',
+                borderWidth: 2,
+                pointRadius: 3,
+                pointHoverRadius: 6,
+                pointBackgroundColor: '#dc2626',
+                pointBorderColor: '#ffffff',
+                pointBorderWidth: 1,
+                showLine: true,
+                tension: 0
+            });
+
+            // Add horizontal marker for mid-parental height
+            // Only the center point (index 1) will have a tooltip
+            datasets.push({
+                label: 'Mid-Parental Height',
+                data: [
+                    { x: targetAge - 0.3, y: parseFloat(mph.mid_parental_height) },
+                    { x: targetAge, y: parseFloat(mph.mid_parental_height) },
+                    { x: targetAge + 0.3, y: parseFloat(mph.mid_parental_height) }
+                ],
+                borderColor: '#dc2626', // Red color
+                backgroundColor: 'transparent',
+                borderWidth: 2.5,
+                pointRadius: [0, 3, 0], // Only center point visible
+                pointHoverRadius: [0, 6, 0], // Only center point hoverable
+                pointBackgroundColor: '#dc2626',
+                pointBorderColor: '#ffffff',
+                pointBorderWidth: 1,
+                showLine: true,
+                tension: 0
+            });
+        }
+    }
+
     // Define axis labels for each measurement type
     const axisLabels = {
         height: { x: 'Age (years)', y: 'Height (cm)' },
@@ -807,9 +862,15 @@ function renderGrowthChart(canvas, centiles, patientData, measurementMethod) {
         maxX = 20;
     }
 
+    // Override maxX for height charts to 18.5 years to accommodate mid-parental height marker
+    if (measurementMethod === 'height') {
+        maxX = 18.5;
+    }
+
     // Generate explicit tick values - only integers from 0 to max
+    // For height charts, limit ticks to 18 even though maxX is 18.5
     const tickValues = [];
-    const maxTick = Math.ceil(maxX);
+    const maxTick = measurementMethod === 'height' ? 18 : Math.ceil(maxX);
     for (let i = 0; i <= maxTick; i++) {
         tickValues.push(i);
     }
@@ -837,11 +898,12 @@ function renderGrowthChart(canvas, centiles, patientData, measurementMethod) {
                     bodyFont: { size: 13 },
                     displayColors: false,  // Remove colored box from tooltip
                     filter: function(tooltipItem) {
-                        // Only show tooltips for patient measurements
+                        // Show tooltips for patient measurements and mid-parental height
                         if (!tooltipItem || !tooltipItem.dataset || !tooltipItem.dataset.label) {
                             return false;
                         }
-                        return tooltipItem.dataset.label.includes('Measurement');
+                        return tooltipItem.dataset.label.includes('Measurement') ||
+                               tooltipItem.dataset.label.includes('Mid-Parental');
                     },
                     callbacks: {
                         title: function(context) {
@@ -855,12 +917,37 @@ function renderGrowthChart(canvas, centiles, patientData, measurementMethod) {
                                 return '';
                             }
 
+                            const datasetLabel = context.dataset.label;
+
+                            // Special handling for mid-parental height markers
+                            if (datasetLabel && datasetLabel.includes('Mid-Parental')) {
+                                const lines = [];
+
+                                if (datasetLabel === 'Mid-Parental Height') {
+                                    if (calculationResults && calculationResults.mid_parental_height) {
+                                        const mph = calculationResults.mid_parental_height;
+                                        lines.push(`Mid-Parental Height: ${mph.mid_parental_height} cm`);
+                                        lines.push(`Centile: ${mph.mid_parental_height_centile}%`);
+                                        lines.push(`Target Range: ${mph.target_range_lower}-${mph.target_range_upper} cm`);
+                                    }
+                                } else if (datasetLabel === 'Mid-Parental Height Target Range') {
+                                    if (calculationResults && calculationResults.mid_parental_height) {
+                                        const mph = calculationResults.mid_parental_height;
+                                        const value = context.parsed.y.toFixed(1);
+                                        lines.push(`Range Limit: ${value} cm`);
+                                        lines.push(`Full Range: ${mph.target_range_lower}-${mph.target_range_upper} cm`);
+                                    }
+                                }
+
+                                return lines;
+                            }
+
                             // Get data from the raw data point
                             const dataPoint = context.raw;
                             const age = context.parsed.x.toFixed(2);
                             const value = context.parsed.y.toFixed(1);
 
-                            // Build tooltip lines
+                            // Build tooltip lines for patient measurements
                             const lines = [];
                             lines.push(`Age: ${age} years`);
                             lines.push(`${labels.y}: ${value}`);
