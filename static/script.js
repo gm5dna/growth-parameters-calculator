@@ -689,7 +689,7 @@ function renderGrowthChart(canvas, centiles, patientData, measurementMethod) {
             scales: {
                 x: {
                     type: 'linear',
-                    min: -0.3846,  // -20 weeks
+                    min: -0.0385,  // -2 weeks
                     title: {
                         display: true,
                         text: labels.x,

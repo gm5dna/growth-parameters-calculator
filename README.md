@@ -56,7 +56,7 @@ All growth references are provided by the Royal College of Paediatrics and Child
 - **Sex-specific colours** - Blue for boys, pink for girls
 - **Patient data overlay** - Current and previous measurements plotted as small dots
 - **Tabbed interface** - Easy switching between different measurement types
-- **Extended x-axis** - Starts at -20 weeks for preterm measurements
+- **Extended x-axis** - Starts at -2 weeks
 - **Hover tooltips** - Interactive details on patient measurements only
 - **Fully responsive** - Optimized viewing on mobile, tablet, and desktop devices
 - **Powered by Chart.js** - Smooth, interactive charts
