@@ -344,6 +344,31 @@ document.querySelectorAll('input[name="paternal_height_units"]').forEach(radio =
 // Set measurement date to today on page load
 document.getElementById('measurement_date').valueAsDate = new Date();
 
+// Sex selection - disable Turner syndrome for males
+const sexInputs = document.querySelectorAll('input[name="sex"]');
+const referenceSelect = document.getElementById('reference');
+const turnerOption = referenceSelect.querySelector('option[value="turners-syndrome"]');
+
+function updateReferenceOptions() {
+    const selectedSex = document.querySelector('input[name="sex"]:checked');
+    if (selectedSex && selectedSex.value === 'male') {
+        turnerOption.disabled = true;
+        // If Turner syndrome is currently selected, switch to UK-WHO
+        if (referenceSelect.value === 'turners-syndrome') {
+            referenceSelect.value = 'uk-who';
+        }
+    } else {
+        turnerOption.disabled = false;
+    }
+}
+
+sexInputs.forEach(input => {
+    input.addEventListener('change', updateReferenceOptions);
+});
+
+// Run on page load in case a sex is pre-selected
+updateReferenceOptions();
+
 // Disclaimer dismiss functionality (non-persistent - reappears on page reload)
 const disclaimerElement = document.getElementById('disclaimer');
 const dismissButton = document.getElementById('dismiss-disclaimer');
