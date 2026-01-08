@@ -527,13 +527,8 @@ document.getElementById('showChartsBtn').addEventListener('click', () => {
         document.querySelectorAll('.chart-tab').forEach(t => t.classList.remove('active'));
         firstEnabledTab.classList.add('active');
 
-        // Show age range selector if first enabled tab is height
-        const ageRangeSelector = document.getElementById('ageRangeSelector');
-        if (firstEnabledTab.dataset.measurement === 'height') {
-            ageRangeSelector.style.display = 'flex';
-        } else {
-            ageRangeSelector.style.display = 'none';
-        }
+        // Show appropriate age range selector based on chart type
+        showAgeRangeSelectorForMeasurement(firstEnabledTab.dataset.measurement);
 
         loadChart(firstEnabledTab.dataset.measurement);
     }
@@ -579,27 +574,48 @@ document.querySelectorAll('.chart-tab').forEach(tab => {
         e.target.classList.add('active');
 
         // Show/hide age range selector based on measurement type
-        const ageRangeSelector = document.getElementById('ageRangeSelector');
-        if (measurement === 'height') {
-            ageRangeSelector.style.display = 'flex';
-        } else {
-            ageRangeSelector.style.display = 'none';
-        }
+        showAgeRangeSelectorForMeasurement(measurement);
 
         // Load corresponding chart
         loadChart(measurement);
     });
 });
 
-// Age Range Selection Handler (for height charts only)
-document.querySelectorAll('input[name="age_range"]').forEach(radio => {
-    radio.addEventListener('change', (e) => {
-        // Reload the height chart with new age range
-        const activeTab = document.querySelector('.chart-tab.active');
-        if (activeTab && activeTab.dataset.measurement === 'height') {
-            loadChart('height');
-        }
-    });
+// Helper function to show/hide appropriate age range selector
+function showAgeRangeSelectorForMeasurement(measurement) {
+    // Hide all age range selectors
+    document.getElementById('heightAgeRangeSelector').style.display = 'none';
+    document.getElementById('weightAgeRangeSelector').style.display = 'none';
+    document.getElementById('bmiAgeRangeSelector').style.display = 'none';
+    document.getElementById('ofcAgeRangeSelector').style.display = 'none';
+
+    // Show the appropriate one
+    if (measurement === 'height') {
+        document.getElementById('heightAgeRangeSelector').style.display = 'flex';
+    } else if (measurement === 'weight') {
+        document.getElementById('weightAgeRangeSelector').style.display = 'flex';
+    } else if (measurement === 'bmi') {
+        document.getElementById('bmiAgeRangeSelector').style.display = 'flex';
+    } else if (measurement === 'ofc') {
+        document.getElementById('ofcAgeRangeSelector').style.display = 'flex';
+    }
+}
+
+// Age Range Selection Handlers for all chart types
+document.querySelectorAll('input[name="height_age_range"]').forEach(radio => {
+    radio.addEventListener('change', () => loadChart('height'));
+});
+
+document.querySelectorAll('input[name="weight_age_range"]').forEach(radio => {
+    radio.addEventListener('change', () => loadChart('weight'));
+});
+
+document.querySelectorAll('input[name="bmi_age_range"]').forEach(radio => {
+    radio.addEventListener('change', () => loadChart('bmi'));
+});
+
+document.querySelectorAll('input[name="ofc_age_range"]').forEach(radio => {
+    radio.addEventListener('change', () => loadChart('ofc'));
 });
 
 /**
@@ -739,27 +755,26 @@ function renderGrowthChart(canvas, centiles, patientData, measurementMethod) {
     const sex = currentPatientData.sex;
     const centileColor = sex === 'male' ? '#3182ce' : '#ec4899'; // Blue for boys, pink for girls
 
-    // Get age range settings for height charts
+    // Get age range settings based on measurement type
     let minAge = 0; // default
     let maxAge = 18; // default
-    let mphAge = 18; // default
-    let showMph = true;
+    let mphAge = 18; // default (for height only)
+    let showMph = true; // default (for height only)
 
-    if (measurementMethod === 'height') {
-        const selectedRange = document.querySelector('input[name="age_range"]:checked');
-        if (selectedRange) {
-            const rangeValue = selectedRange.value;
-            maxAge = parseInt(selectedRange.dataset.max);
+    // Determine which age range selector to use
+    const rangeInputName = `${measurementMethod}_age_range`;
+    const selectedRange = document.querySelector(`input[name="${rangeInputName}"]:checked`);
+
+    if (selectedRange) {
+        minAge = parseInt(selectedRange.dataset.min);
+        maxAge = parseInt(selectedRange.dataset.max);
+
+        // MPH settings only apply to height charts
+        if (measurementMethod === 'height') {
             const mphAgeValue = selectedRange.dataset.mphAge;
             showMph = mphAgeValue !== 'none';
             if (showMph) {
                 mphAge = parseInt(mphAgeValue);
-            }
-            // Set minimum age based on selected range
-            if (rangeValue === '0-4' || rangeValue === '0-18') {
-                minAge = 0;
-            } else if (rangeValue === '8-20') {
-                minAge = 8;
             }
         }
     }
@@ -769,11 +784,9 @@ function renderGrowthChart(canvas, centiles, patientData, measurementMethod) {
         const isMedian = centile.centile === 50;
         const isDotted = [0.4, 9, 91, 99.6].includes(centile.centile);
 
-        // Filter centile data based on age range for height charts
+        // Filter centile data based on age range for all chart types
         let centileData = centile.data.map(point => ({x: point.x, y: point.y}));
-        if (measurementMethod === 'height') {
-            centileData = centileData.filter(point => point.x <= maxAge);
-        }
+        centileData = centileData.filter(point => point.x >= minAge && point.x <= maxAge);
 
         datasets.push({
             label: `${centile.centile}th centile`,
@@ -933,19 +946,18 @@ function renderGrowthChart(canvas, centiles, patientData, measurementMethod) {
         maxX = 20;
     }
 
-    // Override min/max for height charts based on selected age range
-    if (measurementMethod === 'height') {
-        minX = minAge;
+    // Override min/max based on selected age range
+    minX = minAge;
+    if (measurementMethod === 'height' && showMph) {
         // Add 0.5 to accommodate mid-parental height marker if shown
-        maxX = showMph ? maxAge + 0.5 : maxAge;
+        maxX = maxAge + 0.5;
+    } else {
+        maxX = maxAge;
     }
 
     // Generate explicit tick values - only integers from min to max
-    // For height charts, use minAge and maxAge for ticks (not maxX which may have +0.5)
     const tickValues = [];
-    const minTick = measurementMethod === 'height' ? minAge : 0;
-    const maxTick = measurementMethod === 'height' ? maxAge : Math.ceil(maxX);
-    for (let i = minTick; i <= maxTick; i++) {
+    for (let i = minAge; i <= maxAge; i++) {
         tickValues.push(i);
     }
 

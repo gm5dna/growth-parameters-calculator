@@ -277,21 +277,70 @@
                 <button class="chart-tab" data-measurement="ofc">OFC</button>
             </div>
 
-            <!-- Age Range Selector (only visible for height chart) -->
-            <div class="age-range-selector" id="ageRangeSelector" style="display: none;">
+            <!-- Age Range Selector for Height Chart -->
+            <div class="age-range-selector" id="heightAgeRangeSelector" style="display: none;">
                 <label style="font-weight: 600; margin-right: 10px;">Age Range:</label>
                 <div class="radio-group">
                     <label class="radio-label">
-                        <input type="radio" name="age_range" value="0-4" data-max="4" data-mph-age="none">
+                        <input type="radio" name="height_age_range" value="0-4" data-min="0" data-max="4" data-mph-age="none">
                         <span>0-4 years</span>
                     </label>
                     <label class="radio-label">
-                        <input type="radio" name="age_range" value="0-18" data-max="18" data-mph-age="18" checked>
+                        <input type="radio" name="height_age_range" value="0-18" data-min="0" data-max="18" data-mph-age="18" checked>
                         <span>0-18 years</span>
                     </label>
                     <label class="radio-label">
-                        <input type="radio" name="age_range" value="8-20" data-max="20" data-mph-age="20">
+                        <input type="radio" name="height_age_range" value="8-20" data-min="8" data-max="20" data-mph-age="20">
                         <span>8-20 years</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Age Range Selector for Weight Chart -->
+            <div class="age-range-selector" id="weightAgeRangeSelector" style="display: none;">
+                <label style="font-weight: 600; margin-right: 10px;">Age Range:</label>
+                <div class="radio-group">
+                    <label class="radio-label">
+                        <input type="radio" name="weight_age_range" value="0-4" data-min="0" data-max="4">
+                        <span>0-4 years</span>
+                    </label>
+                    <label class="radio-label">
+                        <input type="radio" name="weight_age_range" value="0-18" data-min="0" data-max="18" checked>
+                        <span>0-18 years</span>
+                    </label>
+                    <label class="radio-label">
+                        <input type="radio" name="weight_age_range" value="8-20" data-min="8" data-max="20">
+                        <span>8-20 years</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Age Range Selector for BMI Chart -->
+            <div class="age-range-selector" id="bmiAgeRangeSelector" style="display: none;">
+                <label style="font-weight: 600; margin-right: 10px;">Age Range:</label>
+                <div class="radio-group">
+                    <label class="radio-label">
+                        <input type="radio" name="bmi_age_range" value="0-4" data-min="0" data-max="4">
+                        <span>0-4 years</span>
+                    </label>
+                    <label class="radio-label">
+                        <input type="radio" name="bmi_age_range" value="2-18" data-min="2" data-max="18" checked>
+                        <span>2-18 years</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Age Range Selector for OFC Chart -->
+            <div class="age-range-selector" id="ofcAgeRangeSelector" style="display: none;">
+                <label style="font-weight: 600; margin-right: 10px;">Age Range:</label>
+                <div class="radio-group">
+                    <label class="radio-label">
+                        <input type="radio" name="ofc_age_range" value="0-2" data-min="0" data-max="2">
+                        <span>0-2 years</span>
+                    </label>
+                    <label class="radio-label">
+                        <input type="radio" name="ofc_age_range" value="0-18" data-min="0" data-max="18" checked>
+                        <span>0-18 years</span>
                     </label>
                 </div>
             </div>
