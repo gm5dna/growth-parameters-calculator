@@ -196,6 +196,24 @@ select:focus {
     white-space: nowrap;
 }
 
+/* Gestation Input */
+.gestation-input {
+    display: flex;
+    gap: 15px;
+}
+
+.gestation-input-group {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.gestation-input-group input {
+    flex: 1;
+    min-width: 0;
+}
+
 .button-group {
     display: flex;
     gap: 10px;

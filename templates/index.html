@@ -88,6 +88,20 @@
                     <label for="ofc">Head Circumference / OFC (cm):</label>
                     <input type="number" id="ofc" name="ofc" step="0.1" min="0">
                 </div>
+
+                <div class="form-group">
+                    <label for="gestation">Gestation at Birth (Optional):</label>
+                    <div class="gestation-input">
+                        <div class="gestation-input-group">
+                            <input type="number" id="gestation_weeks" name="gestation_weeks" min="22" max="44" placeholder="wks">
+                            <span class="unit-label">weeks</span>
+                        </div>
+                        <div class="gestation-input-group">
+                            <input type="number" id="gestation_days" name="gestation_days" min="0" max="6" placeholder="days">
+                            <span class="unit-label">days</span>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="section-header">Previous Measurement (Optional)</div>
@@ -282,6 +296,10 @@
                 <label style="font-weight: 600; margin-right: 10px;">Age Range:</label>
                 <div class="radio-group">
                     <label class="radio-label">
+                        <input type="radio" name="height_age_range" value="0-2" data-min="0" data-max="2" data-mph-age="none">
+                        <span>0-2 years</span>
+                    </label>
+                    <label class="radio-label">
                         <input type="radio" name="height_age_range" value="0-4" data-min="0" data-max="4" data-mph-age="none">
                         <span>0-4 years</span>
                     </label>
@@ -300,6 +318,10 @@
             <div class="age-range-selector" id="weightAgeRangeSelector" style="display: none;">
                 <label style="font-weight: 600; margin-right: 10px;">Age Range:</label>
                 <div class="radio-group">
+                    <label class="radio-label">
+                        <input type="radio" name="weight_age_range" value="0-2" data-min="0" data-max="2">
+                        <span>0-2 years</span>
+                    </label>
                     <label class="radio-label">
                         <input type="radio" name="weight_age_range" value="0-4" data-min="0" data-max="4">
                         <span>0-4 years</span>

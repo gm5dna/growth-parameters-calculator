@@ -44,6 +44,9 @@ document.getElementById('growthForm').addEventListener('submit', async (e) => {
         return;
     }
 
+    const gestationWeeks = document.getElementById('gestation_weeks').value;
+    const gestationDays = document.getElementById('gestation_days').value;
+
     const formData = {
         sex: document.querySelector('input[name="sex"]:checked')?.value,
         birth_date: document.getElementById('birth_date').value,
@@ -55,6 +58,8 @@ document.getElementById('growthForm').addEventListener('submit', async (e) => {
         previous_height: document.getElementById('previous_height').value,
         maternal_height: maternalHeightCm,
         paternal_height: paternalHeightCm,
+        gestation_weeks: gestationWeeks ? parseInt(gestationWeeks) : null,
+        gestation_days: gestationDays ? parseInt(gestationDays) : null,
         reference: document.getElementById('reference').value
     };
 
@@ -250,6 +255,12 @@ function displayResults(results) {
         centile: results.previous_height ? results.previous_height.centile : null,
         sds: results.previous_height ? results.previous_height.sds : null
     };
+
+    // Store corrected age measurements if gestation correction was applied
+    currentPatientData.weight_corrected = results.weight_corrected || null;
+    currentPatientData.height_corrected = results.height_corrected || null;
+    currentPatientData.bmi_corrected = results.bmi_corrected || null;
+    currentPatientData.ofc_corrected = results.ofc_corrected || null;
 
     // Show "Show Charts" button
     const showChartsContainer = document.getElementById('show-charts-container');
@@ -606,11 +617,34 @@ function showAgeRangeSelectorForMeasurement(measurement) {
     document.getElementById('bmiAgeRangeSelector').style.display = 'none';
     document.getElementById('ofcAgeRangeSelector').style.display = 'none';
 
-    // Show the appropriate one
+    // Get patient age from current data
+    const patientAge = calculationResults?.age_years || 0;
+
+    // Set default age range based on patient age (for children 2 and under, default to 0-2 years)
     if (measurement === 'height') {
         document.getElementById('heightAgeRangeSelector').style.display = 'flex';
+
+        // Set default based on age
+        const heightRanges = document.querySelectorAll('input[name="height_age_range"]');
+        heightRanges.forEach(radio => radio.checked = false);
+
+        if (patientAge <= 2) {
+            document.querySelector('input[name="height_age_range"][value="0-2"]').checked = true;
+        } else {
+            document.querySelector('input[name="height_age_range"][value="0-18"]').checked = true;
+        }
     } else if (measurement === 'weight') {
         document.getElementById('weightAgeRangeSelector').style.display = 'flex';
+
+        // Set default based on age
+        const weightRanges = document.querySelectorAll('input[name="weight_age_range"]');
+        weightRanges.forEach(radio => radio.checked = false);
+
+        if (patientAge <= 2) {
+            document.querySelector('input[name="weight_age_range"][value="0-2"]').checked = true;
+        } else {
+            document.querySelector('input[name="weight_age_range"][value="0-18"]').checked = true;
+        }
     } else if (measurement === 'bmi') {
         document.getElementById('bmiAgeRangeSelector').style.display = 'flex';
     } else if (measurement === 'ofc') {
@@ -740,6 +774,20 @@ function preparePatientData(measurementMethod) {
         sds: measurement.sds
     });
 
+    // Add corrected age point if gestation correction was applied
+    const correctedKey = `${measurementMethod}_corrected`;
+    const correctedMeasurement = currentPatientData[correctedKey];
+    if (correctedMeasurement && correctedMeasurement.age !== undefined) {
+        patientPoints.push({
+            x: correctedMeasurement.age,
+            y: correctedMeasurement.value,
+            label: 'Corrected Age',
+            isCorrected: true,
+            centile: correctedMeasurement.centile,
+            sds: correctedMeasurement.sds
+        });
+    }
+
     // Add previous measurement (currently only available for height)
     if (measurementMethod === 'height' && currentPatientData.previousMeasurements.height && currentPatientData.previousMeasurements.date) {
         // Calculate previous age in decimal years
@@ -830,9 +878,37 @@ function renderGrowthChart(canvas, centiles, patientData, measurementMethod) {
 
     // Add patient measurement points
     if (patientData.length > 0) {
-        // Separate current and previous measurements
+        // Separate current, corrected, and previous measurements
         const currentPoints = patientData.filter(p => p.isCurrent);
-        const previousPoints = patientData.filter(p => !p.isCurrent);
+        const correctedPoints = patientData.filter(p => p.isCorrected);
+        const previousPoints = patientData.filter(p => !p.isCurrent && !p.isCorrected);
+
+        // Add dotted line connecting corrected and chronological points (if both exist)
+        if (correctedPoints.length > 0 && currentPoints.length > 0) {
+            // Create a line dataset with both points
+            const lineData = [
+                {
+                    x: correctedPoints[0].x,
+                    y: correctedPoints[0].y
+                },
+                {
+                    x: currentPoints[0].x,
+                    y: currentPoints[0].y
+                }
+            ];
+
+            datasets.push({
+                label: 'Correction Line',
+                data: lineData,
+                borderColor: centileColor,
+                borderWidth: 2,
+                borderDash: [5, 5],  // Dotted line pattern
+                pointRadius: 0,  // No points on the line itself
+                showLine: true,
+                fill: false,
+                tension: 0  // Straight line
+            });
+        }
 
         // Add current measurement
         if (currentPoints.length > 0) {
@@ -849,6 +925,27 @@ function renderGrowthChart(canvas, centiles, patientData, measurementMethod) {
                 borderWidth: 2,
                 pointRadius: 5,
                 pointHoverRadius: 7,
+                showLine: false
+            });
+        }
+
+        // Add corrected age measurement (cross to distinguish from chronological)
+        if (correctedPoints.length > 0) {
+            datasets.push({
+                label: 'Corrected Age',
+                data: correctedPoints.map(p => ({
+                    x: p.x,
+                    y: p.y,
+                    centile: p.centile,
+                    sds: p.sds
+                })),
+                pointStyle: 'cross',
+                backgroundColor: centileColor,
+                borderColor: centileColor,
+                borderWidth: 2,
+                pointRadius: 8,
+                pointHoverRadius: 10,
+                rotation: 45,  // Rotate to make an X shape
                 showLine: false
             });
         }
@@ -1010,11 +1107,12 @@ function renderGrowthChart(canvas, centiles, patientData, measurementMethod) {
                     bodyFont: { size: 13 },
                     displayColors: false,  // Remove colored box from tooltip
                     filter: function(tooltipItem) {
-                        // Show tooltips for patient measurements and mid-parental height
+                        // Show tooltips for patient measurements, corrected age, and mid-parental height
                         if (!tooltipItem || !tooltipItem.dataset || !tooltipItem.dataset.label) {
                             return false;
                         }
                         return tooltipItem.dataset.label.includes('Measurement') ||
+                               tooltipItem.dataset.label.includes('Corrected Age') ||
                                tooltipItem.dataset.label.includes('Mid-Parental');
                     },
                     callbacks: {

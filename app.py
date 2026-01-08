@@ -30,6 +30,60 @@ def calculate_age_in_years(birth_date, measurement_date):
 
     return decimal_years, calendar_age
 
+def should_apply_gestation_correction(gestation_weeks, gestation_days, chronological_age_years):
+    """Determine if gestational age correction should be applied
+
+    Args:
+        gestation_weeks: Gestation at birth in weeks
+        gestation_days: Additional days beyond gestation_weeks
+        chronological_age_years: Current chronological age in decimal years
+
+    Returns:
+        bool: True if correction should be applied
+    """
+    if not gestation_weeks:
+        return False
+
+    total_gestation_weeks = gestation_weeks + (gestation_days or 0) / 7.0
+
+    # Only apply correction for babies < 37 weeks gestation
+    if total_gestation_weeks >= 37:
+        return False
+
+    # 32-36 weeks: correction until age 1 year
+    if 32 <= total_gestation_weeks < 37:
+        return chronological_age_years <= 1.0
+
+    # < 32 weeks: correction until age 2 years
+    if total_gestation_weeks < 32:
+        return chronological_age_years <= 2.0
+
+    return False
+
+def calculate_corrected_age(birth_date, measurement_date, gestation_weeks, gestation_days):
+    """Calculate corrected age based on due date (EDD)
+
+    Args:
+        birth_date: Date of birth
+        measurement_date: Date of measurement
+        gestation_weeks: Gestation at birth in weeks
+        gestation_days: Additional days beyond gestation_weeks
+
+    Returns:
+        tuple: (corrected_decimal_years, corrected_calendar_age_dict)
+    """
+    # Calculate expected due date (40 weeks from conception)
+    # Days premature = (40 weeks - actual gestation) in days
+    total_gestation_days = (gestation_weeks * 7) + (gestation_days or 0)
+    expected_gestation_days = 40 * 7  # 280 days
+    days_adjustment = expected_gestation_days - total_gestation_days
+
+    # Corrected "birth" date is the estimated due date
+    corrected_birth_date = birth_date + relativedelta(days=days_adjustment)
+
+    # Calculate age from corrected birth date
+    return calculate_age_in_years(corrected_birth_date, measurement_date)
+
 def calculate_boyd_bsa(weight_kg, height_cm):
     """Calculate Body Surface Area using Boyd formula"""
     # Boyd formula: BSA = 0.0003207 * (height_cm^0.3) * (weight_g^(0.7285 - (0.0188 * log10(weight_g))))
@@ -201,8 +255,23 @@ def calculate():
         maternal_height = float(data.get('maternal_height', 0)) if data.get('maternal_height') else None
         paternal_height = float(data.get('paternal_height', 0)) if data.get('paternal_height') else None
 
-        # Calculate age
+        # Optional gestation data
+        gestation_weeks = data.get('gestation_weeks')
+        gestation_days = data.get('gestation_days')
+
+        # Calculate chronological age
         age_decimal, calendar_age = calculate_age_in_years(birth_date, measurement_date)
+
+        # Determine if gestational age correction should be applied
+        apply_correction = should_apply_gestation_correction(gestation_weeks, gestation_days, age_decimal)
+
+        # Calculate corrected age if applicable
+        corrected_age_decimal = None
+        corrected_calendar_age = None
+        if apply_correction:
+            corrected_age_decimal, corrected_calendar_age = calculate_corrected_age(
+                birth_date, measurement_date, gestation_weeks, gestation_days
+            )
 
         # Create measurement objects only for provided values
         weight_measurement = None
@@ -251,6 +320,61 @@ def calculate():
                 observation_value=ofc,
                 reference=reference
             )
+
+        # Create corrected age measurements if gestation correction applies
+        weight_corrected = None
+        height_corrected = None
+        bmi_corrected = None
+        ofc_corrected = None
+
+        if apply_correction and gestation_weeks:
+            if weight:
+                weight_corrected = Measurement(
+                    sex=sex,
+                    birth_date=birth_date,
+                    observation_date=measurement_date,
+                    measurement_method='weight',
+                    observation_value=weight,
+                    reference=reference,
+                    gestation_weeks=gestation_weeks,
+                    gestation_days=gestation_days or 0
+                )
+
+            if height:
+                height_corrected = Measurement(
+                    sex=sex,
+                    birth_date=birth_date,
+                    observation_date=measurement_date,
+                    measurement_method='height',
+                    observation_value=height,
+                    reference=reference,
+                    gestation_weeks=gestation_weeks,
+                    gestation_days=gestation_days or 0
+                )
+
+            if weight and height:
+                bmi_corrected = Measurement(
+                    sex=sex,
+                    birth_date=birth_date,
+                    observation_date=measurement_date,
+                    measurement_method='bmi',
+                    observation_value=weight / ((height / 100) ** 2),
+                    reference=reference,
+                    gestation_weeks=gestation_weeks,
+                    gestation_days=gestation_days or 0
+                )
+
+            if ofc:
+                ofc_corrected = Measurement(
+                    sex=sex,
+                    birth_date=birth_date,
+                    observation_date=measurement_date,
+                    measurement_method='ofc',
+                    observation_value=ofc,
+                    reference=reference,
+                    gestation_weeks=gestation_weeks,
+                    gestation_days=gestation_days or 0
+                )
 
         # Calculate height velocity and previous height centile/SDS if previous data available
         height_velocity = None
@@ -417,10 +541,56 @@ def calculate():
                 'sds': round(ofc_sds, 2) if ofc_sds else None
             }
 
+        # Extract corrected measurement data if gestation correction was applied
+        weight_corrected_data = None
+        height_corrected_data = None
+        bmi_corrected_data = None
+        ofc_corrected_data = None
+
+        if apply_correction:
+            if weight_corrected:
+                weight_corr_calc = weight_corrected.measurement['measurement_calculated_values']
+                weight_corrected_data = {
+                    'age': round(corrected_age_decimal, 2),
+                    'value': weight,
+                    'centile': round(float(weight_corr_calc['corrected_centile']), 2) if weight_corr_calc['corrected_centile'] else None,
+                    'sds': round(float(weight_corr_calc['corrected_sds']), 2) if weight_corr_calc['corrected_sds'] else None
+                }
+
+            if height_corrected:
+                height_corr_calc = height_corrected.measurement['measurement_calculated_values']
+                height_corrected_data = {
+                    'age': round(corrected_age_decimal, 2),
+                    'value': height,
+                    'centile': round(float(height_corr_calc['corrected_centile']), 2) if height_corr_calc['corrected_centile'] else None,
+                    'sds': round(float(height_corr_calc['corrected_sds']), 2) if height_corr_calc['corrected_sds'] else None
+                }
+
+            if bmi_corrected:
+                bmi_corr_calc = bmi_corrected.measurement['measurement_calculated_values']
+                bmi_corrected_data = {
+                    'age': round(corrected_age_decimal, 2),
+                    'value': round(float(bmi_value), 1) if bmi_value else None,
+                    'centile': round(float(bmi_corr_calc['corrected_centile']), 2) if bmi_corr_calc['corrected_centile'] else None,
+                    'sds': round(float(bmi_corr_calc['corrected_sds']), 2) if bmi_corr_calc['corrected_sds'] else None
+                }
+
+            if ofc_corrected:
+                ofc_corr_calc = ofc_corrected.measurement['measurement_calculated_values']
+                ofc_corrected_data = {
+                    'age': round(corrected_age_decimal, 2),
+                    'value': ofc,
+                    'centile': round(float(ofc_corr_calc['corrected_centile']), 2) if ofc_corr_calc['corrected_centile'] else None,
+                    'sds': round(float(ofc_corr_calc['corrected_sds']), 2) if ofc_corr_calc['corrected_sds'] else None
+                }
+
         # Prepare results - only include data for measurements that were provided
         results = {
             'age_years': round(age_decimal, 2),
             'age_calendar': calendar_age,
+            'gestation_correction_applied': apply_correction,
+            'corrected_age_years': round(corrected_age_decimal, 2) if corrected_age_decimal else None,
+            'corrected_age_calendar': corrected_calendar_age,
             'weight': {
                 'value': weight,
                 'centile': round(float(weight_calc['corrected_centile']), 2) if weight_calc and weight_calc['corrected_centile'] else None,
@@ -437,6 +607,10 @@ def calculate():
                 'sds': round(bmi_sds, 2) if bmi_sds is not None else None
             } if bmi_measurement else None,
             'ofc': ofc_data,
+            'weight_corrected': weight_corrected_data,
+            'height_corrected': height_corrected_data,
+            'bmi_corrected': bmi_corrected_data,
+            'ofc_corrected': ofc_corrected_data,
             'height_velocity': height_velocity,
             'previous_height': previous_height_data,
             'bsa': bsa,
