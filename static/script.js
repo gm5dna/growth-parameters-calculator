@@ -322,6 +322,14 @@ function toggleMaternalHeightUnits() {
 
     document.getElementById('maternal-height-cm').style.display = isCm ? 'block' : 'none';
     document.getElementById('maternal-height-ft').style.display = isCm ? 'none' : 'block';
+
+    // Clear the non-active input when switching units to avoid confusion
+    if (isCm) {
+        document.getElementById('maternal_height_ft').value = '';
+        document.getElementById('maternal_height_in').value = '';
+    } else {
+        document.getElementById('maternal_height').value = '';
+    }
 }
 
 function togglePaternalHeightUnits() {
@@ -330,6 +338,14 @@ function togglePaternalHeightUnits() {
 
     document.getElementById('paternal-height-cm').style.display = isCm ? 'block' : 'none';
     document.getElementById('paternal-height-ft').style.display = isCm ? 'none' : 'block';
+
+    // Clear the non-active input when switching units to avoid confusion
+    if (isCm) {
+        document.getElementById('paternal_height_ft').value = '';
+        document.getElementById('paternal_height_in').value = '';
+    } else {
+        document.getElementById('paternal_height').value = '';
+    }
 }
 
 // Add event listeners to height unit radio buttons for each parent
@@ -1054,7 +1070,7 @@ function renderGrowthChart(canvas, centiles, patientData, measurementMethod) {
                 },
                 title: {
                     display: true,
-                    text: `${measurementTitle} Growth Chart (${referenceTitle})`,
+                    text: `${measurementTitle} (${referenceTitle})`,
                     font: { size: 16, weight: 'bold' },
                     color: '#333',
                     padding: { top: 10, bottom: 20 }
