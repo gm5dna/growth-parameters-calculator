@@ -27,7 +27,19 @@
 </head>
 <body>
     <div class="container">
-        <h1>Growth Parameters Calculator</h1>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h1 style="margin: 0;">Growth Parameters Calculator</h1>
+
+            <div class="mode-toggle">
+                <label class="toggle-label">
+                    <span class="mode-text" id="modeText">Basic Mode</span>
+                    <label class="switch">
+                        <input type="checkbox" id="modeToggle">
+                        <span class="slider"></span>
+                    </label>
+                </label>
+            </div>
+        </div>
 
         <div class="disclaimer" id="disclaimer">
             <div style="display: flex; justify-content: space-between; align-items: start;">
@@ -53,7 +65,7 @@
                 </div>
             </div>
 
-            <div class="form-group full-width">
+            <div class="form-group full-width advanced-only">
                 <label for="reference">Growth Reference:</label>
                 <select id="reference" name="reference">
                     <option value="uk-who" selected>UK-WHO (Standard)</option>
@@ -89,7 +101,7 @@
                     <input type="number" id="ofc" name="ofc" step="0.1" min="0">
                 </div>
 
-                <div class="form-group">
+                <div class="form-group advanced-only">
                     <label for="gestation">Gestation at Birth (Optional):</label>
                     <div class="gestation-input">
                         <div class="gestation-input-group">
@@ -104,9 +116,9 @@
                 </div>
             </div>
 
-            <div class="section-header">Previous Measurement (Optional)</div>
+            <div class="section-header advanced-only">Previous Measurement (Optional)</div>
 
-            <div class="form-grid">
+            <div class="form-grid advanced-only">
                 <div class="form-group">
                     <label for="previous_date">Previous Measurement Date:</label>
                     <input type="date" id="previous_date" name="previous_date">
@@ -230,18 +242,18 @@
                     <div class="result-sub">SDS: <span id="ofc-sds"></span></div>
                 </div>
 
-                <div class="result-item" id="height-velocity-item">
+                <div class="result-item advanced-only" id="height-velocity-item">
                     <div class="result-label">Height Velocity</div>
                     <div class="result-value" id="height-velocity"></div>
                     <div class="result-message" id="height-velocity-message"></div>
                 </div>
 
-                <div class="result-item">
+                <div class="result-item advanced-only">
                     <div class="result-label" id="bsa-label">Body Surface Area (Boyd)</div>
                     <div class="result-value" id="bsa"></div>
                 </div>
 
-                <div class="result-item" id="gh-dose-item">
+                <div class="result-item advanced-only" id="gh-dose-item">
                     <div class="result-label">GH Dose Calculator</div>
                     <div class="gh-dose-adjuster">
                         <div class="dose-input-group">

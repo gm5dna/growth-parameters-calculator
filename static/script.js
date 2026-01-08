@@ -1,3 +1,37 @@
+// Mode toggle functionality
+let isAdvancedMode = false;
+
+// Initialize basic mode on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // Set measurement date to today in basic mode
+    if (!isAdvancedMode) {
+        const measurementDateInput = document.getElementById('measurement_date');
+        measurementDateInput.value = new Date().toISOString().split('T')[0];
+    }
+});
+
+document.getElementById('modeToggle').addEventListener('change', function() {
+    isAdvancedMode = this.checked;
+    const modeText = document.getElementById('modeText');
+    modeText.textContent = isAdvancedMode ? 'Advanced Mode' : 'Basic Mode';
+
+    // Toggle advanced mode class on body
+    if (isAdvancedMode) {
+        document.body.classList.add('advanced-mode');
+    } else {
+        document.body.classList.remove('advanced-mode');
+
+        // In basic mode, ensure reference is set to uk-who
+        document.getElementById('reference').value = 'uk-who';
+
+        // In basic mode, set measurement date to today if not set
+        const measurementDateInput = document.getElementById('measurement_date');
+        if (!measurementDateInput.value) {
+            measurementDateInput.value = new Date().toISOString().split('T')[0];
+        }
+    }
+});
+
 // Convert feet and inches to cm
 function feetInchesToCm(feet, inches) {
     const totalInches = (parseFloat(feet) || 0) * 12 + (parseFloat(inches) || 0);
