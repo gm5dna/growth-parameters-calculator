@@ -467,6 +467,7 @@ document.getElementById('gh-dose-plus').addEventListener('click', () => {
 // Store calculation results and chart instance
 let calculationResults = null;
 let currentChartInstance = null;
+let isLoadingChart = false; // Flag to prevent overlapping chart loads
 
 // Store patient data for chart requests
 let currentPatientData = {
@@ -639,6 +640,13 @@ document.querySelectorAll('input[name="ofc_age_range"]').forEach(radio => {
  * @param {string} measurementMethod - 'height', 'weight', 'bmi', or 'ofc'
  */
 async function loadChart(measurementMethod) {
+    // Prevent overlapping chart loads
+    if (isLoadingChart) {
+        console.log('Chart already loading, skipping request');
+        return;
+    }
+
+    isLoadingChart = true;
     const loadingEl = document.getElementById('chartLoading');
     const canvasEl = document.getElementById('growthChart');
 
@@ -703,6 +711,8 @@ async function loadChart(measurementMethod) {
     } finally {
         // Hide loading indicator
         loadingEl.classList.remove('show');
+        // Reset loading flag
+        isLoadingChart = false;
     }
 }
 
