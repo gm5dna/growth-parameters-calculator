@@ -277,6 +277,25 @@
                 <button class="chart-tab" data-measurement="ofc">OFC</button>
             </div>
 
+            <!-- Age Range Selector (only visible for height chart) -->
+            <div class="age-range-selector" id="ageRangeSelector" style="display: none;">
+                <label style="font-weight: 600; margin-right: 10px;">Age Range:</label>
+                <div class="radio-group">
+                    <label class="radio-label">
+                        <input type="radio" name="age_range" value="0-4" data-max="4" data-mph-age="none">
+                        <span>0-4 years</span>
+                    </label>
+                    <label class="radio-label">
+                        <input type="radio" name="age_range" value="0-18" data-max="18" data-mph-age="18" checked>
+                        <span>0-18 years</span>
+                    </label>
+                    <label class="radio-label">
+                        <input type="radio" name="age_range" value="8-20" data-max="20" data-mph-age="20">
+                        <span>8-20 years</span>
+                    </label>
+                </div>
+            </div>
+
             <!-- Chart Canvas Container -->
             <div class="chart-container">
                 <canvas id="growthChart"></canvas>

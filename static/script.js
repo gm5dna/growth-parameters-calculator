@@ -344,19 +344,13 @@ document.querySelectorAll('input[name="paternal_height_units"]').forEach(radio =
 // Set measurement date to today on page load
 document.getElementById('measurement_date').valueAsDate = new Date();
 
-// Disclaimer dismiss functionality
+// Disclaimer dismiss functionality (non-persistent - reappears on page reload)
 const disclaimerElement = document.getElementById('disclaimer');
 const dismissButton = document.getElementById('dismiss-disclaimer');
-
-// Check if disclaimer was previously dismissed
-if (localStorage.getItem('disclaimerDismissed') === 'true') {
-    disclaimerElement.style.display = 'none';
-}
 
 // Handle dismiss button click
 dismissButton.addEventListener('click', () => {
     disclaimerElement.style.display = 'none';
-    localStorage.setItem('disclaimerDismissed', 'true');
 });
 
 // GH Dose adjustment functions
@@ -507,6 +501,15 @@ document.getElementById('showChartsBtn').addEventListener('click', () => {
     if (firstEnabledTab) {
         document.querySelectorAll('.chart-tab').forEach(t => t.classList.remove('active'));
         firstEnabledTab.classList.add('active');
+
+        // Show age range selector if first enabled tab is height
+        const ageRangeSelector = document.getElementById('ageRangeSelector');
+        if (firstEnabledTab.dataset.measurement === 'height') {
+            ageRangeSelector.style.display = 'flex';
+        } else {
+            ageRangeSelector.style.display = 'none';
+        }
+
         loadChart(firstEnabledTab.dataset.measurement);
     }
 
@@ -550,8 +553,27 @@ document.querySelectorAll('.chart-tab').forEach(tab => {
         document.querySelectorAll('.chart-tab').forEach(t => t.classList.remove('active'));
         e.target.classList.add('active');
 
+        // Show/hide age range selector based on measurement type
+        const ageRangeSelector = document.getElementById('ageRangeSelector');
+        if (measurement === 'height') {
+            ageRangeSelector.style.display = 'flex';
+        } else {
+            ageRangeSelector.style.display = 'none';
+        }
+
         // Load corresponding chart
         loadChart(measurement);
+    });
+});
+
+// Age Range Selection Handler (for height charts only)
+document.querySelectorAll('input[name="age_range"]').forEach(radio => {
+    radio.addEventListener('change', (e) => {
+        // Reload the height chart with new age range
+        const activeTab = document.querySelector('.chart-tab.active');
+        if (activeTab && activeTab.dataset.measurement === 'height') {
+            loadChart('height');
+        }
     });
 });
 
@@ -692,15 +714,40 @@ function renderGrowthChart(canvas, centiles, patientData, measurementMethod) {
     const sex = currentPatientData.sex;
     const centileColor = sex === 'male' ? '#3182ce' : '#ec4899'; // Blue for boys, pink for girls
 
+    // Get age range settings for height charts
+    let minAge = 0; // default
+    let maxAge = 18; // default
+    let mphAge = 18; // default
+    let showMph = true;
+
+    if (measurementMethod === 'height') {
+        const selectedRange = document.querySelector('input[name="age_range"]:checked');
+        if (selectedRange) {
+            const rangeValue = selectedRange.value;
+            maxAge = parseInt(selectedRange.dataset.max);
+            const mphAgeValue = selectedRange.dataset.mphAge;
+            showMph = mphAgeValue !== 'none';
+            if (showMph) {
+                mphAge = parseInt(mphAgeValue);
+            }
+            // Set minimum age based on selected range
+            if (rangeValue === '0-4' || rangeValue === '0-18') {
+                minAge = 0;
+            } else if (rangeValue === '8-20') {
+                minAge = 8;
+            }
+        }
+    }
+
     // Add centile curve datasets
     centiles.forEach(centile => {
         const isMedian = centile.centile === 50;
         const isDotted = [0.4, 9, 91, 99.6].includes(centile.centile);
 
-        // Filter centile data to only show up to 18 years for height charts
+        // Filter centile data based on age range for height charts
         let centileData = centile.data.map(point => ({x: point.x, y: point.y}));
         if (measurementMethod === 'height') {
-            centileData = centileData.filter(point => point.x <= 18);
+            centileData = centileData.filter(point => point.x <= maxAge);
         }
 
         datasets.push({
@@ -762,10 +809,10 @@ function renderGrowthChart(canvas, centiles, patientData, measurementMethod) {
         }
     }
 
-    // Add mid-parental height target range (only for height charts)
-    if (measurementMethod === 'height' && calculationResults && calculationResults.mid_parental_height) {
+    // Add mid-parental height target range (only for height charts when enabled)
+    if (measurementMethod === 'height' && showMph && calculationResults && calculationResults.mid_parental_height) {
         const mph = calculationResults.mid_parental_height;
-        const targetAge = 18; // Adult height target at age 18
+        const targetAge = mphAge; // Use age from selected range
         // Use complementary colors that stand out clearly (dark teal for boys, dark magenta for girls)
         const mphColor = sex === 'male' ? '#059669' : '#a21caf';
 
@@ -861,16 +908,19 @@ function renderGrowthChart(canvas, centiles, patientData, measurementMethod) {
         maxX = 20;
     }
 
-    // Override maxX for height charts to 18.5 years to accommodate mid-parental height marker
+    // Override min/max for height charts based on selected age range
     if (measurementMethod === 'height') {
-        maxX = 18.5;
+        minX = minAge;
+        // Add 0.5 to accommodate mid-parental height marker if shown
+        maxX = showMph ? maxAge + 0.5 : maxAge;
     }
 
-    // Generate explicit tick values - only integers from 0 to max
-    // For height charts, limit ticks to 18 even though maxX is 18.5
+    // Generate explicit tick values - only integers from min to max
+    // For height charts, use minAge and maxAge for ticks (not maxX which may have +0.5)
     const tickValues = [];
-    const maxTick = measurementMethod === 'height' ? 18 : Math.ceil(maxX);
-    for (let i = 0; i <= maxTick; i++) {
+    const minTick = measurementMethod === 'height' ? minAge : 0;
+    const maxTick = measurementMethod === 'height' ? maxAge : Math.ceil(maxX);
+    for (let i = minTick; i <= maxTick; i++) {
         tickValues.push(i);
     }
 

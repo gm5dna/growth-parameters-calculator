@@ -622,6 +622,28 @@ select:focus {
     flex-wrap: wrap;
 }
 
+/* Age Range Selector */
+.age-range-selector {
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.age-range-selector label:first-child {
+    line-height: 20px;
+    padding-bottom: 2px;
+}
+
+.age-range-selector .radio-group {
+    margin-top: 0;
+    align-items: center;
+}
+
 .chart-tab {
     flex: 1;
     min-width: 80px;
