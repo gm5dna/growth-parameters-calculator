@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, jsonify
-from rcpchgrowth import mid_parental_height, mid_parental_height_z, lower_and_upper_limits_of_expected_height_z, measurement_from_sds
+from rcpchgrowth import Measurement, mid_parental_height, mid_parental_height_z, lower_and_upper_limits_of_expected_height_z, measurement_from_sds
 from rcpchgrowth.chart_functions import create_chart
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
