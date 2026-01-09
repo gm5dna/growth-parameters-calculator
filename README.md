@@ -135,14 +135,6 @@ pytest --cov=. --cov-report=html
 pytest tests/test_calculations.py
 ```
 
-## Contributing
-
-Contributions are welcome! Please see [DEVELOPMENT.md](./docs/DEVELOPMENT.md) for:
-- Development setup
-- Code style guidelines
-- Testing requirements
-- Pull request process
-
 ## License
 
 This project is open source. The underlying growth calculations are provided by the RCPCH rcpchgrowth library.
@@ -152,12 +144,6 @@ This project is open source. The underlying growth calculations are provided by 
 - **RCPCH** - For the validated [rcpchgrowth library](https://growth.rcpch.ac.uk/developer/rcpchgrowth/)
 - **Claude AI** (Anthropic) - For rapid application development assistance
 - **Chart.js** - For interactive charting capabilities
-
-## Support
-
-- 📖 [Documentation](./docs/)
-- 🐛 [Issue Tracker](https://github.com/gm5dna/growth-parameters-calculator/issues)
-- 💬 [Discussions](https://github.com/gm5dna/growth-parameters-calculator/discussions)
 
 ## Disclaimer
 
