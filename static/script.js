@@ -3,11 +3,23 @@ let isAdvancedMode = false;
 
 // Initialize basic mode on page load
 document.addEventListener('DOMContentLoaded', function() {
-    // Set measurement date to today in basic mode
+    // Restore form state from localStorage
+    restoreFormState();
+
+    // Set measurement date to today in basic mode if not restored
     if (!isAdvancedMode) {
         const measurementDateInput = document.getElementById('measurement_date');
-        measurementDateInput.value = new Date().toISOString().split('T')[0];
+        if (!measurementDateInput.value) {
+            measurementDateInput.value = new Date().toISOString().split('T')[0];
+        }
     }
+
+    // Add input event listeners for auto-save
+    const formInputs = document.querySelectorAll('#growthForm input, #growthForm select');
+    formInputs.forEach(input => {
+        input.addEventListener('input', debouncedSave);
+        input.addEventListener('change', debouncedSave);
+    });
 });
 
 document.getElementById('modeToggle').addEventListener('change', function() {
@@ -61,6 +73,7 @@ document.getElementById('growthForm').addEventListener('submit', async (e) => {
 
     const errorDiv = document.getElementById('error');
     const resultsDiv = document.getElementById('results');
+    const submitBtn = document.querySelector('.btn-submit');
 
     errorDiv.classList.remove('show');
     resultsDiv.classList.remove('show');
@@ -71,12 +84,6 @@ document.getElementById('growthForm').addEventListener('submit', async (e) => {
     const weight = document.getElementById('weight').value;
     const height = document.getElementById('height').value;
     const ofc = document.getElementById('ofc').value;
-
-    // Validate that at least one measurement is provided
-    if (!weight && !height && !ofc) {
-        showError('At least one measurement (weight, height, or OFC) is required.');
-        return;
-    }
 
     const gestationWeeks = document.getElementById('gestation_weeks').value;
     const gestationDays = document.getElementById('gestation_days').value;
@@ -97,6 +104,18 @@ document.getElementById('growthForm').addEventListener('submit', async (e) => {
         reference: document.getElementById('reference').value
     };
 
+    // Client-side validation
+    const validationErrors = validateFormInputs(formData);
+    if (validationErrors.length > 0) {
+        showError(validationErrors.join('; '));
+        return;
+    }
+
+    // Show loading state
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Calculating...';
+    submitBtn.style.cursor = 'wait';
+
     try {
         const response = await fetch('/calculate', {
             method: 'POST',
@@ -110,11 +129,18 @@ document.getElementById('growthForm').addEventListener('submit', async (e) => {
 
         if (data.success) {
             displayResults(data.results);
+            // Clear saved form state on successful calculation
+            clearSavedFormState();
         } else {
             showError(data.error || 'An error occurred during calculation');
         }
     } catch (error) {
         showError('Failed to connect to server: ' + error.message);
+    } finally {
+        // Reset loading state
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Calculate';
+        submitBtn.style.cursor = 'pointer';
     }
 });
 
