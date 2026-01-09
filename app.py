@@ -483,27 +483,13 @@ def get_chart_data():
                 'error': f'Invalid measurement_method. Must be one of: {", ".join(valid_methods)}'
             }), 400
 
-        # Get chart data from rcpchgrowth library
-        chart_data = create_chart(
+        # Get chart data using utils function
+        from utils import get_chart_data as fetch_chart_data
+        centile_curves = fetch_chart_data(
             reference=reference,
             measurement_method=measurement_method,
             sex=sex
         )
-
-        # Extract and flatten centile data from nested structure
-        # chart_data is a list of dicts, each with a reference dataset name as key
-        centile_curves = []
-
-        for dataset in chart_data:
-            for ref_key, ref_data in dataset.items():
-                # Navigate: ref_data[sex][measurement_method] = list of centile objects
-                if sex in ref_data and measurement_method in ref_data[sex]:
-                    for centile_obj in ref_data[sex][measurement_method]:
-                        centile_curves.append({
-                            'centile': centile_obj.get('centile'),
-                            'sds': centile_obj.get('sds'),
-                            'data': centile_obj.get('data', [])
-                        })
 
         return jsonify({
             'success': True,

@@ -101,19 +101,23 @@ def get_chart_data(reference, measurement_method, sex, min_age=0, max_age=20):
     try:
         chart_data = create_chart(
             reference=reference,
-            centile_selection=[0.4, 2, 9, 25, 50, 75, 91, 98, 99.6],
+            centile_format=[0.4, 2, 9, 25, 50, 75, 91, 98, 99.6],
             measurement_method=measurement_method,
             sex=sex
         )
 
-        # Extract centile lines
+        # chart_data is a list of dicts with reference names as keys
+        # Extract centile curves from the structure
         centiles = []
-        for centile in chart_data['centile_data']:
-            centile_data = {
-                'centile': centile['centile'],
-                'data': centile['data']
-            }
-            centiles.append(centile_data)
+        if isinstance(chart_data, list) and len(chart_data) > 0:
+            for dataset in chart_data:
+                for ref_name, ref_data in dataset.items():
+                    if sex in ref_data and measurement_method in ref_data[sex]:
+                        for centile_obj in ref_data[sex][measurement_method]:
+                            centiles.append({
+                                'centile': centile_obj.get('centile'),
+                                'data': centile_obj.get('data', [])
+                            })
 
         return centiles
     except Exception as e:

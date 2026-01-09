@@ -44,9 +44,11 @@ class TestAgeCalculation:
         measurement = date(2021, 2, 28)
         decimal_years, calendar = calculate_age_in_years(birth, measurement)
 
+        # Feb 29, 2020 to Feb 28, 2021 is exactly 1 year (365 days)
         assert decimal_years == pytest.approx(1.0, rel=0.02)
-        assert calendar['years'] == 0
-        assert calendar['months'] == 11
+        assert calendar['years'] == 1
+        assert calendar['months'] == 0
+        assert calendar['days'] == 0
 
 
 class TestGestationCorrection:
