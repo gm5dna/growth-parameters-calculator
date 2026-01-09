@@ -5,6 +5,9 @@
 ![License](https://img.shields.io/badge/license-Open%20Source-brightgreen.svg)
 ![Status](https://img.shields.io/badge/status-active-success.svg)
 ![Maintenance](https://img.shields.io/badge/maintained-yes-brightgreen.svg)
+![GitHub last commit](https://img.shields.io/github/last-commit/gm5dna/growth-parameters-calculator)
+![Deploy on Render](https://img.shields.io/badge/deploy-Render-46E3B7?logo=render)
+![PWA](https://img.shields.io/badge/PWA-enabled-5A0FC8?logo=pwa)
 
 **🌐 Live App: [https://growth-parameters-calculator.onrender.com](https://growth-parameters-calculator.onrender.com)**
 
