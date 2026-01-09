@@ -1,11 +1,25 @@
 """
 Utility functions for mid-parental height and chart data
 """
+import math
 from rcpchgrowth import mid_parental_height, mid_parental_height_z
 from rcpchgrowth import lower_and_upper_limits_of_expected_height_z, measurement_from_sds
 from rcpchgrowth.chart_functions import create_chart
-from scipy import stats
 from constants import MPH_ADULT_AGE
+
+
+def norm_cdf(z):
+    """
+    Calculate cumulative distribution function for standard normal distribution
+    Uses the error function approximation (accurate to ~1e-7)
+
+    Args:
+        z: z-score (standard deviations from mean)
+
+    Returns:
+        Probability (0 to 1) that a value is less than z
+    """
+    return 0.5 * (1.0 + math.erf(z / math.sqrt(2.0)))
 
 
 def calculate_mid_parental_height(maternal_height, paternal_height, sex):
@@ -59,7 +73,7 @@ def calculate_mid_parental_height(maternal_height, paternal_height, sex):
     )
 
     # Calculate centile from z-score (using standard normal distribution)
-    mph_centile = stats.norm.cdf(mph_z) * 100
+    mph_centile = norm_cdf(mph_z) * 100
 
     return {
         'mid_parental_height': round(mph_cm, 1),

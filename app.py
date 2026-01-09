@@ -268,9 +268,9 @@ def calculate():
                 age=18.0  # Adult height at 18 years
             )
 
-            # Calculate centile from z-score (approximate using standard normal distribution)
-            from scipy import stats
-            mph_centile = stats.norm.cdf(mph_z) * 100
+            # Calculate centile from z-score (using standard normal distribution)
+            from utils import norm_cdf
+            mph_centile = norm_cdf(mph_z) * 100
 
             mph_data = {
                 'mid_parental_height': round(mph_cm, 1),
