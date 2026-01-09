@@ -234,6 +234,7 @@ function displayResults(results) {
     }
 
     // Display BSA with method in label, not value
+    const bsaItem = document.getElementById('bsa-item');
     if (results.bsa !== null) {
         document.getElementById('bsa').textContent = `${results.bsa} m²`;
         // Update label to show method used
@@ -243,9 +244,9 @@ function displayResults(results) {
         } else {
             bsaLabel.textContent = 'Body Surface Area (Boyd)';
         }
+        bsaItem.style.display = 'block';
     } else {
-        document.getElementById('bsa').textContent = 'N/A';
-        document.getElementById('bsa-label').textContent = 'Body Surface Area (Boyd)';
+        bsaItem.style.display = 'none';
     }
 
     // Display GH dose with interactive adjuster
