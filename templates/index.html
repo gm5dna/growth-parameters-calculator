@@ -205,7 +205,15 @@
         <div id="error" class="error"></div>
 
         <div id="results" class="results">
-            <h2>Results</h2>
+            <div class="results-header">
+                <h2>Results</h2>
+                <div class="results-actions">
+                    <button id="copyResultsBtn" class="btn-copy" title="Copy results to clipboard" aria-label="Copy results to clipboard">
+                        <span class="icon">📋</span>
+                        <span class="text">Copy</span>
+                    </button>
+                </div>
+            </div>
             <div class="reference-note" id="reference-note"></div>
             <div id="validation-warnings" class="validation-warnings"></div>
             <div class="result-grid">
@@ -399,7 +407,14 @@
         </p>
     </footer>
 
+    <!-- Toast notification for copy feedback -->
+    <div id="copyToast" class="toast" role="status" aria-live="polite" aria-atomic="true">
+        <span class="toast-icon">✓</span>
+        <span class="toast-message">Results copied to clipboard</span>
+    </div>
+
     <script src="{{ url_for('static', filename='validation.js') }}"></script>
+    <script src="{{ url_for('static', filename='clipboard.js') }}"></script>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>

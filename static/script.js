@@ -1294,3 +1294,204 @@ function renderGrowthChart(canvas, centiles, patientData, measurementMethod) {
 
     return chart;
 }
+
+// ============================================================
+// COPY RESULTS TO CLIPBOARD
+// ============================================================
+
+/**
+ * Copy results button event listener
+ */
+document.getElementById('copyResultsBtn')?.addEventListener('click', async () => {
+    const data = extractResultsData();
+    const result = await clipboardManager.copy(data, 'plain');
+
+    if (result.success) {
+        showToast('Results copied to clipboard', 'success');
+    } else {
+        showToast('Failed to copy results. Please try again.', 'error');
+        console.error('Copy failed:', result.error);
+    }
+});
+
+/**
+ * Keyboard shortcut: Ctrl/Cmd + C to copy results
+ */
+document.addEventListener('keydown', (e) => {
+    // Only trigger if results are visible and Ctrl/Cmd+C
+    if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
+        const resultsVisible = document.getElementById('results').classList.contains('show');
+        const noTextSelected = window.getSelection().toString().length === 0;
+
+        if (resultsVisible && noTextSelected) {
+            e.preventDefault();
+            document.getElementById('copyResultsBtn').click();
+        }
+    }
+});
+
+/**
+ * Extract all results data from DOM for copying
+ * @returns {Object} Structured results data
+ */
+function extractResultsData() {
+    return {
+        sex: document.querySelector('input[name="sex"]:checked')?.value,
+        age: document.getElementById('age')?.textContent,
+        dateOfBirth: document.getElementById('birth_date')?.value,
+        measurementDate: document.getElementById('measurement_date')?.value,
+        reference: document.getElementById('reference')?.value,
+
+        weight: extractMeasurement('weight'),
+        height: extractMeasurement('height'),
+        bmi: extractMeasurement('bmi'),
+        ofc: extractMeasurement('ofc'),
+
+        heightVelocity: extractHeightVelocity(),
+        bsa: extractBSA(),
+        ghDose: extractGHDose(),
+        mph: extractMPH(),
+
+        warnings: extractWarnings()
+    };
+}
+
+/**
+ * Extract measurement data (weight, height, BMI, OFC)
+ */
+function extractMeasurement(type) {
+    const valueEl = document.getElementById(`${type}-value`);
+    if (!valueEl || !valueEl.textContent) return null;
+
+    return {
+        value: parseFloat(valueEl.textContent),
+        centile: document.getElementById(`${type}-centile`)?.textContent || '',
+        sds: document.getElementById(`${type}-sds`)?.textContent || ''
+    };
+}
+
+/**
+ * Extract height velocity data
+ */
+function extractHeightVelocity() {
+    const el = document.getElementById('height-velocity');
+    if (!el || !el.textContent || el.textContent === 'N/A') return null;
+
+    const messageEl = document.getElementById('height-velocity-message');
+    let interval = null;
+
+    if (messageEl && messageEl.textContent) {
+        // Extract interval from message like "interval of 6.0 months"
+        const match = messageEl.textContent.match(/interval of ([\d.]+) months?/);
+        if (match) {
+            interval = `${match[1]} months`;
+        }
+    }
+
+    return {
+        value: parseFloat(el.textContent),
+        interval: interval
+    };
+}
+
+/**
+ * Extract BSA data
+ */
+function extractBSA() {
+    const el = document.getElementById('bsa');
+    if (!el || !el.textContent) return null;
+
+    const labelEl = document.getElementById('bsa-label');
+    let method = 'Boyd';
+
+    if (labelEl && labelEl.textContent) {
+        if (labelEl.textContent.includes('cBNF')) {
+            method = 'cBNF';
+        }
+    }
+
+    return {
+        value: parseFloat(el.textContent),
+        method: method
+    };
+}
+
+/**
+ * Extract GH Dose data
+ */
+function extractGHDose() {
+    const el = document.getElementById('gh-dose-input');
+    if (!el || !el.value || parseFloat(el.value) === 0) return null;
+
+    return {
+        mgPerDay: parseFloat(el.value).toFixed(3),
+        mgM2Week: document.getElementById('gh-dose-mg-m2-week')?.textContent || '',
+        mcgKgDay: document.getElementById('gh-dose-mcg-kg-day')?.textContent || ''
+    };
+}
+
+/**
+ * Extract Mid-Parental Height data
+ */
+function extractMPH() {
+    const el = document.getElementById('mph-value');
+    if (!el || !el.textContent) return null;
+
+    const rangeText = document.getElementById('mph-range')?.textContent || '';
+    let rangeMin = null;
+    let rangeMax = null;
+
+    if (rangeText) {
+        const match = rangeText.match(/([\d.]+)\s*-\s*([\d.]+)/);
+        if (match) {
+            rangeMin = parseFloat(match[1]);
+            rangeMax = parseFloat(match[2]);
+        }
+    }
+
+    return {
+        value: parseFloat(el.textContent),
+        centile: document.getElementById('mph-centile')?.textContent || '',
+        rangeMin: rangeMin,
+        rangeMax: rangeMax
+    };
+}
+
+/**
+ * Extract warnings from validation warnings section
+ */
+function extractWarnings() {
+    const warningsEl = document.getElementById('validation-warnings');
+    if (!warningsEl || !warningsEl.classList.contains('show')) return [];
+
+    const warnings = [];
+    warningsEl.querySelectorAll('li').forEach(li => {
+        warnings.push(li.textContent.trim());
+    });
+    return warnings;
+}
+
+/**
+ * Show toast notification
+ * @param {string} message - Message to display
+ * @param {string} type - 'success' or 'error'
+ */
+function showToast(message, type = 'success') {
+    const toast = document.getElementById('copyToast');
+    const messageEl = toast.querySelector('.toast-message');
+    const iconEl = toast.querySelector('.toast-icon');
+
+    messageEl.textContent = message;
+    toast.classList.remove('success', 'error');
+    toast.classList.add(type);
+
+    // Update icon based on type
+    iconEl.textContent = type === 'success' ? '✓' : '✗';
+
+    toast.classList.add('show');
+
+    // Auto-hide after 3 seconds
+    setTimeout(() => {
+        toast.classList.remove('show');
+    }, 3000);
+}
