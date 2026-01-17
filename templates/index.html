@@ -26,6 +26,14 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
 <body>
+    <!-- Dark Mode Toggle -->
+    <div class="theme-toggle">
+        <button class="theme-toggle-btn" id="themeToggle" aria-label="Toggle dark mode" title="Toggle dark mode">
+            <span class="theme-icon" id="sunIcon">☀️</span>
+            <span class="theme-icon hidden" id="moonIcon">🌙</span>
+        </button>
+    </div>
+
     <div class="container">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
             <h1 style="margin: 0;">Growth Parameters Calculator</h1>
@@ -211,6 +219,10 @@
                     <button id="copyResultsBtn" class="btn-copy" title="Copy results to clipboard" aria-label="Copy results to clipboard">
                         <span class="icon">📋</span>
                         <span class="text">Copy</span>
+                    </button>
+                    <button id="exportPdfBtn" class="btn-export-pdf" title="Export results as PDF" aria-label="Export results as PDF">
+                        <span class="icon">📄</span>
+                        <span class="text">Export PDF</span>
                     </button>
                 </div>
             </div>

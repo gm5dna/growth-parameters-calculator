@@ -37,6 +37,15 @@ Welcome to the Growth Parameters Calculator documentation. This folder contains 
   - Performance optimization
   - Deployment guide
 
+- **[Project Design Document](PROJECT_DESIGN.md)** - Design decisions and architecture
+  - Project vision and principles
+  - High-level architecture
+  - Module responsibilities
+  - Feature specifications
+  - API reference
+  - Testing strategy
+  - Decision log
+
 ### Development Documentation
 
 - **[Recent Improvements](IMPROVEMENTS_SUMMARY.md)** - Latest enhancements
@@ -45,6 +54,16 @@ Welcome to the Growth Parameters Calculator documentation. This folder contains 
   - Code quality improvements
   - Testing instructions
   - Production deployment notes
+
+### Feature Plans and Reports
+
+- **[feature-plans/](feature-plans/)** - Feature implementation plans
+  - Copy results feature plan
+  - Feature history and evolution
+
+- **[test-reports/](test-reports/)** - Testing documentation
+  - Mobile responsiveness test report
+  - Feature validation reports
 
 ## Quick Links
 

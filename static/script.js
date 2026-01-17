@@ -1,3 +1,74 @@
+// Dark Mode Functionality
+function initDarkMode() {
+    const htmlElement = document.documentElement;
+    const themeToggleBtn = document.getElementById('themeToggle');
+    const sunIcon = document.getElementById('sunIcon');
+    const moonIcon = document.getElementById('moonIcon');
+
+    // Check for saved theme preference or default to system preference
+    const savedTheme = localStorage.getItem('theme');
+    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+    // Set initial theme
+    let currentTheme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
+    setTheme(currentTheme);
+
+    // Theme toggle click handler
+    if (themeToggleBtn) {
+        themeToggleBtn.addEventListener('click', () => {
+            currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+            setTheme(currentTheme);
+            localStorage.setItem('theme', currentTheme);
+
+            // Reload chart if currently displayed to update colors
+            reloadChartIfVisible();
+        });
+    }
+
+    // Listen for system theme changes
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+        // Only auto-switch if user hasn't manually set a preference
+        if (!localStorage.getItem('theme')) {
+            currentTheme = e.matches ? 'dark' : 'light';
+            setTheme(currentTheme);
+        }
+    });
+
+    function setTheme(theme) {
+        if (theme === 'dark') {
+            htmlElement.setAttribute('data-theme', 'dark');
+            sunIcon.classList.add('hidden');
+            moonIcon.classList.remove('hidden');
+        } else {
+            htmlElement.setAttribute('data-theme', 'light');
+            sunIcon.classList.remove('hidden');
+            moonIcon.classList.add('hidden');
+        }
+    }
+}
+
+// Initialize dark mode as early as possible
+initDarkMode();
+
+/**
+ * Reload chart if currently visible to update theme colors
+ */
+function reloadChartIfVisible() {
+    // Check if charts section is visible
+    const chartsSection = document.getElementById('chartsSection');
+    if (chartsSection && chartsSection.classList.contains('show')) {
+        // Find the active chart tab
+        const activeTab = document.querySelector('.chart-tab.active');
+        if (activeTab) {
+            const measurementType = activeTab.getAttribute('data-chart');
+            if (measurementType && currentPatientData) {
+                // Reload the chart with new theme colors
+                loadChart(measurementType);
+            }
+        }
+    }
+}
+
 // Mode toggle functionality
 let isAdvancedMode = false;
 
@@ -128,6 +199,9 @@ document.getElementById('growthForm').addEventListener('submit', async (e) => {
         const data = await response.json();
 
         if (data.success) {
+            // Store results globally for PDF export
+            window.calculationResults = data.results;
+
             displayResults(data.results);
             // Clear saved form state on successful calculation
             clearSavedFormState();
@@ -883,8 +957,26 @@ function preparePatientData(measurementMethod) {
  * @param {string} measurementMethod - Type of measurement being plotted
  * @returns {Chart} Chart.js instance
  */
+/**
+ * Get theme-aware colors for charts
+ * @returns {Object} Object with color values for current theme
+ */
+function getChartColors() {
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+
+    return {
+        title: isDark ? '#e0e0e0' : '#333',
+        axisTitle: isDark ? '#b0b0b0' : '#555',
+        axisTicks: isDark ? '#808080' : '#666',
+        gridLines: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)',
+        tooltip: isDark ? 'rgba(30, 30, 46, 0.95)' : 'rgba(0, 0, 0, 0.8)',
+        pointBorder: isDark ? '#1e1e2e' : '#ffffff'
+    };
+}
+
 function renderGrowthChart(canvas, centiles, patientData, measurementMethod) {
     const datasets = [];
+    const colors = getChartColors();
 
     // Determine color based on sex (blue for boys, pink for girls)
     const sex = currentPatientData.sex;
@@ -982,7 +1074,7 @@ function renderGrowthChart(canvas, centiles, patientData, measurementMethod) {
                     sds: p.sds
                 })),
                 backgroundColor: centileColor,
-                borderColor: '#ffffff',
+                borderColor: colors.pointBorder,
                 borderWidth: 2,
                 pointRadius: 5,
                 pointHoverRadius: 7,
@@ -1022,7 +1114,7 @@ function renderGrowthChart(canvas, centiles, patientData, measurementMethod) {
                     sds: p.sds
                 })),
                 backgroundColor: '#f6ad55',
-                borderColor: '#ffffff',
+                borderColor: colors.pointBorder,
                 borderWidth: 2,
                 pointRadius: 5,
                 pointHoverRadius: 7,
@@ -1071,7 +1163,7 @@ function renderGrowthChart(canvas, centiles, patientData, measurementMethod) {
                 pointRadius: [0, 3, 0], // Only center point visible
                 pointHoverRadius: [0, 6, 0], // Only center point hoverable
                 pointBackgroundColor: mphColor,
-                pointBorderColor: '#ffffff',
+                pointBorderColor: colors.pointBorder,
                 pointBorderWidth: 1,
                 showLine: true,
                 tension: 0
@@ -1162,7 +1254,7 @@ function renderGrowthChart(canvas, centiles, patientData, measurementMethod) {
                 },
                 tooltip: {
                     enabled: true,
-                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    backgroundColor: colors.tooltip,
                     padding: 12,
                     titleFont: { size: 14, weight: 'bold' },
                     bodyFont: { size: 13 },
@@ -1241,7 +1333,7 @@ function renderGrowthChart(canvas, centiles, patientData, measurementMethod) {
                     display: true,
                     text: `${measurementTitle} (${referenceTitle})`,
                     font: { size: 16, weight: 'bold' },
-                    color: '#333',
+                    color: colors.title,
                     padding: { top: 10, bottom: 20 }
                 }
             },
@@ -1254,10 +1346,10 @@ function renderGrowthChart(canvas, centiles, patientData, measurementMethod) {
                         display: true,
                         text: labels.x,
                         font: { size: 14, weight: 'bold' },
-                        color: '#555'
+                        color: colors.axisTitle
                     },
                     grid: {
-                        color: 'rgba(0, 0, 0, 0.05)',
+                        color: colors.gridLines,
                         drawBorder: true
                     },
                     afterBuildTicks: function(axis) {
@@ -1266,7 +1358,7 @@ function renderGrowthChart(canvas, centiles, patientData, measurementMethod) {
                     },
                     ticks: {
                         font: { size: 12 },
-                        color: '#666',
+                        color: colors.axisTicks,
                         autoSkip: false,
                         maxRotation: 0,
                         minRotation: 0
@@ -1277,15 +1369,15 @@ function renderGrowthChart(canvas, centiles, patientData, measurementMethod) {
                         display: true,
                         text: labels.y,
                         font: { size: 14, weight: 'bold' },
-                        color: '#555'
+                        color: colors.axisTitle
                     },
                     grid: {
-                        color: 'rgba(0, 0, 0, 0.05)',
+                        color: colors.gridLines,
                         drawBorder: true
                     },
                     ticks: {
                         font: { size: 12 },
-                        color: '#666'
+                        color: colors.axisTicks
                     }
                 }
             }
@@ -1495,3 +1587,130 @@ function showToast(message, type = 'success') {
         toast.classList.remove('show');
     }, 3000);
 }
+
+/**
+ * Export chart as base64 image
+ * @returns {string|null} Base64 encoded PNG image or null if no chart
+ */
+function exportChartAsImage() {
+    if (!currentChartInstance) {
+        return null;
+    }
+
+    try {
+        // Use Chart.js built-in toBase64Image() method for high quality
+        return currentChartInstance.toBase64Image('image/png', 1.0);
+    } catch (error) {
+        console.error('Error exporting chart:', error);
+        return null;
+    }
+}
+
+/**
+ * Export all currently visible charts
+ * @returns {Object} Object with chart type as key and base64 image as value
+ */
+async function exportAllChartImages() {
+    const images = {};
+
+    // Get all chart tabs
+    const chartTabs = document.querySelectorAll('.chart-tab');
+
+    for (const tab of chartTabs) {
+        if (tab.classList.contains('active')) {
+            // Get chart type from data attribute
+            const chartType = tab.getAttribute('data-chart');
+
+            // Export the current chart
+            const imageData = exportChartAsImage();
+            if (imageData) {
+                images[chartType] = imageData;
+            }
+        }
+    }
+
+    return images;
+}
+
+/**
+ * Handle PDF export
+ */
+async function handlePdfExport() {
+    const exportBtn = document.getElementById('exportPdfBtn');
+
+    // Disable button during export
+    if (exportBtn) {
+        exportBtn.disabled = true;
+    }
+
+    showToast('Generating PDF...', 'info');
+
+    try {
+        // Check if we have calculation results
+        if (!window.calculationResults) {
+            showToast('No calculation results available', 'error');
+            return;
+        }
+
+        // 1. Get chart images (only currently visible charts)
+        const chartImages = await exportAllChartImages();
+
+        // 2. Prepare patient info
+        const patientInfo = {
+            sex: document.querySelector('input[name="sex"]:checked')?.value || 'unknown',
+            birth_date: document.getElementById('birth_date')?.value || '',
+            measurement_date: document.getElementById('measurement_date')?.value || '',
+            reference: document.getElementById('reference')?.value || 'uk-who'
+        };
+
+        // 3. Prepare payload
+        const pdfData = {
+            results: window.calculationResults,
+            patient_info: patientInfo,
+            chart_images: chartImages
+        };
+
+        // 4. Request PDF from server
+        const response = await fetch('/export-pdf', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(pdfData)
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to generate PDF');
+        }
+
+        // 5. Download the PDF
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `growth-report-${new Date().toISOString().split('T')[0]}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+
+        showToast('PDF downloaded successfully', 'success');
+    } catch (error) {
+        console.error('PDF export error:', error);
+        showToast(`Failed to generate PDF: ${error.message}`, 'error');
+    } finally {
+        // Re-enable button
+        if (exportBtn) {
+            exportBtn.disabled = false;
+        }
+    }
+}
+
+// Add event listener for PDF export button when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    const exportPdfBtn = document.getElementById('exportPdfBtn');
+    if (exportPdfBtn) {
+        exportPdfBtn.addEventListener('click', handlePdfExport);
+    }
+});

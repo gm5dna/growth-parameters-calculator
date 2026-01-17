@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, send_file
 from rcpchgrowth import Measurement, mid_parental_height, mid_parental_height_z, lower_and_upper_limits_of_expected_height_z, measurement_from_sds
 from rcpchgrowth.chart_functions import create_chart
 from datetime import datetime
@@ -501,6 +501,73 @@ def get_chart_data():
             'success': False,
             'error': f'Chart data error: {str(e)}'
         }), 400
+
+@app.route('/export-pdf', methods=['POST'])
+@limiter.limit("10 per minute")
+def export_pdf():
+    """
+    Generate PDF report from calculation results
+
+    Expected JSON payload:
+    {
+        "results": {...},  # Complete calculation results
+        "patient_info": {
+            "sex": "male" | "female",
+            "birth_date": "YYYY-MM-DD",
+            "measurement_date": "YYYY-MM-DD",
+            "reference": "uk-who" | "uk90" | "who"
+        },
+        "chart_images": {
+            "height": "base64_image_data",
+            "weight": "base64_image_data",
+            ...
+        }
+    }
+
+    Returns:
+        PDF file download
+    """
+    try:
+        data = request.get_json()
+
+        if not data:
+            return jsonify({
+                'success': False,
+                'error': 'No data provided'
+            }), 400
+
+        results = data.get('results')
+        patient_info = data.get('patient_info')
+        chart_images = data.get('chart_images', {})
+
+        if not results or not patient_info:
+            return jsonify({
+                'success': False,
+                'error': 'Missing required data (results or patient_info)'
+            }), 400
+
+        # Generate PDF using pdf_utils
+        from pdf_utils import GrowthReportPDF
+        pdf_generator = GrowthReportPDF(results, patient_info, chart_images)
+        pdf_buffer = pdf_generator.generate()
+
+        # Create filename with timestamp
+        timestamp = datetime.now().strftime('%Y-%m-%d-%H%M%S')
+        filename = f"growth-report-{timestamp}.pdf"
+
+        # Return PDF file
+        return send_file(
+            pdf_buffer,
+            mimetype='application/pdf',
+            as_attachment=True,
+            download_name=filename
+        )
+
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': f'PDF generation error: {str(e)}'
+        }), 500
 
 if __name__ == '__main__':
     import os

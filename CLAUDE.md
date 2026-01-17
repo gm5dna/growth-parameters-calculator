@@ -31,15 +31,20 @@ validation.py   # Input validation (ValidationError class)
 calculations.py # Age, BSA, height velocity, GH dose
 models.py       # rcpchgrowth Measurement factory
 utils.py        # MPH, centile data, response formatting
+pdf_utils.py    # PDF report generation (ReportLab)
 
 static/
-  script.js     # Frontend logic, Chart.js integration
+  script.js     # Frontend logic, Chart.js integration, dark mode
   validation.js # Client-side validation
-  style.css     # Mobile-first responsive styles
+  style.css     # Mobile-first responsive styles, theme system
 templates/
   index.html    # SPA shell
 tests/
-  test_calculations.py, test_validation.py
+  test_calculations.py, test_validation.py, test_pdf_export.py
+  test_copy_feature.py, test_responsive.py
+docs/
+  README.md, FEATURES.md, USER_GUIDE.md, TECHNICAL.md
+  feature-plans/, test-reports/
 ```
 
 ## Key Patterns
@@ -50,11 +55,45 @@ tests/
 - **Measurements:** Created via `create_measurement()` factory in models.py
 - **Growth data:** All SDS/centile calculations via `rcpchgrowth.Measurement`
 
+## Development Workflow
+
+### Git Commit Best Practices
+
+**IMPORTANT:** After completing and testing any todo/goal/task, you MUST:
+
+1. **Test thoroughly** - Run relevant tests (`pytest`) to ensure nothing is broken
+2. **Commit changes** - Create a meaningful commit with descriptive message
+3. **Push to remote** - Push commits to keep remote repository in sync
+
+```bash
+# Example workflow after completing a feature
+pytest                                    # Test first
+git add .                                 # Stage all changes
+git commit -m "Add dark mode feature"     # Commit with clear message
+git push origin main                      # Push to remote
+```
+
+**Commit Message Guidelines:**
+- Use imperative mood ("Add feature" not "Added feature")
+- Be specific and descriptive
+- Reference issue numbers if applicable
+- Keep first line under 50 characters
+- Add detailed description if needed
+
+**When to Commit:**
+- ✅ After completing a feature/fix and tests pass
+- ✅ After significant refactoring
+- ✅ After updating documentation
+- ✅ Before starting a new major task
+- ❌ Don't commit broken/untested code
+- ❌ Don't commit commented-out code or debug statements
+
 ## API Endpoints
 
 - `GET /` - Serves SPA
 - `POST /calculate` - Main calculation (JSON in/out)
 - `POST /chart-data` - Centile curve data for charts
+- `POST /export-pdf` - Generate PDF report from calculation results
 
 ## Important Constants (constants.py)
 
@@ -76,18 +115,18 @@ Full docs in `docs/` folder - see `docs/README.md` for index.
 ## Future Improvements Backlog
 
 ### 🎨 User Experience - Quick Wins
-1. Dark mode theme with system preference detection
+1. ~~Dark mode theme with system preference detection~~ ✅ **COMPLETED**
 2. Keyboard shortcuts (Ctrl+Enter to calculate, Ctrl+R to reset)
 3. Undo/redo functionality for form changes
 4. **Recent calculations history** (last 5-10 in sidebar)
-5. Copy results to clipboard button
+5. ~~Copy results to clipboard button~~ ✅ **COMPLETED**
 6. Patient session management (save/switch between patients)
 7. Guided tour/onboarding for new users
 8. Comparison view (current vs previous visit)
 9. Customizable units (imperial/metric toggle)
 
 ### 📊 Data & Analytics
-10. Export to PDF/CSV/print-friendly view
+10. ~~Export to PDF/CSV/print-friendly view~~ ✅ **COMPLETED** (PDF export)
 11. Screenshot/image export for charts
 12. Growth trajectory tracking (multiple measurements over time)
 13. Data import from CSV/EMR systems
