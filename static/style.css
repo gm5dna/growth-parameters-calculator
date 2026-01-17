@@ -154,7 +154,7 @@ input:checked + .slider:before {
     padding: 15px;
     margin-bottom: 30px;
     border-radius: 8px;
-    font-size: 0.95rem;
+    font-size: 14px;
     color: #856404;
     line-height: 1.6;
 }
@@ -218,6 +218,7 @@ label {
     margin-bottom: 8px;
     color: #555;
     font-weight: 500;
+    font-size: 14px;
 }
 
 input[type="text"],
