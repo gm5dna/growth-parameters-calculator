@@ -51,10 +51,12 @@ instance/
 *.tmp
 *.log
 
-# Summary files
-*improvements*.md
-*removements*.md
-*removal*.md
+# Temporary summary files (not permanent docs)
+*_improvements_*.md
+*_removements_*.md
+*_removal_*.md
+temp_*.md
+draft_*.md
 
 # OS
 .DS_Store

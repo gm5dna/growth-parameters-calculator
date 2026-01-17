@@ -1,6 +1,6 @@
 # Growth Parameters Calculator - Project Design Document
 
-> **Living Document** - Last updated: 2026-01-17
+> **Living Document** - Last updated: 2026-01-17 (Post PDF Export & Dark Mode)
 > Update this document as design decisions evolve.
 
 ---
@@ -206,6 +206,33 @@ User Input → Client Validation → POST /calculate → Server Validation
 }
 ```
 
+### POST /export-pdf
+
+**Request:**
+```json
+{
+  "results": {
+    "age": {...},
+    "measurements": {...},
+    "bsa": {...},
+    "warnings": [...]
+  },
+  "patient_info": {
+    "sex": "male",
+    "birth_date": "2020-01-15",
+    "measurement_date": "2024-01-15",
+    "reference": "uk-who"
+  },
+  "chart_images": {
+    "height": "data:image/png;base64,...",
+    "weight": "data:image/png;base64,..."
+  }
+}
+```
+
+**Response:**
+Binary PDF file download with Content-Disposition header.
+
 ---
 
 ## 6. UI/UX Design
@@ -273,12 +300,20 @@ User Input → Client Validation → POST /calculate → Server Validation
 
 ## 10. Future Considerations
 
+### Recently Completed
+- [x] Export results as PDF report (implemented with ReportLab)
+- [x] Dark mode theme with system preference detection
+- [x] Copy results to clipboard feature
+
 ### Potential Enhancements
-- [ ] Export results as PDF report
 - [ ] Multiple measurement history on charts
 - [ ] Additional growth references
 - [ ] Internationalization (i18n)
 - [ ] Specialized calculators (bone age, predicted adult height)
+- [ ] Keyboard shortcuts (Ctrl+Enter to calculate)
+- [ ] Recent calculations history
+
+See `docs/FUTURE_IMPROVEMENTS.md` for full backlog.
 
 ### Technical Debt
 - None currently identified
@@ -289,6 +324,9 @@ User Input → Client Validation → POST /calculate → Server Validation
 
 | Date | Decision | Rationale |
 |------|----------|-----------|
+| 2026-01-17 | Add PDF export with ReportLab | Clinical documentation needs, server-side for quality |
+| 2026-01-17 | Implement dark mode with CSS variables | User experience, accessibility, system preference |
+| 2026-01-17 | Add copy to clipboard feature | Quick data sharing, clinical workflow |
 | 2026-01-17 | Document created | Establish project context for AI assistance |
 | Prior | Modular architecture | Separation of concerns, testability |
 | Prior | No database | Privacy compliance, simplicity |

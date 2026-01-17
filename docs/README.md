@@ -55,6 +55,12 @@ Welcome to the Growth Parameters Calculator documentation. This folder contains 
   - Testing instructions
   - Production deployment notes
 
+- **[Future Improvements](FUTURE_IMPROVEMENTS.md)** - Feature backlog and roadmap
+  - Completed features
+  - Planned enhancements by category
+  - Priority rankings
+  - Implementation notes
+
 ### Feature Plans and Reports
 
 - **[feature-plans/](feature-plans/)** - Feature implementation plans
