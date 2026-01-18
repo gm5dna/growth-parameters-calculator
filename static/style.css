@@ -303,24 +303,49 @@ select {
     min-height: 44px; /* Improved touch target for mobile */
     background: var(--input-bg);
     color: var(--text-primary);
-    text-align: left !important; /* Fix date field alignment on iOS */
-    -webkit-text-align: left; /* Webkit-specific for iOS Safari */
 }
 
-/* iOS Safari date input pseudo-elements - force left alignment */
+/* iOS Safari date input - nuclear option for left alignment */
+input[type="date"] {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    display: block;
+    text-align: left !important;
+    direction: ltr;
+    unicode-bidi: embed;
+}
+
 input[type="date"]::-webkit-date-and-time-value {
     text-align: left !important;
-    padding-left: 0;
+    margin-left: 0 !important;
+    margin-right: auto !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
 }
 
 input[type="date"]::-webkit-datetime-edit {
-    text-align: left;
-    padding-left: 0;
+    display: inline-block;
+    text-align: left !important;
+    padding: 0 !important;
+    margin: 0 !important;
 }
 
 input[type="date"]::-webkit-datetime-edit-fields-wrapper {
-    text-align: left;
-    padding-left: 0;
+    display: inline-block;
+    text-align: left !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+input[type="date"]::-webkit-datetime-edit-text {
+    padding: 0 !important;
+}
+
+input[type="date"]::-webkit-datetime-edit-month-field,
+input[type="date"]::-webkit-datetime-edit-day-field,
+input[type="date"]::-webkit-datetime-edit-year-field {
+    text-align: left !important;
 }
 
 @media (min-width: 768px) {
