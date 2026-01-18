@@ -5,3 +5,5 @@ pytest==7.4.3
 playwright==1.40.0
 pytest-playwright==0.4.3
 pytest-cov==4.1.0
+requests==2.31.0  # For live_server fixture in E2E tests
+axe-playwright==0.1.0  # For accessibility testing (Phase 3.4)

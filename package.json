@@ -1,0 +1,46 @@
+{
+  "name": "growth-parameters-calculator",
+  "version": "1.0.0",
+  "description": "Growth Parameters Calculator - Frontend Testing",
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:verbose": "jest --verbose"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "@testing-library/dom": "^9.3.3"
+  },
+  "jest": {
+    "testEnvironment": "jsdom",
+    "collectCoverageFrom": [
+      "static/*.js",
+      "!static/*.min.js"
+    ],
+    "coverageDirectory": "coverage-js",
+    "testMatch": [
+      "**/tests/js/**/*.test.js"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 50,
+        "functions": 60,
+        "lines": 60,
+        "statements": 60
+      }
+    },
+    "setupFilesAfterEnv": [
+      "<rootDir>/tests/js/setup.js"
+    ]
+  },
+  "keywords": [
+    "growth",
+    "calculator",
+    "pediatric",
+    "testing"
+  ],
+  "author": "",
+  "license": "ISC"
+}

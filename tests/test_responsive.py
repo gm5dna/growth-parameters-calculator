@@ -46,16 +46,14 @@ def browser(playwright_instance):
 class TestMobileResponsiveness:
     """Test suite for mobile responsiveness"""
 
-    BASE_URL = "http://localhost:8080"
-
     @pytest.mark.parametrize("device_name,viewport", MOBILE_DEVICES.items())
-    def test_page_loads_without_horizontal_scroll(self, browser, device_name, viewport):
+    def test_page_loads_without_horizontal_scroll(self, browser, base_url, device_name, viewport):
         """Test that page loads without horizontal scrolling"""
         context = browser.new_context(viewport=viewport)
         page = context.new_page()
 
         try:
-            page.goto(self.BASE_URL, wait_until="networkidle")
+            page.goto(base_url, wait_until="networkidle")
 
             # Check for horizontal scrollbar
             scroll_width = page.evaluate("document.documentElement.scrollWidth")
@@ -68,13 +66,13 @@ class TestMobileResponsiveness:
             context.close()
 
     @pytest.mark.parametrize("device_name,viewport", MOBILE_DEVICES.items())
-    def test_header_and_title_visible(self, browser, device_name, viewport):
+    def test_header_and_title_visible(self, browser, base_url, device_name, viewport):
         """Test that header and title are visible and properly sized"""
         context = browser.new_context(viewport=viewport)
         page = context.new_page()
 
         try:
-            page.goto(self.BASE_URL, wait_until="networkidle")
+            page.goto(base_url, wait_until="networkidle")
 
             # Check h1 is visible
             h1 = page.locator("h1")
@@ -91,13 +89,13 @@ class TestMobileResponsiveness:
             context.close()
 
     @pytest.mark.parametrize("device_name,viewport", MOBILE_DEVICES.items())
-    def test_mode_toggle_visible_and_functional(self, browser, device_name, viewport):
+    def test_mode_toggle_visible_and_functional(self, browser, base_url, device_name, viewport):
         """Test that mode toggle is visible and works"""
         context = browser.new_context(viewport=viewport)
         page = context.new_page()
 
         try:
-            page.goto(self.BASE_URL, wait_until="networkidle")
+            page.goto(base_url, wait_until="networkidle")
 
             # Check mode toggle container is visible (not the hidden checkbox)
             mode_toggle_container = page.locator(".mode-toggle")
@@ -120,13 +118,13 @@ class TestMobileResponsiveness:
             context.close()
 
     @pytest.mark.parametrize("device_name,viewport", MOBILE_DEVICES.items())
-    def test_form_inputs_are_touch_friendly(self, browser, device_name, viewport):
+    def test_form_inputs_are_touch_friendly(self, browser, base_url, device_name, viewport):
         """Test that form inputs meet minimum touch target size (44px)"""
         context = browser.new_context(viewport=viewport)
         page = context.new_page()
 
         try:
-            page.goto(self.BASE_URL, wait_until="networkidle")
+            page.goto(base_url, wait_until="networkidle")
 
             # Test main inputs
             inputs_to_test = [
@@ -147,13 +145,13 @@ class TestMobileResponsiveness:
             context.close()
 
     @pytest.mark.parametrize("device_name,viewport", MOBILE_DEVICES.items())
-    def test_buttons_are_touch_friendly(self, browser, device_name, viewport):
+    def test_buttons_are_touch_friendly(self, browser, base_url, device_name, viewport):
         """Test that buttons meet minimum touch target size"""
         context = browser.new_context(viewport=viewport)
         page = context.new_page()
 
         try:
-            page.goto(self.BASE_URL, wait_until="networkidle")
+            page.goto(base_url, wait_until="networkidle")
 
             # Test main buttons
             submit_btn = page.locator(".btn-submit")
@@ -170,13 +168,13 @@ class TestMobileResponsiveness:
             context.close()
 
     @pytest.mark.parametrize("device_name,viewport", MOBILE_DEVICES.items())
-    def test_radio_buttons_are_accessible(self, browser, device_name, viewport):
+    def test_radio_buttons_are_accessible(self, browser, base_url, device_name, viewport):
         """Test that radio buttons and labels are properly sized"""
         context = browser.new_context(viewport=viewport)
         page = context.new_page()
 
         try:
-            page.goto(self.BASE_URL, wait_until="networkidle")
+            page.goto(base_url, wait_until="networkidle")
 
             # Test sex radio buttons
             male_radio = page.locator("#sex-male")
@@ -192,13 +190,13 @@ class TestMobileResponsiveness:
             context.close()
 
     @pytest.mark.parametrize("device_name,viewport", MOBILE_DEVICES.items())
-    def test_disclaimer_renders_properly(self, browser, device_name, viewport):
+    def test_disclaimer_renders_properly(self, browser, base_url, device_name, viewport):
         """Test that disclaimer is visible and doesn't overflow"""
         context = browser.new_context(viewport=viewport)
         page = context.new_page()
 
         try:
-            page.goto(self.BASE_URL, wait_until="networkidle")
+            page.goto(base_url, wait_until="networkidle")
 
             disclaimer = page.locator("#disclaimer")
             expect(disclaimer).to_be_visible()
@@ -213,13 +211,13 @@ class TestMobileResponsiveness:
             context.close()
 
     @pytest.mark.parametrize("device_name,viewport", MOBILE_DEVICES.items())
-    def test_form_completes_successfully(self, browser, device_name, viewport):
+    def test_form_completes_successfully(self, browser, base_url, device_name, viewport):
         """Test that form can be filled and submitted on mobile"""
         context = browser.new_context(viewport=viewport)
         page = context.new_page()
 
         try:
-            page.goto(self.BASE_URL, wait_until="networkidle")
+            page.goto(base_url, wait_until="networkidle")
 
             # Fill form
             page.locator("#sex-male").click()
@@ -242,13 +240,13 @@ class TestMobileResponsiveness:
             context.close()
 
     @pytest.mark.parametrize("device_name,viewport", MOBILE_DEVICES.items())
-    def test_results_grid_layout(self, browser, device_name, viewport):
+    def test_results_grid_layout(self, browser, base_url, device_name, viewport):
         """Test that results grid renders properly"""
         context = browser.new_context(viewport=viewport)
         page = context.new_page()
 
         try:
-            page.goto(self.BASE_URL, wait_until="networkidle")
+            page.goto(base_url, wait_until="networkidle")
 
             # Fill and submit form
             page.locator("#sex-male").click()
@@ -276,13 +274,13 @@ class TestMobileResponsiveness:
             context.close()
 
     @pytest.mark.parametrize("device_name,viewport", MOBILE_DEVICES.items())
-    def test_chart_section_responsive(self, browser, device_name, viewport):
+    def test_chart_section_responsive(self, browser, base_url, device_name, viewport):
         """Test that chart section renders properly on mobile"""
         context = browser.new_context(viewport=viewport)
         page = context.new_page()
 
         try:
-            page.goto(self.BASE_URL, wait_until="networkidle")
+            page.goto(base_url, wait_until="networkidle")
 
             # Fill and submit form
             page.locator("#sex-male").click()
@@ -321,13 +319,13 @@ class TestMobileResponsiveness:
             context.close()
 
     @pytest.mark.parametrize("device_name,viewport", MOBILE_DEVICES.items())
-    def test_text_readability(self, browser, device_name, viewport):
+    def test_text_readability(self, browser, base_url, device_name, viewport):
         """Test that text sizes are readable (minimum 14px for body text)"""
         context = browser.new_context(viewport=viewport)
         page = context.new_page()
 
         try:
-            page.goto(self.BASE_URL, wait_until="networkidle")
+            page.goto(base_url, wait_until="networkidle")
 
             # Check various text elements
             elements_to_check = [
@@ -351,13 +349,13 @@ class TestMobileResponsiveness:
             context.close()
 
     @pytest.mark.parametrize("device_name,viewport", MOBILE_DEVICES.items())
-    def test_footer_visible(self, browser, device_name, viewport):
+    def test_footer_visible(self, browser, base_url, device_name, viewport):
         """Test that footer is visible and properly formatted"""
         context = browser.new_context(viewport=viewport)
         page = context.new_page()
 
         try:
-            page.goto(self.BASE_URL, wait_until="networkidle")
+            page.goto(base_url, wait_until="networkidle")
 
             footer = page.locator(".footer")
             expect(footer).to_be_visible()
@@ -380,7 +378,7 @@ class TestLayoutBreakpoints:
         # Just below breakpoint (767px)
         context = browser.new_context(viewport={"width": 767, "height": 1024})
         page = context.new_page()
-        page.goto(self.BASE_URL, wait_until="networkidle")
+        page.goto(base_url, wait_until="networkidle")
 
         form_grid = page.locator(".form-grid").first
         grid_columns = form_grid.evaluate(
@@ -396,7 +394,7 @@ class TestLayoutBreakpoints:
         # At breakpoint (768px)
         context = browser.new_context(viewport={"width": 768, "height": 1024})
         page = context.new_page()
-        page.goto(self.BASE_URL, wait_until="networkidle")
+        page.goto(base_url, wait_until="networkidle")
 
         form_grid = page.locator(".form-grid").first
         grid_columns = form_grid.evaluate(
@@ -414,7 +412,7 @@ class TestLayoutBreakpoints:
         # Below breakpoint (599px)
         context = browser.new_context(viewport={"width": 599, "height": 800})
         page = context.new_page()
-        page.goto(self.BASE_URL, wait_until="networkidle")
+        page.goto(base_url, wait_until="networkidle")
 
         # Fill and submit form
         page.locator("#sex-male").click()

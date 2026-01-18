@@ -602,32 +602,69 @@ select:focus {
 }
 
 .bone-age-table th {
-    padding: 12px;
+    padding: 14px 12px;
     text-align: left;
     font-weight: 600;
+    font-size: 13px;
     color: var(--text-primary);
     border-bottom: 2px solid var(--border-color);
+    white-space: nowrap;
+}
+
+.bone-age-table th:nth-child(1) {
+    width: 180px;
+}
+
+.bone-age-table th:nth-child(2) {
+    width: auto;
+}
+
+.bone-age-table th:nth-child(3) {
+    width: 200px;
+}
+
+.bone-age-table th:nth-child(4) {
+    width: 120px;
+    text-align: center;
 }
 
 .bone-age-table td {
-    padding: 10px 12px;
+    padding: 12px;
     border-bottom: 1px solid var(--border-color);
+    vertical-align: middle;
+}
+
+.bone-age-table td:nth-child(4) {
+    text-align: center;
 }
 
 .bone-age-table tbody tr:last-child td {
     border-bottom: none;
 }
 
+.bone-age-table tbody tr:hover {
+    background: var(--hover-bg);
+}
+
 .bone-age-table input[type="date"],
 .bone-age-table input[type="number"],
 .bone-age-table select {
     width: 100%;
-    padding: 6px 8px;
+    padding: 8px 10px;
     border: 1px solid var(--border-color);
     border-radius: 4px;
     font-size: 14px;
     background: var(--input-bg);
     color: var(--text-primary);
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.bone-age-table input[type="date"]:focus,
+.bone-age-table input[type="number"]:focus,
+.bone-age-table select:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
 .bone-age-table input[type="number"] {
@@ -640,23 +677,41 @@ select:focus {
     align-items: center;
 }
 
+.bone-age-input-container {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.bone-age-input-wrapper {
+    flex: 1;
+    min-width: 0;
+}
+
 .bone-age-format-toggle {
     display: flex;
     background: var(--input-bg);
     border: 1px solid var(--border-color);
     border-radius: 4px;
     overflow: hidden;
-    margin-bottom: 4px;
+    flex-shrink: 0;
 }
 
 .bone-age-format-toggle button {
-    padding: 4px 8px;
+    padding: 6px 10px;
     border: none;
     background: transparent;
     color: var(--text-primary);
     cursor: pointer;
-    font-size: 11px;
+    font-size: 12px;
+    font-weight: 500;
     transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.bone-age-format-toggle button:hover:not(.active) {
+    background: var(--hover-bg);
 }
 
 .bone-age-format-toggle button.active {
@@ -681,6 +736,7 @@ select:focus {
 
 .bone-age-ym-input input {
     width: 50px;
+    flex-shrink: 0;
 }
 
 .bone-age-ym-input span {
@@ -809,6 +865,14 @@ select:focus {
     font-size: 20px;
 }
 
+/* Keyboard shortcut hints */
+.keyboard-hint {
+    font-size: 0.85em;
+    opacity: 0.7;
+    font-weight: 400;
+    margin-left: 0.25rem;
+}
+
 @media (max-width: 480px) {
     .button-group {
         flex-direction: column;
@@ -818,6 +882,11 @@ select:focus {
     .btn-reset,
     .btn-demo {
         width: 100%;
+    }
+
+    .keyboard-hint {
+        font-size: 0.75em;
+        opacity: 0.6;
     }
 }
 
@@ -1224,6 +1293,43 @@ select:focus {
     input[type="number"],
     input[type="date"],
     select {
+        font-size: 16px;
+    }
+
+    /* Bone Age Table Responsive */
+    .bone-age-table th,
+    .bone-age-table td {
+        padding: 8px 6px;
+        font-size: 13px;
+    }
+
+    .bone-age-table th:nth-child(1),
+    .bone-age-table th:nth-child(3) {
+        width: auto;
+    }
+
+    .bone-age-input-container {
+        flex-direction: column;
+        gap: 6px;
+        align-items: stretch;
+    }
+
+    .bone-age-format-toggle {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .bone-age-format-toggle button {
+        flex: 1;
+        padding: 8px;
+    }
+
+    .btn-remove-measurement {
+        font-size: 12px;
+        padding: 6px 10px;
+    }
+
+    .btn-remove-measurement .material-symbols-outlined {
         font-size: 16px;
     }
 }

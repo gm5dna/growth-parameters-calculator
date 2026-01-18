@@ -667,18 +667,20 @@ function addBoneAgeRow() {
         </td>
         <td>
             <div class="bone-age-input-container">
+                <div class="bone-age-input-wrapper">
+                    <div class="bone-age-decimal-input active" data-row-id="${rowId}">
+                        <input type="number" class="bone-age-decimal" step="0.1" min="0" max="18" placeholder="e.g., 8.5" data-row-id="${rowId}" />
+                    </div>
+                    <div class="bone-age-ym-input" data-row-id="${rowId}">
+                        <input type="number" class="bone-age-years" min="0" max="18" placeholder="Y" data-row-id="${rowId}" />
+                        <span>y</span>
+                        <input type="number" class="bone-age-months" min="0" max="11" placeholder="M" data-row-id="${rowId}" />
+                        <span>m</span>
+                    </div>
+                </div>
                 <div class="bone-age-format-toggle">
-                    <button type="button" class="bone-age-format-btn active" data-format="decimal" data-row-id="${rowId}">Decimal</button>
-                    <button type="button" class="bone-age-format-btn" data-format="ym" data-row-id="${rowId}">Years + Months</button>
-                </div>
-                <div class="bone-age-decimal-input active" data-row-id="${rowId}">
-                    <input type="number" class="bone-age-decimal" step="0.1" min="0" max="18" placeholder="e.g., 8.5" data-row-id="${rowId}" />
-                </div>
-                <div class="bone-age-ym-input" data-row-id="${rowId}">
-                    <input type="number" class="bone-age-years" min="0" max="18" placeholder="Y" data-row-id="${rowId}" />
-                    <span>y</span>
-                    <input type="number" class="bone-age-months" min="0" max="11" placeholder="M" data-row-id="${rowId}" />
-                    <span>m</span>
+                    <button type="button" class="bone-age-format-btn active" data-format="decimal" data-row-id="${rowId}" title="Decimal format">Dec</button>
+                    <button type="button" class="bone-age-format-btn" data-format="ym" data-row-id="${rowId}" title="Years and Months format">Y+M</button>
                 </div>
             </div>
         </td>
@@ -1977,6 +1979,35 @@ document.addEventListener('keydown', (e) => {
 });
 
 /**
+ * Keyboard shortcut: Ctrl/Cmd + Enter to submit form
+ */
+document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+
+        // Trigger form submission programmatically
+        const form = document.getElementById('growthForm');
+        const submitEvent = new Event('submit', {
+            bubbles: true,
+            cancelable: true
+        });
+        form.dispatchEvent(submitEvent);
+    }
+});
+
+/**
+ * Keyboard shortcut: Escape key to reset form
+ */
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        e.preventDefault();
+
+        // Trigger reset button click
+        document.getElementById('resetBtn').click();
+    }
+});
+
+/**
  * Extract all results data from DOM for copying
  * @returns {Object} Structured results data
  */
@@ -2314,5 +2345,32 @@ document.addEventListener('DOMContentLoaded', () => {
     const exportPdfBtn = document.getElementById('exportPdfBtn');
     if (exportPdfBtn) {
         exportPdfBtn.addEventListener('click', handlePdfExport);
+    }
+});
+
+/**
+ * Detect macOS and update keyboard hints to show ⌘ instead of Ctrl
+ */
+document.addEventListener('DOMContentLoaded', () => {
+    // Detect operating system
+    const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+    const modifierKey = isMac ? '⌘' : 'Ctrl';
+
+    // Update Calculate button hint
+    const calculateBtn = document.querySelector('.btn-submit');
+    if (calculateBtn) {
+        const hint = calculateBtn.querySelector('.keyboard-hint');
+        if (hint) {
+            hint.textContent = `(${modifierKey}+Enter)`;
+        }
+    }
+
+    // Update Copy Results button hint
+    const copyBtn = document.getElementById('copyResultsBtn');
+    if (copyBtn) {
+        const hint = copyBtn.querySelector('.keyboard-hint');
+        if (hint) {
+            hint.textContent = `(${modifierKey}+C)`;
+        }
     }
 });
