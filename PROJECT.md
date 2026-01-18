@@ -70,7 +70,6 @@ docs/                 # GitHub Pages user guide
 - `POST /calculate` - Main growth calculations
 - `POST /chart-data` - Centile curve data for charts
 - `POST /export-pdf` - PDF report generation
-- `GET /generate-demo-data` - Realistic demo data
 
 ## Validation Rules
 
@@ -102,7 +101,6 @@ docs/                 # GitHub Pages user guide
 - ✅ Auto-save form state (localStorage)
 - ✅ PDF export with charts
 - ✅ Copy results to clipboard (clinical formatting)
-- ✅ Demo mode (realistic auto-generated data)
 
 ### Advanced Features (Jan 2026)
 - ✅ Percentage median BMI (malnutrition assessment)
@@ -113,12 +111,11 @@ docs/                 # GitHub Pages user guide
 
 ## Current Sprint (Jan 18, 2026)
 
-**Status:** Debugging and polish
+**Status:** Cleanup and stabilization
 - ✅ Fixed collapsible sections CSS conflicts
-- ✅ Fixed demo mode parameter naming bug
-- ✅ Added debug logging for troubleshooting
 - ✅ Improved CSV button layout
-- 🔄 Awaiting deployment to verify demo mode fix
+- ✅ Reorganized documentation structure
+- ✅ Removed demo mode feature (unstable)
 
 ## Known Issues
 

@@ -46,7 +46,6 @@ git add . && git commit -m "msg" && git push # Auto-deploys
 - `POST /calculate` → Growth calculations
 - `POST /chart-data` → Centile curves
 - `POST /export-pdf` → PDF report
-- `GET /generate-demo-data` → Demo data
 
 ## Key Patterns
 
@@ -67,15 +66,15 @@ git add . && git commit -m "msg" && git push # Auto-deploys
 ## Recent Work (Jan 18, 2026)
 
 - ✅ Collapsible sections (prev measurements, bone age)
-- ✅ Demo mode with realistic data generation
 - ✅ CSV import/export for previous measurements
-- 🐛 Fixed: CSS conflicts, demo mode parameter bug
+- ✅ Documentation reorganization (PROJECT.md as source of truth)
+- ✅ Removed demo mode (unstable)
 
 ## Current Status
 
 - All 46 tests passing
-- Demo mode bug fixed (awaiting deployment)
 - Collapsible sections working correctly
+- Documentation streamlined and organized
 
 ## See Also
 
