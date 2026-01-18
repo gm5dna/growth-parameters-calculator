@@ -129,14 +129,16 @@ body.advanced-mode .result-item.advanced-only {
 }
 
 /* Collapsible Section Controls */
-.section-collapsed {
+/* In advanced mode, show collapsed sections by default, hide expanded */
+body.advanced-mode .section-collapsed {
     display: block !important;
 }
 
-.section-expanded {
+body.advanced-mode .section-expanded {
     display: none !important;
 }
 
+/* When a section is expanded, hide collapsed and show expanded */
 body.advanced-mode .section-collapsed.hidden {
     display: none !important;
 }
