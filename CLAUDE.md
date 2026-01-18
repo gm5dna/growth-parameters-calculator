@@ -69,12 +69,14 @@ git add . && git commit -m "msg" && git push # Auto-deploys
 - ✅ CSV import/export for previous measurements
 - ✅ Documentation reorganization (PROJECT.md as source of truth)
 - ✅ Removed demo mode (unstable)
+- ✅ Feature backlog reviewed and curated (10 features remaining)
 
 ## Current Status
 
 - All 46 tests passing
 - Collapsible sections working correctly
 - Documentation streamlined and organized
+- Feature backlog focused on clinical value
 
 ## See Also
 

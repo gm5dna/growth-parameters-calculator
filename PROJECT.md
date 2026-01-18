@@ -100,12 +100,14 @@ docs/                 # GitHub Pages user guide
 - ✅ PWA offline support
 - ✅ Auto-save form state (localStorage)
 - ✅ PDF export with charts
+- ✅ Chart download (PNG export)
 - ✅ Copy results to clipboard (clinical formatting)
 
 ### Advanced Features (Jan 2026)
 - ✅ Percentage median BMI (malnutrition assessment)
 - ✅ Intelligent age range selection (optimizes chart display)
 - ✅ Multiple previous measurements with CSV import/export
+- ✅ Growth trajectory tracking (previous measurements plotted on charts)
 - ✅ Bone age assessment (Greulich-Pyle, TW3)
 - ✅ Collapsible sections (progressive disclosure)
 
@@ -126,26 +128,21 @@ docs/                 # GitHub Pages user guide
 
 ## Feature Backlog
 
-### High Priority (Quick Wins - 1-3 days)
-- [ ] **CDC Reference Support** - Enable CDC reference (already in dropdown, needs backend)
+### High Priority (Quick Wins)
 - [ ] **Keyboard Shortcuts** - Ctrl+Enter to calculate, Ctrl+R to reset
-- [ ] **Recent Calculations History** - Last 5-10 in localStorage
-- [ ] **Chart Download** - Export charts as PNG/SVG
 
-### Medium Priority (rcpchgrowth Library Features)
+### Medium Priority (Clinical Features)
 - [ ] **Centile Band Interpretation** - "Between 25th-50th centile" text
 - [ ] **Weight Target Calculator** - Calculate weight for target BMI centile
-- [ ] **Growth Trajectory Tracking** - Multiple measurements over time on charts
 - [ ] **Parental OFC Plotting** - For familial macrocephaly assessment
 - [ ] **Event Annotations** - Tag measurements with clinical notes
 
 ### Low Priority (Future Enhancements)
-- [ ] Predicted Adult Height - Bayley-Pinneau, Khamis-Roche methods
-- [ ] Privacy Mode - No localStorage/ephemeral session
-- [ ] Puberty Staging - Tanner stage selector
-- [ ] Voice Input - For measurements
-- [ ] Multi-language Support - i18n
-- [ ] Syndrome-Specific Charts - Noonan, Achondroplasia, etc.
+- [ ] **Predicted Adult Height** - Bayley-Pinneau, Khamis-Roche methods
+- [ ] **Privacy Mode** - No localStorage/ephemeral session
+- [ ] **Puberty Staging** - Tanner stage selector
+- [ ] **Multi-language Support** - i18n
+- [ ] **Syndrome-Specific Charts** - Noonan, Achondroplasia, etc.
 
 ## Testing
 
