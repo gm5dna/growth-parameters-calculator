@@ -303,6 +303,7 @@ select {
     min-height: 44px; /* Improved touch target for mobile */
     background: var(--input-bg);
     color: var(--text-primary);
+    text-align: left; /* Fix date field alignment on iOS */
 }
 
 @media (min-width: 768px) {
@@ -1183,6 +1184,36 @@ select:focus {
     .chart-info {
         font-size: 0.85rem;
         padding: 12px 15px;
+    }
+
+    /* Age range selector responsiveness */
+    .age-range-selector {
+        padding: 12px 15px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .age-range-selector > label {
+        width: 100%;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .age-range-selector .radio-group {
+        width: 100%;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .age-range-selector .radio-label {
+        font-size: 14px;
+        min-width: calc(50% - 6px);
+        flex: 0 0 calc(50% - 6px);
+    }
+
+    .age-range-selector .radio-label span {
+        font-size: 14px;
     }
 }
 

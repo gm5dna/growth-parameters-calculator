@@ -1241,9 +1241,29 @@ function renderGrowthChart(canvas, centiles, patientData, measurementMethod) {
     }
 
     // Generate explicit tick values - only integers from min to max
+    // Use step size based on screen width for better mobile display
+    const screenWidth = window.innerWidth;
+    const ageRange = maxAge - minAge;
+    let stepSize;
+
+    if (screenWidth < 400) {
+        // Very small screens: show fewer ticks (every 2-4 years depending on range)
+        stepSize = ageRange > 10 ? 4 : 2;
+    } else if (screenWidth < 600) {
+        // Small screens: show moderate ticks (every 2-3 years)
+        stepSize = ageRange > 10 ? 3 : 2;
+    } else {
+        // Larger screens: show all years
+        stepSize = 1;
+    }
+
     const tickValues = [];
-    for (let i = minAge; i <= maxAge; i++) {
+    for (let i = minAge; i <= maxAge; i += stepSize) {
         tickValues.push(i);
+    }
+    // Always include the max age
+    if (tickValues[tickValues.length - 1] !== maxAge) {
+        tickValues.push(maxAge);
     }
 
     // Create Chart.js chart
