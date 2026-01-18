@@ -67,10 +67,6 @@ def calculate():
         maternal_height = float(data.get('maternal_height', 0)) if data.get('maternal_height') else None
         paternal_height = float(data.get('paternal_height', 0)) if data.get('paternal_height') else None
 
-        # Optional parental OFC (for benign familial macrocephaly assessment)
-        maternal_ofc = float(data.get('maternal_ofc', 0)) if data.get('maternal_ofc') else None
-        paternal_ofc = float(data.get('paternal_ofc', 0)) if data.get('paternal_ofc') else None
-
         # Optional gestation data
         gestation_weeks = data.get('gestation_weeks')
         gestation_days = data.get('gestation_days')
@@ -284,49 +280,6 @@ def calculate():
                 'target_range_upper': round(upper_height, 1)
             }
 
-        # Calculate parental OFC centiles at age 17 (for benign familial macrocephaly assessment)
-        # Note: UK-WHO OFC reference data only extends to age 17
-        parental_ofc_data = None
-        if (maternal_ofc or paternal_ofc) and ofc:
-            parental_ofc_data = {}
-
-            # Calculate birth date for 17-year-old at measurement date
-            adult_birth_date = measurement_date - relativedelta(years=17)
-
-            if maternal_ofc:
-                maternal_ofc_measurement = Measurement(
-                    sex='female',
-                    birth_date=adult_birth_date,
-                    observation_date=measurement_date,
-                    measurement_method='ofc',
-                    observation_value=maternal_ofc,
-                    reference=reference
-                )
-                maternal_calc = maternal_ofc_measurement.measurement['measurement_calculated_values']
-                parental_ofc_data['maternal'] = {
-                    'value': maternal_ofc,
-                    'centile': round(float(maternal_calc['corrected_centile']), 2) if maternal_calc['corrected_centile'] else None,
-                    'sds': round(float(maternal_calc['corrected_sds']), 2) if maternal_calc['corrected_sds'] else None,
-                    'age': 17.0
-                }
-
-            if paternal_ofc:
-                paternal_ofc_measurement = Measurement(
-                    sex='male',
-                    birth_date=adult_birth_date,
-                    observation_date=measurement_date,
-                    measurement_method='ofc',
-                    observation_value=paternal_ofc,
-                    reference=reference
-                )
-                paternal_calc = paternal_ofc_measurement.measurement['measurement_calculated_values']
-                parental_ofc_data['paternal'] = {
-                    'value': paternal_ofc,
-                    'centile': round(float(paternal_calc['corrected_centile']), 2) if paternal_calc['corrected_centile'] else None,
-                    'sds': round(float(paternal_calc['corrected_sds']), 2) if paternal_calc['corrected_sds'] else None,
-                    'age': 17.0
-                }
-
         # Extract calculated values only for measurements that were performed
         weight_calc = None
         height_calc = None
@@ -486,7 +439,6 @@ def calculate():
             'bsa_method': bsa_method,
             'gh_dose': gh_dose,
             'mid_parental_height': mph_data,
-            'parental_ofc': parental_ofc_data,
             'validation_messages': validation_messages
         }
 

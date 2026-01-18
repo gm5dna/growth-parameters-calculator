@@ -36,6 +36,7 @@ See `documentation/feature-plans/FEATURES_BACKLOG.md` for comprehensive list.
 - [ ] Centile Band Interpretation (e.g., "between 25th-50th centile")
 
 ### Short Term
+- [ ] Parental OFC Plotting (for benign familial macrocephaly assessment)
 - [ ] Bone Age Assessment
 - [ ] Event Annotations (tag measurements with clinical events)
 - [ ] Library Age Functions (use rcpchgrowth built-in age calculations)
