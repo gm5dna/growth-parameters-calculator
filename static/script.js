@@ -745,6 +745,11 @@ document.getElementById('closeChartsBtn').addEventListener('click', () => {
     document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
 });
 
+// Download Chart Button Click Handler
+document.getElementById('downloadChartBtn').addEventListener('click', () => {
+    downloadCurrentChart();
+});
+
 // Chart Tab Switching
 document.querySelectorAll('.chart-tab').forEach(tab => {
     tab.addEventListener('click', (e) => {
@@ -1702,6 +1707,57 @@ function exportChartAsImage() {
     } catch (error) {
         console.error('Error exporting chart:', error);
         return null;
+    }
+}
+
+/**
+ * Download current chart as PNG file
+ */
+function downloadCurrentChart() {
+    if (!currentChartInstance) {
+        showToast('No chart available to download', 'error');
+        return;
+    }
+
+    try {
+        // Get the base64 image
+        const base64Image = exportChartAsImage();
+        if (!base64Image) {
+            showToast('Failed to export chart', 'error');
+            return;
+        }
+
+        // Determine the chart type from active tab
+        const activeTab = document.querySelector('.chart-tab.active');
+        const chartType = activeTab ? activeTab.getAttribute('data-measurement') : 'chart';
+
+        // Get the current date for filename
+        const date = new Date().toISOString().split('T')[0];
+
+        // Convert base64 to blob
+        const base64Data = base64Image.replace(/^data:image\/png;base64,/, '');
+        const byteCharacters = atob(base64Data);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: 'image/png' });
+
+        // Create download link and trigger download
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `growth-chart-${chartType}-${date}.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+
+        showToast('Chart downloaded successfully', 'success');
+    } catch (error) {
+        console.error('Error downloading chart:', error);
+        showToast('Failed to download chart', 'error');
     }
 }
 

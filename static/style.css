@@ -1033,6 +1033,40 @@ select:focus {
     color: #667eea;
 }
 
+.charts-header-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.btn-download-chart {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-download-chart:hover {
+    background: #5568d3;
+    transform: translateY(-1px);
+}
+
+.btn-download-chart:active {
+    transform: translateY(0);
+}
+
+.btn-download-chart .material-symbols-outlined {
+    font-size: 18px;
+}
+
 .btn-close-charts {
     padding: 8px 20px;
     background: #e0e0e0;
@@ -1225,9 +1259,16 @@ select:focus {
         gap: 15px;
     }
 
+    .charts-header-actions {
+        width: 100%;
+        flex-direction: column;
+    }
+
+    .btn-download-chart,
     .btn-close-charts {
-        align-self: stretch;
+        width: 100%;
         padding: 10px;
+        justify-content: center;
     }
 
     .chart-tabs {
