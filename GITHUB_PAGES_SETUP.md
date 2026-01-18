@@ -15,7 +15,7 @@ To make the user documentation website live at `https://gm5dna.github.io/growth-
 - Under "Build and deployment"
 - **Source:** Select "Deploy from a branch"
 - **Branch:** Select `main`
-- **Folder:** Select `/docs-site`
+- **Folder:** Select `/docs`
 - Click **Save**
 
 ### 4. Wait for Deployment
@@ -39,7 +39,7 @@ Once enabled, users can access the documentation:
 
 To update the documentation:
 
-1. Edit files in the `docs-site/` folder
+1. Edit files in the `docs/` folder
 2. Commit and push changes to the `main` branch
 3. GitHub Pages will automatically rebuild and redeploy (1-2 minutes)
 
@@ -55,7 +55,7 @@ If you want to use a custom domain:
 
 **Site not appearing?**
 - Check that GitHub Pages is enabled in Settings > Pages
-- Verify the branch is set to `main` and folder to `/docs-site`
+- Verify the branch is set to `main` and folder to `/docs`
 - Wait a few minutes for the build to complete
 - Check the Actions tab for build status
 
@@ -65,8 +65,8 @@ If you want to use a custom domain:
 - Check that changes were pushed to the `main` branch
 
 **404 error?**
-- Verify the folder is `/docs-site` (not `/docs` or root)
-- Ensure `index.html` exists in the `docs-site/` folder
+- Verify the folder is `/docs` (this is a GitHub Pages requirement)
+- Ensure `index.html` exists in the `docs/` folder
 - Check repository visibility is set to Public
 
 ## What's Included

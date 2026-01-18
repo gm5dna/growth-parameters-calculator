@@ -28,7 +28,7 @@
 
 ## Feature Backlog 📋
 
-See `docs/feature-plans/FEATURES_BACKLOG.md` for comprehensive list.
+See `documentation/feature-plans/FEATURES_BACKLOG.md` for comprehensive list.
 
 ### Immediate Priority
 - [ ] CDC Reference Support (enable in backend)

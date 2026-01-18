@@ -6,7 +6,8 @@
 **Stack:** Flask 3.0.0 + Vanilla JS SPA + Chart.js + Material Design Icons
 **Deploy:** https://growth-parameters-calculator.onrender.com
 **Python:** 3.12.8 (specified in runtime.txt for Render)
-**Docs:** See `docs/` folder - comprehensive guides in `docs/README.md`
+**Dev Docs:** See `documentation/` folder - technical guides
+**User Docs:** See `docs/` folder - GitHub Pages site at https://gm5dna.github.io/growth-parameters-calculator/
 
 ## Commands
 
@@ -48,7 +49,8 @@ static/
 templates/
   index.html          # SPA shell with Material Icons
 tests/                # pytest test suite
-docs/                 # Full documentation
+docs/                 # User documentation (GitHub Pages)
+documentation/        # Developer documentation & guides
 ```
 
 ## Key Patterns
@@ -123,7 +125,7 @@ are in requirements-dev.txt and won't affect Render deployments.
 
 ## Next Priority Features
 
-See `docs/feature-plans/` for detailed roadmaps. Top candidates:
+See `documentation/feature-plans/` for detailed roadmaps. Top candidates:
 - Keyboard shortcuts (Ctrl+Enter to calculate)
 - Recent calculations history
 - Chart download (PNG/SVG)
