@@ -25,6 +25,14 @@
 
 **Note:** Deployment info is in `/PROJECT.md` (Render.com auto-deploy)
 
+### Future Planning
+
+- **`FHIR_INTEGRATION.md`** - FHIR/HL7 interoperability research paper
+  - Technical feasibility analysis
+  - Implementation phases and strategies
+  - NHS/EHR integration considerations
+  - Cost-benefit analysis
+
 ### Test Reports
 
 - **`test-reports/`** - Testing documentation

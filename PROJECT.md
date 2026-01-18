@@ -143,6 +143,7 @@ docs/                 # GitHub Pages user guide
 - [ ] **Puberty Staging** - Tanner stage selector
 - [ ] **Multi-language Support** - i18n
 - [ ] **Syndrome-Specific Charts** - Noonan, Achondroplasia, etc.
+- [ ] **FHIR/HL7 Integration** - EHR interoperability (see documentation/FHIR_INTEGRATION.md)
 
 ## Testing
 
