@@ -303,7 +303,24 @@ select {
     min-height: 44px; /* Improved touch target for mobile */
     background: var(--input-bg);
     color: var(--text-primary);
-    text-align: left; /* Fix date field alignment on iOS */
+    text-align: left !important; /* Fix date field alignment on iOS */
+    -webkit-text-align: left; /* Webkit-specific for iOS Safari */
+}
+
+/* iOS Safari date input pseudo-elements - force left alignment */
+input[type="date"]::-webkit-date-and-time-value {
+    text-align: left !important;
+    padding-left: 0;
+}
+
+input[type="date"]::-webkit-datetime-edit {
+    text-align: left;
+    padding-left: 0;
+}
+
+input[type="date"]::-webkit-datetime-edit-fields-wrapper {
+    text-align: left;
+    padding-left: 0;
 }
 
 @media (min-width: 768px) {
