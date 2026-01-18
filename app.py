@@ -730,7 +730,7 @@ def generate_demo_data():
             measurement_method='height',
             requested_sds=height_centile_sds,
             sex=sex,
-            decimal_age=age_years,
+            age=age_years,
             reference=reference
         )
         height = round(height_measurement, 1)
@@ -739,7 +739,7 @@ def generate_demo_data():
             measurement_method='weight',
             requested_sds=weight_centile_sds,
             sex=sex,
-            decimal_age=age_years,
+            age=age_years,
             reference=reference
         )
         weight = round(weight_measurement, 1)
@@ -751,7 +751,7 @@ def generate_demo_data():
                 measurement_method='ofc',
                 requested_sds=ofc_centile_sds,
                 sex=sex,
-                decimal_age=age_years,
+                age=age_years,
                 reference=reference
             )
             ofc = round(ofc_measurement, 1)
@@ -776,7 +776,7 @@ def generate_demo_data():
                     measurement_method='height',
                     requested_sds=prev_height_sds,
                     sex=sex,
-                    decimal_age=prev_age,
+                    age=prev_age,
                     reference=reference
                 ), 1)
 
@@ -784,7 +784,7 @@ def generate_demo_data():
                     measurement_method='weight',
                     requested_sds=prev_weight_sds,
                     sex=sex,
-                    decimal_age=prev_age,
+                    age=prev_age,
                     reference=reference
                 ), 1)
 
@@ -795,7 +795,7 @@ def generate_demo_data():
                         measurement_method='ofc',
                         requested_sds=prev_ofc_sds,
                         sex=sex,
-                        decimal_age=prev_age,
+                        age=prev_age,
                         reference=reference
                     ), 1)
 
