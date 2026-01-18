@@ -156,6 +156,9 @@ document.getElementById('growthForm').addEventListener('submit', async (e) => {
     const height = document.getElementById('height').value;
     const ofc = document.getElementById('ofc').value;
 
+    const maternalOfc = document.getElementById('maternal_ofc')?.value;
+    const paternalOfc = document.getElementById('paternal_ofc')?.value;
+
     const gestationWeeks = document.getElementById('gestation_weeks').value;
     const gestationDays = document.getElementById('gestation_days').value;
 
@@ -170,6 +173,8 @@ document.getElementById('growthForm').addEventListener('submit', async (e) => {
         previous_height: document.getElementById('previous_height').value,
         maternal_height: maternalHeightCm,
         paternal_height: paternalHeightCm,
+        maternal_ofc: maternalOfc,
+        paternal_ofc: paternalOfc,
         gestation_weeks: gestationWeeks ? parseInt(gestationWeeks) : null,
         gestation_days: gestationDays ? parseInt(gestationDays) : null,
         reference: document.getElementById('reference').value
@@ -429,6 +434,9 @@ function displayResults(results) {
     currentPatientData.bmi_corrected = results.bmi_corrected || null;
     currentPatientData.ofc_corrected = results.ofc_corrected || null;
 
+    // Store parental OFC data (for benign familial macrocephaly assessment)
+    currentPatientData.parentalOfc = results.parental_ofc || null;
+
     // Show "Show Charts" button
     const showChartsContainer = document.getElementById('show-charts-container');
     showChartsContainer.classList.add('show');
@@ -562,6 +570,61 @@ sexInputs.forEach(input => {
 
 // Run on page load in case a sex is pre-selected
 updateReferenceOptions();
+
+// Parental OFC visibility - show only when child OFC entered and age > 2 years
+function updateParentalOfcVisibility() {
+    const ofcInput = document.getElementById('ofc');
+    const birthDateInput = document.getElementById('birth_date');
+    const measurementDateInput = document.getElementById('measurement_date');
+    const parentalOfcHeader = document.getElementById('parental-ofc-header');
+    const parentalOfcSection = document.getElementById('parental-ofc-section');
+
+    // Check if OFC is entered
+    const hasOfc = ofcInput && ofcInput.value && parseFloat(ofcInput.value) > 0;
+
+    // Calculate age if dates are available
+    let ageYears = 0;
+    if (birthDateInput && birthDateInput.value && measurementDateInput && measurementDateInput.value) {
+        const birthDate = new Date(birthDateInput.value);
+        const measurementDate = new Date(measurementDateInput.value);
+        const ageMs = measurementDate - birthDate;
+        ageYears = ageMs / (365.25 * 24 * 60 * 60 * 1000); // Convert to years
+    }
+
+    // Show parental OFC section if OFC entered and age > 2 years
+    const shouldShow = hasOfc && ageYears > 2;
+
+    if (parentalOfcHeader && parentalOfcSection) {
+        if (shouldShow && isAdvancedMode) {
+            parentalOfcHeader.style.display = 'block';
+            parentalOfcSection.style.display = 'grid';
+        } else {
+            parentalOfcHeader.style.display = 'none';
+            parentalOfcSection.style.display = 'none';
+        }
+    }
+}
+
+// Add event listeners for parental OFC visibility
+const ofcField = document.getElementById('ofc');
+const birthDateField = document.getElementById('birth_date');
+const measurementDateField = document.getElementById('measurement_date');
+
+if (ofcField) {
+    ofcField.addEventListener('input', updateParentalOfcVisibility);
+}
+if (birthDateField) {
+    birthDateField.addEventListener('change', updateParentalOfcVisibility);
+}
+if (measurementDateField) {
+    measurementDateField.addEventListener('change', updateParentalOfcVisibility);
+}
+
+// Also update when mode changes
+document.getElementById('modeToggle').addEventListener('change', updateParentalOfcVisibility);
+
+// Run on page load
+updateParentalOfcVisibility();
 
 // Disclaimer dismiss functionality (non-persistent - reappears on page reload)
 const disclaimerElement = document.getElementById('disclaimer');
@@ -1033,6 +1096,32 @@ function preparePatientData(measurementMethod) {
         }
     }
 
+    // Add parental OFC measurements at age 17 (for benign familial macrocephaly assessment)
+    // Note: UK-WHO OFC reference data only extends to age 17
+    if (measurementMethod === 'ofc' && currentPatientData.parentalOfc) {
+        if (currentPatientData.parentalOfc.maternal) {
+            patientPoints.push({
+                x: 17.0,
+                y: currentPatientData.parentalOfc.maternal.value,
+                label: 'Maternal OFC',
+                isParentalMaternal: true,
+                centile: currentPatientData.parentalOfc.maternal.centile,
+                sds: currentPatientData.parentalOfc.maternal.sds
+            });
+        }
+
+        if (currentPatientData.parentalOfc.paternal) {
+            patientPoints.push({
+                x: 17.0,
+                y: currentPatientData.parentalOfc.paternal.value,
+                label: 'Paternal OFC',
+                isParentalPaternal: true,
+                centile: currentPatientData.parentalOfc.paternal.centile,
+                sds: currentPatientData.parentalOfc.paternal.sds
+            });
+        }
+    }
+
     return patientPoints;
 }
 
@@ -1205,6 +1294,48 @@ function renderGrowthChart(canvas, centiles, patientData, measurementMethod) {
                 borderWidth: 2,
                 pointRadius: 5,
                 pointHoverRadius: 7,
+                showLine: false
+            });
+        }
+
+        // Add parental OFC measurements (for benign familial macrocephaly assessment)
+        const maternalOfcPoints = patientData.filter(p => p.isParentalMaternal);
+        const paternalOfcPoints = patientData.filter(p => p.isParentalPaternal);
+
+        if (maternalOfcPoints.length > 0) {
+            datasets.push({
+                label: 'Maternal OFC',
+                data: maternalOfcPoints.map(p => ({
+                    x: p.x,
+                    y: p.y,
+                    centile: p.centile,
+                    sds: p.sds
+                })),
+                backgroundColor: '#ef4444', // Red for maternal
+                borderColor: colors.pointBorder,
+                borderWidth: 2,
+                pointRadius: 6,
+                pointHoverRadius: 8,
+                pointStyle: 'triangle',
+                showLine: false
+            });
+        }
+
+        if (paternalOfcPoints.length > 0) {
+            datasets.push({
+                label: 'Paternal OFC',
+                data: paternalOfcPoints.map(p => ({
+                    x: p.x,
+                    y: p.y,
+                    centile: p.centile,
+                    sds: p.sds
+                })),
+                backgroundColor: '#3b82f6', // Blue for paternal
+                borderColor: colors.pointBorder,
+                borderWidth: 2,
+                pointRadius: 6,
+                pointHoverRadius: 8,
+                pointStyle: 'triangle',
                 showLine: false
             });
         }
