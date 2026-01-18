@@ -865,6 +865,13 @@ async function loadDemoData() {
 
         const data = result.data;
 
+        // Enable advanced mode if not already enabled
+        if (!isAdvancedMode) {
+            const modeToggle = document.getElementById('modeToggle');
+            modeToggle.checked = true;
+            modeToggle.dispatchEvent(new Event('change'));
+        }
+
         // Populate basic fields
         document.querySelector(`input[name="sex"][value="${data.sex}"]`).checked = true;
         document.getElementById('birth_date').value = data.birth_date;
