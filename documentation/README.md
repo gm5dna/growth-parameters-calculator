@@ -20,17 +20,9 @@
 
 - **`TECHNICAL.md`** - Architecture & implementation details
 - **`PROJECT_DESIGN.md`** - Design decisions & API reference
-- **`FEATURES.md`** - Complete feature documentation
 - **`USER_GUIDE.md`** - Step-by-step usage instructions
 - **`DEPLOYMENT.md`** - Production deployment guide
-- **`FUTURE_IMPROVEMENTS.md`** - Feature backlog
-
-### Feature Plans
-
-- **`feature-plans/`** - Detailed implementation plans
-  - `FEATURES_BACKLOG.md` - Prioritized backlog
-  - `FEATURE_PLAN_*.md` - Specific feature designs
-  - `*_USAGE.md` - Feature usage guides
+- **`PROJECT_STRUCTURE.md`** - Codebase organization
 
 ### Test Reports
 
@@ -46,10 +38,10 @@
 3. Dive into `TECHNICAL.md` or `PROJECT_DESIGN.md` as needed
 
 **For Developers:**
-1. Start with `/PROJECT.md` (overview)
+1. Start with `/PROJECT.md` (overview, features, backlog)
 2. Read `TECHNICAL.md` (architecture)
 3. Check `DEPLOYMENT.md` (production setup)
-4. Review `FEATURES.md` (what's implemented)
+4. Review `PROJECT_DESIGN.md` (design decisions)
 
 **For Users:**
 1. Visit https://gm5dna.github.io/growth-parameters-calculator/

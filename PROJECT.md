@@ -126,22 +126,26 @@ docs/                 # GitHub Pages user guide
 
 ## Feature Backlog
 
-### High Priority
-- [ ] Keyboard shortcuts (Ctrl+Enter to calculate)
-- [ ] Recent calculations history
-- [ ] Chart download (PNG/SVG export)
-- [ ] Weight target calculator (for target BMI centile)
+### High Priority (Quick Wins - 1-3 days)
+- [ ] **CDC Reference Support** - Enable CDC reference (already in dropdown, needs backend)
+- [ ] **Keyboard Shortcuts** - Ctrl+Enter to calculate, Ctrl+R to reset
+- [ ] **Recent Calculations History** - Last 5-10 in localStorage
+- [ ] **Chart Download** - Export charts as PNG/SVG
 
-### Medium Priority
-- [ ] Serial measurements trajectory tracking
-- [ ] Parental OFC plotting (familial macrocephaly)
-- [ ] Event annotations on charts
-- [ ] Expected height from MPH comparison
+### Medium Priority (rcpchgrowth Library Features)
+- [ ] **Centile Band Interpretation** - "Between 25th-50th centile" text
+- [ ] **Weight Target Calculator** - Calculate weight for target BMI centile
+- [ ] **Growth Trajectory Tracking** - Multiple measurements over time on charts
+- [ ] **Parental OFC Plotting** - For familial macrocephaly assessment
+- [ ] **Event Annotations** - Tag measurements with clinical notes
 
-### Low Priority
-- [ ] Voice input for measurements
-- [ ] Multi-language support (i18n)
-- [ ] Additional specialized references
+### Low Priority (Future Enhancements)
+- [ ] Predicted Adult Height - Bayley-Pinneau, Khamis-Roche methods
+- [ ] Privacy Mode - No localStorage/ephemeral session
+- [ ] Puberty Staging - Tanner stage selector
+- [ ] Voice Input - For measurements
+- [ ] Multi-language Support - i18n
+- [ ] Syndrome-Specific Charts - Noonan, Achondroplasia, etc.
 
 ## Testing
 
