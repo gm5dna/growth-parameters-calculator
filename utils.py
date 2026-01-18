@@ -4,6 +4,7 @@ Utility functions for mid-parental height and chart data
 import math
 from rcpchgrowth import mid_parental_height, mid_parental_height_z
 from rcpchgrowth import lower_and_upper_limits_of_expected_height_z, measurement_from_sds
+from rcpchgrowth import percentage_median_bmi
 from rcpchgrowth.chart_functions import create_chart
 from constants import MPH_ADULT_AGE
 
@@ -20,6 +21,39 @@ def norm_cdf(z):
         Probability (0 to 1) that a value is less than z
     """
     return 0.5 * (1.0 + math.erf(z / math.sqrt(2.0)))
+
+
+def calculate_percentage_median_bmi(reference, age, bmi, sex):
+    """
+    Calculate BMI as percentage of median for age and sex
+
+    This is particularly useful for malnutrition assessment:
+    - <70% indicates severe malnutrition
+    - 70-80% indicates moderate malnutrition
+    - 80-90% indicates mild malnutrition
+    - 90-110% indicates normal nutritional status
+    - >120% may indicate overweight/obesity
+
+    Args:
+        reference: Growth reference ('uk-who', 'turners-syndrome', etc.)
+        age: Age in years (decimal)
+        bmi: Actual BMI value
+        sex: Child's sex ('male' or 'female')
+
+    Returns:
+        float: BMI as percentage of median, rounded to 1 decimal place, or None if calculation fails
+    """
+    try:
+        percentage = percentage_median_bmi(
+            reference=reference,
+            age=age,
+            actual_bmi=bmi,
+            sex=sex
+        )
+        return round(percentage, 1) if percentage is not None else None
+    except Exception as e:
+        print(f"Error calculating percentage median BMI: {str(e)}")
+        return None
 
 
 def calculate_mid_parental_height(maternal_height, paternal_height, sex):

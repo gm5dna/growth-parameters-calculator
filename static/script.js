@@ -272,6 +272,15 @@ function displayResults(results) {
         document.getElementById('bmi-value').textContent = `${results.bmi.value} kg/m²`;
         document.getElementById('bmi-centile').textContent = results.bmi.centile !== null ? `${results.bmi.centile}%` : 'N/A';
         document.getElementById('bmi-sds').textContent = results.bmi.sds !== null ? results.bmi.sds : 'N/A';
+
+        // Display percentage of median BMI (advanced mode only)
+        const percentageMedianElement = document.getElementById('bmi-percentage-median');
+        if (results.bmi.percentage_median !== null && results.bmi.percentage_median !== undefined) {
+            percentageMedianElement.textContent = `${results.bmi.percentage_median}%`;
+        } else {
+            percentageMedianElement.textContent = 'N/A';
+        }
+
         bmiItem.style.display = 'block';
     } else {
         bmiItem.style.display = 'none';

@@ -117,6 +117,7 @@ are in requirements-dev.txt and won't affect Render deployments.
 - ✅ Growth chart visualization (Chart.js)
 - ✅ PWA offline support
 - ✅ Render deployment optimized (Python 3.12.8, split dependencies)
+- ✅ Percentage median BMI (advanced mode - malnutrition assessment)
 
 ## Next Priority Features
 

@@ -10,7 +10,7 @@ from constants import ErrorCodes
 from validation import ValidationError, validate_date, validate_date_range, validate_weight, validate_height, validate_ofc, validate_gestation
 from calculations import calculate_age_in_years, should_apply_gestation_correction, calculate_corrected_age, calculate_boyd_bsa, calculate_cbnf_bsa, calculate_height_velocity, calculate_gh_dose
 from models import create_measurement, validate_measurement_sds
-from utils import calculate_mid_parental_height, get_chart_data
+from utils import calculate_mid_parental_height, get_chart_data, calculate_percentage_median_bmi
 
 app = Flask(__name__)
 
@@ -285,6 +285,7 @@ def calculate():
         height_calc = None
         bmi_calc = None
         bmi_value = None
+        bmi_percentage_median = None
 
         if weight_measurement:
             weight_calc = weight_measurement.measurement['measurement_calculated_values']
@@ -293,6 +294,14 @@ def calculate():
         if bmi_measurement:
             bmi_calc = bmi_measurement.measurement['measurement_calculated_values']
             bmi_value = bmi_measurement.measurement['child_observation_value']['observation_value']
+
+            # Calculate percentage of median BMI (for malnutrition assessment)
+            bmi_percentage_median = calculate_percentage_median_bmi(
+                reference=reference,
+                age=age_decimal,
+                bmi=float(bmi_value),
+                sex=sex
+            )
 
         # Get SDS values for validation
         weight_sds = float(weight_calc['corrected_sds']) if weight_calc and weight_calc['corrected_sds'] else None
@@ -416,7 +425,8 @@ def calculate():
             'bmi': {
                 'value': round(float(bmi_value), 1) if bmi_value else None,
                 'centile': round(float(bmi_calc['corrected_centile']), 2) if bmi_calc and bmi_calc['corrected_centile'] else None,
-                'sds': round(bmi_sds, 2) if bmi_sds is not None else None
+                'sds': round(bmi_sds, 2) if bmi_sds is not None else None,
+                'percentage_median': bmi_percentage_median
             } if bmi_measurement else None,
             'ofc': ofc_data,
             'weight_corrected': weight_corrected_data,
