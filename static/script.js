@@ -776,6 +776,67 @@ document.querySelectorAll('.chart-tab').forEach(tab => {
     });
 });
 
+/**
+ * Intelligently select the optimal age range for a measurement chart
+ * based on the child's age and available measurements
+ *
+ * @param {string} measurement - 'height', 'weight', 'bmi', or 'ofc'
+ * @returns {string} - The optimal age range value (e.g., '0-2', '2-18')
+ */
+function selectOptimalAgeRange(measurement) {
+    const age = calculationResults?.age_years || 0;
+    const hasMph = calculationResults?.mid_parental_height !== null && calculationResults?.mid_parental_height !== undefined;
+
+    let optimalRange = null;
+
+    switch(measurement) {
+        case 'height':
+            if (age < 2) {
+                optimalRange = '0-2'; // Detailed infant view, most clinically relevant
+            } else if (age < 4) {
+                optimalRange = '0-4'; // Shows growth trajectory from birth
+            } else {
+                // For older children, show 2-18 with MPH if available
+                // Otherwise show full range 0-18
+                optimalRange = hasMph ? '2-18' : '0-18';
+            }
+            break;
+
+        case 'weight':
+            if (age < 2) {
+                optimalRange = '0-2'; // Detailed infant view
+            } else if (age < 4) {
+                optimalRange = '0-4'; // Shows transition from infant to child
+            } else {
+                optimalRange = '0-18'; // Full range for context
+            }
+            break;
+
+        case 'bmi':
+            // BMI is most meaningful from age 2+ years
+            if (age < 4) {
+                optimalRange = '0-4'; // Shows early BMI pattern if needed
+            } else if (age < 10) {
+                optimalRange = '2-18'; // Most clinically relevant range (default)
+            } else {
+                optimalRange = '0-18'; // Full pattern for adolescents
+            }
+            break;
+
+        case 'ofc':
+            // OFC is primarily measured in young children
+            if (age < 2) {
+                optimalRange = '0-2'; // Most detailed and clinically relevant
+            } else {
+                // If still measuring OFC in older child, show full range for context
+                optimalRange = '0-18';
+            }
+            break;
+    }
+
+    return optimalRange;
+}
+
 // Helper function to show/hide appropriate age range selector
 function showAgeRangeSelectorForMeasurement(measurement) {
     // Hide all age range selectors
@@ -784,38 +845,32 @@ function showAgeRangeSelectorForMeasurement(measurement) {
     document.getElementById('bmiAgeRangeSelector').style.display = 'none';
     document.getElementById('ofcAgeRangeSelector').style.display = 'none';
 
-    // Get patient age from current data
-    const patientAge = calculationResults?.age_years || 0;
+    // Show the appropriate selector for this measurement
+    const selectorId = `${measurement}AgeRangeSelector`;
+    const selector = document.getElementById(selectorId);
 
-    // Set default age range based on patient age (for children 2 and under, default to 0-2 years)
-    if (measurement === 'height') {
-        document.getElementById('heightAgeRangeSelector').style.display = 'flex';
+    if (selector) {
+        selector.style.display = 'flex';
 
-        // Set default based on age
-        const heightRanges = document.querySelectorAll('input[name="height_age_range"]');
-        heightRanges.forEach(radio => radio.checked = false);
+        // Get optimal age range for this measurement
+        const optimalRange = selectOptimalAgeRange(measurement);
 
-        if (patientAge <= 2) {
-            document.querySelector('input[name="height_age_range"][value="0-2"]').checked = true;
-        } else {
-            document.querySelector('input[name="height_age_range"][value="0-18"]').checked = true;
+        // Clear all selections for this measurement first
+        const rangeInputs = document.querySelectorAll(`input[name="${measurement}_age_range"]`);
+        rangeInputs.forEach(radio => radio.checked = false);
+
+        // Select the optimal range
+        if (optimalRange) {
+            const optimalInput = document.querySelector(`input[name="${measurement}_age_range"][value="${optimalRange}"]`);
+            if (optimalInput) {
+                optimalInput.checked = true;
+            } else {
+                // Fallback: select first available option if optimal not found
+                if (rangeInputs.length > 0) {
+                    rangeInputs[0].checked = true;
+                }
+            }
         }
-    } else if (measurement === 'weight') {
-        document.getElementById('weightAgeRangeSelector').style.display = 'flex';
-
-        // Set default based on age
-        const weightRanges = document.querySelectorAll('input[name="weight_age_range"]');
-        weightRanges.forEach(radio => radio.checked = false);
-
-        if (patientAge <= 2) {
-            document.querySelector('input[name="weight_age_range"][value="0-2"]').checked = true;
-        } else {
-            document.querySelector('input[name="weight_age_range"][value="0-18"]').checked = true;
-        }
-    } else if (measurement === 'bmi') {
-        document.getElementById('bmiAgeRangeSelector').style.display = 'flex';
-    } else if (measurement === 'ofc') {
-        document.getElementById('ofcAgeRangeSelector').style.display = 'flex';
     }
 }
 

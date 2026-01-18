@@ -118,6 +118,8 @@ are in requirements-dev.txt and won't affect Render deployments.
 - ✅ PWA offline support
 - ✅ Render deployment optimized (Python 3.12.8, split dependencies)
 - ✅ Percentage median BMI (advanced mode - malnutrition assessment)
+- ✅ Intelligent age range selection (auto-selects optimal chart range based on age and measurements)
+- ✅ User documentation site (GitHub Pages)
 
 ## Next Priority Features
 
