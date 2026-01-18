@@ -853,12 +853,16 @@ document.getElementById('resetBtn').addEventListener('click', () => {
 // Demo Mode functionality
 async function loadDemoData() {
     try {
+        console.log('Demo mode: Starting...');
         showToast('Generating demo data...', 'info');
 
         const response = await fetch('/generate-demo-data');
+        console.log('Demo mode: Response received', response.status);
         const result = await response.json();
+        console.log('Demo mode: Data parsed', result);
 
         if (!result.success) {
+            console.error('Demo mode: Failed -', result.error);
             showToast('Failed to generate demo data: ' + result.error, 'error');
             return;
         }
@@ -867,12 +871,17 @@ async function loadDemoData() {
 
         // Enable advanced mode if not already enabled
         if (!isAdvancedMode) {
+            console.log('Demo mode: Enabling advanced mode...');
             const modeToggle = document.getElementById('modeToggle');
             modeToggle.checked = true;
             modeToggle.dispatchEvent(new Event('change'));
+            // Wait for DOM to update after mode change
+            await new Promise(resolve => setTimeout(resolve, 100));
+            console.log('Demo mode: Advanced mode enabled, isAdvancedMode =', isAdvancedMode);
         }
 
         // Populate basic fields
+        console.log('Demo mode: Populating basic fields...');
         document.querySelector(`input[name="sex"][value="${data.sex}"]`).checked = true;
         document.getElementById('birth_date').value = data.birth_date;
         document.getElementById('measurement_date').value = data.measurement_date;
@@ -898,10 +907,12 @@ async function loadDemoData() {
         document.getElementById('paternal_height_cm').value = data.paternal_height;
 
         // Clear and populate previous measurements table
+        console.log('Demo mode: Populating previous measurements...', data.previous_measurements.length, 'measurements');
         document.getElementById('previousMeasurementsBody').innerHTML = '';
         previousMeasurementRowCounter = 0;
 
-        data.previous_measurements.forEach(pm => {
+        data.previous_measurements.forEach((pm, index) => {
+            console.log('Demo mode: Adding previous measurement', index + 1);
             addPreviousMeasurementRow();
             const rows = document.querySelectorAll('#previousMeasurementsBody tr');
             const lastRow = rows[rows.length - 1];
@@ -920,10 +931,12 @@ async function loadDemoData() {
         });
 
         // Clear and populate bone age assessments table
+        console.log('Demo mode: Populating bone age assessments...', data.bone_age_assessments.length, 'assessments');
         document.getElementById('boneAgeBody').innerHTML = '';
         boneAgeRowCounter = 0;
 
-        data.bone_age_assessments.forEach(ba => {
+        data.bone_age_assessments.forEach((ba, index) => {
+            console.log('Demo mode: Adding bone age assessment', index + 1);
             addBoneAgeRow();
             const rows = document.querySelectorAll('#boneAgeBody tr');
             const lastRow = rows[rows.length - 1];
@@ -939,6 +952,7 @@ async function loadDemoData() {
             }
         });
 
+        console.log('Demo mode: Complete!');
         showToast('Demo data loaded! Click Calculate to see results.', 'success');
 
         // Scroll to top of form
@@ -946,6 +960,7 @@ async function loadDemoData() {
 
     } catch (error) {
         console.error('Error loading demo data:', error);
+        console.error('Error stack:', error.stack);
         showToast('Failed to load demo data: ' + error.message, 'error');
     }
 }
