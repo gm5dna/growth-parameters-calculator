@@ -167,8 +167,7 @@ document.getElementById('growthForm').addEventListener('submit', async (e) => {
         height: height,
         ofc: ofc,
         previous_measurements: getPreviousMeasurements(),
-        bone_age: document.getElementById('bone_age')?.value,
-        bone_age_assessment_date: document.getElementById('bone_age_assessment_date')?.value,
+        bone_age_assessments: getBoneAgeAssessments(),
         maternal_height: maternalHeightCm,
         paternal_height: paternalHeightCm,
         gestation_weeks: gestationWeeks ? parseInt(gestationWeeks) : null,
@@ -416,6 +415,7 @@ function displayResults(results) {
 
     // Store bone age height data
     currentPatientData.boneAgeHeight = results.bone_age_height || null;
+    currentPatientData.boneAgeAssessments = results.bone_age_assessments || [];
 
     // Show "Show Charts" button
     const showChartsContainer = document.getElementById('show-charts-container');
@@ -628,6 +628,136 @@ document.getElementById('csvFileInput').addEventListener('change', (e) => {
     }
 });
 
+// Bone Age Assessment Management
+let boneAgeRowCounter = 0;
+
+function addBoneAgeRow() {
+    const tbody = document.getElementById('boneAgeBody');
+    const rowId = `bone-age-row-${boneAgeRowCounter++}`;
+
+    const row = document.createElement('tr');
+    row.id = rowId;
+    row.innerHTML = `
+        <td>
+            <input type="date" class="bone-age-date" data-row-id="${rowId}" />
+        </td>
+        <td>
+            <div class="bone-age-input-container">
+                <div class="bone-age-format-toggle">
+                    <button type="button" class="bone-age-format-btn active" data-format="decimal" data-row-id="${rowId}">Decimal</button>
+                    <button type="button" class="bone-age-format-btn" data-format="ym" data-row-id="${rowId}">Years + Months</button>
+                </div>
+                <div class="bone-age-decimal-input active" data-row-id="${rowId}">
+                    <input type="number" class="bone-age-decimal" step="0.1" min="0" max="18" placeholder="e.g., 8.5" data-row-id="${rowId}" />
+                </div>
+                <div class="bone-age-ym-input" data-row-id="${rowId}">
+                    <input type="number" class="bone-age-years" min="0" max="18" placeholder="Y" data-row-id="${rowId}" />
+                    <span>y</span>
+                    <input type="number" class="bone-age-months" min="0" max="11" placeholder="M" data-row-id="${rowId}" />
+                    <span>m</span>
+                </div>
+            </div>
+        </td>
+        <td>
+            <select class="bone-age-standard" data-row-id="${rowId}">
+                <option value="">Select...</option>
+                <option value="greulich-pyle">Greulich & Pyle</option>
+                <option value="tw3">TW3</option>
+            </select>
+        </td>
+        <td>
+            <button type="button" class="btn-remove-measurement" onclick="removeBoneAgeRow('${rowId}')">
+                <span class="material-symbols-outlined">delete</span>
+                Remove
+            </button>
+        </td>
+    `;
+
+    tbody.appendChild(row);
+
+    // Add event listeners for format toggle buttons
+    const formatBtns = row.querySelectorAll('.bone-age-format-btn');
+    formatBtns.forEach(btn => {
+        btn.addEventListener('click', toggleBoneAgeFormat);
+    });
+}
+
+function toggleBoneAgeFormat(e) {
+    const btn = e.target;
+    const rowId = btn.getAttribute('data-row-id');
+    const format = btn.getAttribute('data-format');
+    const row = document.getElementById(rowId);
+
+    // Update button active states
+    row.querySelectorAll('.bone-age-format-btn').forEach(b => {
+        b.classList.remove('active');
+    });
+    btn.classList.add('active');
+
+    // Toggle input visibility
+    const decimalInput = row.querySelector('.bone-age-decimal-input');
+    const ymInput = row.querySelector('.bone-age-ym-input');
+
+    if (format === 'decimal') {
+        decimalInput.classList.add('active');
+        ymInput.classList.remove('active');
+    } else {
+        decimalInput.classList.remove('active');
+        ymInput.classList.add('active');
+    }
+}
+
+function removeBoneAgeRow(rowId) {
+    const row = document.getElementById(rowId);
+    if (row) {
+        row.remove();
+    }
+}
+
+function getBoneAgeAssessments() {
+    const rows = document.querySelectorAll('#boneAgeBody tr');
+    const assessments = [];
+
+    rows.forEach(row => {
+        const rowId = row.id;
+        const date = row.querySelector('.bone-age-date')?.value;
+        const standard = row.querySelector('.bone-age-standard')?.value;
+
+        // Determine which format is active
+        const decimalInput = row.querySelector('.bone-age-decimal-input');
+        const isDecimalActive = decimalInput?.classList.contains('active');
+
+        let boneAge = null;
+
+        if (isDecimalActive) {
+            const decimalValue = row.querySelector('.bone-age-decimal')?.value;
+            if (decimalValue) {
+                boneAge = parseFloat(decimalValue);
+            }
+        } else {
+            const years = row.querySelector('.bone-age-years')?.value;
+            const months = row.querySelector('.bone-age-months')?.value;
+            if (years) {
+                boneAge = parseInt(years) + (months ? parseInt(months) / 12 : 0);
+            }
+        }
+
+        // Only include if date, bone age, and standard are provided
+        if (date && boneAge !== null && standard) {
+            assessments.push({
+                date: date,
+                bone_age: boneAge,
+                standard: standard
+            });
+        }
+    });
+
+    return assessments;
+}
+
+// Add event listener for Add Bone Age button
+document.getElementById('addBoneAgeBtn').addEventListener('click', addBoneAgeRow);
+
 // Reset button functionality
 document.getElementById('resetBtn').addEventListener('click', () => {
     // Reset the form
@@ -649,6 +779,10 @@ document.getElementById('resetBtn').addEventListener('click', () => {
     // Clear previous measurements table
     document.getElementById('previousMeasurementsBody').innerHTML = '';
     previousMeasurementRowCounter = 0;
+
+    // Clear bone age table
+    document.getElementById('boneAgeBody').innerHTML = '';
+    boneAgeRowCounter = 0;
 
     // Hide and reset charts
     document.getElementById('charts-section').classList.remove('show');
@@ -1618,12 +1752,13 @@ function renderGrowthChart(canvas, centiles, patientData, measurementMethod) {
                     bodyFont: { size: 13 },
                     displayColors: false,  // Remove colored box from tooltip
                     filter: function(tooltipItem) {
-                        // Show tooltips for patient measurements, corrected age, and mid-parental height
+                        // Show tooltips for patient measurements, corrected age, bone age, and mid-parental height
                         if (!tooltipItem || !tooltipItem.dataset || !tooltipItem.dataset.label) {
                             return false;
                         }
                         return tooltipItem.dataset.label.includes('Measurement') ||
                                tooltipItem.dataset.label.includes('Corrected Age') ||
+                               tooltipItem.dataset.label.includes('Bone Age') ||
                                tooltipItem.dataset.label.includes('Mid-Parental');
                     },
                     callbacks: {
@@ -1639,6 +1774,32 @@ function renderGrowthChart(canvas, centiles, patientData, measurementMethod) {
                             }
 
                             const datasetLabel = context.dataset.label;
+
+                            // Special handling for bone age measurements
+                            if (datasetLabel && datasetLabel.includes('Bone Age')) {
+                                const lines = [];
+                                lines.push(`Age: ${age} years`);
+                                lines.push(`Height: ${value} cm`);
+
+                                // Show all bone age assessments
+                                if (currentPatientData.boneAgeAssessments && currentPatientData.boneAgeAssessments.length > 0) {
+                                    lines.push(''); // Empty line for separation
+                                    currentPatientData.boneAgeAssessments.forEach((assessment, index) => {
+                                        const standardLabel = assessment.standard === 'tw3' ? 'TW3' :
+                                                            assessment.standard === 'greulich-pyle' ? 'Greulich & Pyle' :
+                                                            assessment.standard;
+                                        lines.push(`${standardLabel}:`);
+                                        lines.push(`  Bone Age: ${assessment.bone_age} years`);
+                                        lines.push(`  Centile: ${assessment.centile}%`);
+                                        lines.push(`  SDS: ${assessment.sds}`);
+                                        if (index < currentPatientData.boneAgeAssessments.length - 1) {
+                                            lines.push(''); // Separator between assessments
+                                        }
+                                    });
+                                }
+
+                                return lines;
+                            }
 
                             // Special handling for mid-parental height markers
                             if (datasetLabel && datasetLabel.includes('Mid-Parental')) {

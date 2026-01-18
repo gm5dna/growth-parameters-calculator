@@ -66,9 +66,8 @@ def calculate():
         maternal_height = float(data.get('maternal_height', 0)) if data.get('maternal_height') else None
         paternal_height = float(data.get('paternal_height', 0)) if data.get('paternal_height') else None
 
-        # Optional bone age data
-        bone_age = float(data.get('bone_age', 0)) if data.get('bone_age') else None
-        bone_age_assessment_date = datetime.strptime(data['bone_age_assessment_date'], '%Y-%m-%d').date() if data.get('bone_age_assessment_date') else None
+        # Optional bone age assessments
+        bone_age_assessments = data.get('bone_age_assessments', [])
 
         # Optional gestation data
         gestation_weeks = data.get('gestation_weeks')
@@ -339,38 +338,60 @@ def calculate():
                             'message': error_message
                         }
 
-        # Calculate height for bone age if available and within +/- 1 month of measurement
-        bone_age_height_data = None
-        if height and bone_age and bone_age_assessment_date:
-            # Check if bone age assessment is within +/- 1 month of measurement date
-            days_difference = abs((measurement_date - bone_age_assessment_date).days)
+        # Process bone age assessments - calculate height for bone age if within +/- 1 month
+        bone_age_height_data = []
+        bone_age_for_plotting = None  # The one to plot (prefer TW3)
 
-            # Approximately 30.44 days per month
-            if days_difference <= 30.44:
-                # Calculate height centile/SDS using bone age instead of chronological age
-                # We create a synthetic birth date such that the "age" at measurement equals bone age
-                bone_age_birth_date = measurement_date - relativedelta(years=int(bone_age),
-                                                                       days=int((bone_age % 1) * 365.25))
+        if height and bone_age_assessments:
+            for assessment in bone_age_assessments:
+                try:
+                    assessment_date = datetime.strptime(assessment['date'], '%Y-%m-%d').date()
+                    bone_age_value = float(assessment['bone_age'])
+                    standard = assessment.get('standard', '')
 
-                bone_age_height_measurement = Measurement(
-                    sex=sex,
-                    birth_date=bone_age_birth_date,
-                    observation_date=measurement_date,
-                    measurement_method='height',
-                    observation_value=height,
-                    reference=reference
-                )
+                    # Check if assessment is within +/- 1 month of measurement date
+                    days_difference = abs((measurement_date - assessment_date).days)
 
-                bone_age_height_calc = bone_age_height_measurement.measurement['measurement_calculated_values']
-                bone_age_height_sds = float(bone_age_height_calc['corrected_sds']) if bone_age_height_calc['corrected_sds'] else None
+                    # Approximately 30.44 days per month
+                    if days_difference <= 30.44:
+                        # Calculate height centile/SDS using bone age instead of chronological age
+                        # Create synthetic birth date such that the "age" at measurement equals bone age
+                        bone_age_birth_date = measurement_date - relativedelta(
+                            years=int(bone_age_value),
+                            days=int((bone_age_value % 1) * 365.25)
+                        )
 
-                bone_age_height_data = {
-                    'bone_age': bone_age,
-                    'assessment_date': bone_age_assessment_date.isoformat(),
-                    'height': height,
-                    'centile': round(float(bone_age_height_calc['corrected_centile']), 2) if bone_age_height_calc['corrected_centile'] else None,
-                    'sds': round(bone_age_height_sds, 2) if bone_age_height_sds is not None else None
-                }
+                        bone_age_height_measurement = Measurement(
+                            sex=sex,
+                            birth_date=bone_age_birth_date,
+                            observation_date=measurement_date,
+                            measurement_method='height',
+                            observation_value=height,
+                            reference=reference
+                        )
+
+                        bone_age_height_calc = bone_age_height_measurement.measurement['measurement_calculated_values']
+                        bone_age_height_sds = float(bone_age_height_calc['corrected_sds']) if bone_age_height_calc['corrected_sds'] else None
+
+                        assessment_data = {
+                            'bone_age': bone_age_value,
+                            'assessment_date': assessment_date.isoformat(),
+                            'standard': standard,
+                            'height': height,
+                            'centile': round(float(bone_age_height_calc['corrected_centile']), 2) if bone_age_height_calc['corrected_centile'] else None,
+                            'sds': round(bone_age_height_sds, 2) if bone_age_height_sds is not None else None,
+                            'within_window': True
+                        }
+
+                        bone_age_height_data.append(assessment_data)
+
+                        # Determine which to plot - prefer TW3, otherwise use first
+                        if bone_age_for_plotting is None or standard == 'tw3':
+                            bone_age_for_plotting = assessment_data
+
+                except (ValueError, KeyError) as e:
+                    # Skip invalid bone age assessments
+                    continue
 
         # Calculate BSA
         # Use Boyd formula if both weight and height available
@@ -595,7 +616,8 @@ def calculate():
             'height_velocity': height_velocity,
             'previous_height': previous_height_data,
             'previous_measurements': processed_previous_measurements,
-            'bone_age_height': bone_age_height_data,
+            'bone_age_height': bone_age_for_plotting,  # Single bone age for plotting (TW3 preferred)
+            'bone_age_assessments': bone_age_height_data,  # All bone age assessments with calculations
             'bsa': bsa,
             'bsa_method': bsa_method,
             'gh_dose': gh_dose,
