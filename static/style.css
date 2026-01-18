@@ -128,6 +128,23 @@ body.advanced-mode .result-item.advanced-only {
     display: block !important;
 }
 
+/* Collapsible Section Controls */
+.section-collapsed {
+    display: block !important;
+}
+
+.section-expanded {
+    display: none !important;
+}
+
+body.advanced-mode .section-collapsed.hidden {
+    display: none !important;
+}
+
+body.advanced-mode .section-expanded.visible {
+    display: block !important;
+}
+
 /* Mode Toggle Switch */
 .mode-toggle {
     display: flex;

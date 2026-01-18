@@ -438,8 +438,8 @@ let previousMeasurementsExpanded = false;
 
 function expandPreviousMeasurementsSection() {
     if (!previousMeasurementsExpanded) {
-        document.getElementById('previous-measurements-collapsed').style.display = 'none';
-        document.getElementById('previous-measurements-expanded').style.display = 'block';
+        document.getElementById('previous-measurements-collapsed').classList.add('hidden');
+        document.getElementById('previous-measurements-expanded').classList.add('visible');
         previousMeasurementsExpanded = true;
     }
 }
@@ -648,8 +648,8 @@ let boneAgeExpanded = false;
 
 function expandBoneAgeSection() {
     if (!boneAgeExpanded) {
-        document.getElementById('bone-age-collapsed').style.display = 'none';
-        document.getElementById('bone-age-expanded').style.display = 'block';
+        document.getElementById('bone-age-collapsed').classList.add('hidden');
+        document.getElementById('bone-age-expanded').classList.add('visible');
         boneAgeExpanded = true;
     }
 }
@@ -810,13 +810,13 @@ document.getElementById('resetBtn').addEventListener('click', () => {
     boneAgeRowCounter = 0;
 
     // Collapse previous measurements section
-    document.getElementById('previous-measurements-collapsed').style.display = 'block';
-    document.getElementById('previous-measurements-expanded').style.display = 'none';
+    document.getElementById('previous-measurements-collapsed').classList.remove('hidden');
+    document.getElementById('previous-measurements-expanded').classList.remove('visible');
     previousMeasurementsExpanded = false;
 
     // Collapse bone age section
-    document.getElementById('bone-age-collapsed').style.display = 'block';
-    document.getElementById('bone-age-expanded').style.display = 'none';
+    document.getElementById('bone-age-collapsed').classList.remove('hidden');
+    document.getElementById('bone-age-expanded').classList.remove('visible');
     boneAgeExpanded = false;
 
     // Hide and reset charts
