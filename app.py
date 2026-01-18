@@ -67,6 +67,10 @@ def calculate():
         maternal_height = float(data.get('maternal_height', 0)) if data.get('maternal_height') else None
         paternal_height = float(data.get('paternal_height', 0)) if data.get('paternal_height') else None
 
+        # Optional bone age data
+        bone_age = float(data.get('bone_age', 0)) if data.get('bone_age') else None
+        bone_age_assessment_date = datetime.strptime(data['bone_age_assessment_date'], '%Y-%m-%d').date() if data.get('bone_age_assessment_date') else None
+
         # Optional gestation data
         gestation_weeks = data.get('gestation_weeks')
         gestation_days = data.get('gestation_days')
@@ -212,6 +216,39 @@ def calculate():
                 'centile': round(float(previous_height_calc['corrected_centile']), 2) if previous_height_calc['corrected_centile'] else None,
                 'sds': round(previous_height_sds, 2) if previous_height_sds is not None else None
             }
+
+        # Calculate height for bone age if available and within +/- 1 month of measurement
+        bone_age_height_data = None
+        if height and bone_age and bone_age_assessment_date:
+            # Check if bone age assessment is within +/- 1 month of measurement date
+            days_difference = abs((measurement_date - bone_age_assessment_date).days)
+
+            # Approximately 30.44 days per month
+            if days_difference <= 30.44:
+                # Calculate height centile/SDS using bone age instead of chronological age
+                # We create a synthetic birth date such that the "age" at measurement equals bone age
+                bone_age_birth_date = measurement_date - relativedelta(years=int(bone_age),
+                                                                       days=int((bone_age % 1) * 365.25))
+
+                bone_age_height_measurement = Measurement(
+                    sex=sex,
+                    birth_date=bone_age_birth_date,
+                    observation_date=measurement_date,
+                    measurement_method='height',
+                    observation_value=height,
+                    reference=reference
+                )
+
+                bone_age_height_calc = bone_age_height_measurement.measurement['measurement_calculated_values']
+                bone_age_height_sds = float(bone_age_height_calc['corrected_sds']) if bone_age_height_calc['corrected_sds'] else None
+
+                bone_age_height_data = {
+                    'bone_age': bone_age,
+                    'assessment_date': bone_age_assessment_date.isoformat(),
+                    'height': height,
+                    'centile': round(float(bone_age_height_calc['corrected_centile']), 2) if bone_age_height_calc['corrected_centile'] else None,
+                    'sds': round(bone_age_height_sds, 2) if bone_age_height_sds is not None else None
+                }
 
         # Calculate BSA
         # Use Boyd formula if both weight and height available
@@ -435,6 +472,7 @@ def calculate():
             'ofc_corrected': ofc_corrected_data,
             'height_velocity': height_velocity,
             'previous_height': previous_height_data,
+            'bone_age_height': bone_age_height_data,
             'bsa': bsa,
             'bsa_method': bsa_method,
             'gh_dose': gh_dose,

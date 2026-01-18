@@ -168,6 +168,8 @@ document.getElementById('growthForm').addEventListener('submit', async (e) => {
         ofc: ofc,
         previous_date: document.getElementById('previous_date').value,
         previous_height: document.getElementById('previous_height').value,
+        bone_age: document.getElementById('bone_age')?.value,
+        bone_age_assessment_date: document.getElementById('bone_age_assessment_date')?.value,
         maternal_height: maternalHeightCm,
         paternal_height: paternalHeightCm,
         gestation_weeks: gestationWeeks ? parseInt(gestationWeeks) : null,
@@ -419,6 +421,9 @@ function displayResults(results) {
     currentPatientData.height_corrected = results.height_corrected || null;
     currentPatientData.bmi_corrected = results.bmi_corrected || null;
     currentPatientData.ofc_corrected = results.ofc_corrected || null;
+
+    // Store bone age height data
+    currentPatientData.boneAgeHeight = results.bone_age_height || null;
 
     // Show "Show Charts" button
     const showChartsContainer = document.getElementById('show-charts-container');
@@ -1029,6 +1034,18 @@ function preparePatientData(measurementMethod) {
         }
     }
 
+    // Add bone age height point (only for height measurements)
+    if (measurementMethod === 'height' && currentPatientData.boneAgeHeight) {
+        patientPoints.push({
+            x: currentPatientData.boneAgeHeight.bone_age,
+            y: currentPatientData.boneAgeHeight.height,
+            label: 'Bone Age',
+            isBoneAge: true,
+            centile: currentPatientData.boneAgeHeight.centile,
+            sds: currentPatientData.boneAgeHeight.sds
+        });
+    }
+
     return patientPoints;
 }
 
@@ -1114,10 +1131,11 @@ function renderGrowthChart(canvas, centiles, patientData, measurementMethod) {
 
     // Add patient measurement points
     if (patientData.length > 0) {
-        // Separate current, corrected, and previous measurements
+        // Separate current, corrected, previous, and bone age measurements
         const currentPoints = patientData.filter(p => p.isCurrent);
         const correctedPoints = patientData.filter(p => p.isCorrected);
-        const previousPoints = patientData.filter(p => !p.isCurrent && !p.isCorrected);
+        const boneAgePoints = patientData.filter(p => p.isBoneAge);
+        const previousPoints = patientData.filter(p => !p.isCurrent && !p.isCorrected && !p.isBoneAge);
 
         // Add dotted line connecting corrected and chronological points (if both exist)
         if (correctedPoints.length > 0 && currentPoints.length > 0) {
@@ -1201,6 +1219,52 @@ function renderGrowthChart(canvas, centiles, patientData, measurementMethod) {
                 borderWidth: 2,
                 pointRadius: 5,
                 pointHoverRadius: 7,
+                showLine: false
+            });
+        }
+
+        // Add dotted line connecting chronological and bone age points (if both exist)
+        if (boneAgePoints.length > 0 && currentPoints.length > 0) {
+            const lineData = [
+                {
+                    x: currentPoints[0].x,
+                    y: currentPoints[0].y
+                },
+                {
+                    x: boneAgePoints[0].x,
+                    y: boneAgePoints[0].y
+                }
+            ];
+
+            datasets.push({
+                label: 'Bone Age Connection',
+                data: lineData,
+                borderColor: '#10b981', // Green
+                borderWidth: 2,
+                borderDash: [5, 5],  // Dotted line pattern
+                pointRadius: 0,  // No points on the line itself
+                showLine: true,
+                fill: false,
+                tension: 0  // Straight line
+            });
+        }
+
+        // Add bone age measurement (green marker)
+        if (boneAgePoints.length > 0) {
+            datasets.push({
+                label: 'Height for Bone Age',
+                data: boneAgePoints.map(p => ({
+                    x: p.x,
+                    y: p.y,
+                    centile: p.centile,
+                    sds: p.sds
+                })),
+                backgroundColor: '#10b981', // Green
+                borderColor: colors.pointBorder,
+                borderWidth: 2,
+                pointRadius: 6,
+                pointHoverRadius: 8,
+                pointStyle: 'circle',
                 showLine: false
             });
         }

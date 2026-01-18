@@ -145,6 +145,22 @@
                 </div>
             </div>
 
+            <div class="section-header advanced-only">Bone Age Assessment</div>
+
+            <div class="form-grid advanced-only">
+                <div class="form-group">
+                    <label for="bone_age_assessment_date">Bone Age Assessment Date:</label>
+                    <input type="date" id="bone_age_assessment_date" name="bone_age_assessment_date" aria-label="Date of bone age assessment">
+                    <small class="hint">Should be within ±1 month of measurement date</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="bone_age">Bone Age (years):</label>
+                    <input type="number" id="bone_age" name="bone_age" step="0.1" min="0" max="18" placeholder="e.g., 8.5" aria-label="Bone age in years">
+                    <small class="hint">Used to plot height corrected for skeletal maturity</small>
+                </div>
+            </div>
+
             <div class="section-header advanced-only">Growth Hormone Treatment</div>
 
             <div class="form-group advanced-only">
