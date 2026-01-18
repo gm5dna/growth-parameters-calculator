@@ -119,13 +119,6 @@ docs/                 # GitHub Pages user guide
 - ✅ Reorganized documentation structure
 - ✅ Removed demo mode feature (unstable)
 
-## Known Issues
-
-1. **iOS Safari date input alignment** (cosmetic only)
-   - Date fields center-aligned on iOS instead of left
-   - CSS fixes unsuccessful, appears to be iOS quirk
-   - Impact: Visual only, functionality unaffected
-
 ## Feature Backlog
 
 ### High Priority (Quick Wins)
