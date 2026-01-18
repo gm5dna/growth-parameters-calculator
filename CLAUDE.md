@@ -11,7 +11,9 @@
 
 ```bash
 # Setup
-python3 -m venv venv && source venv/bin/activate && pip install -r requirements.txt
+python3 -m venv venv && source venv/bin/activate
+pip install -r requirements.txt              # Production dependencies
+pip install -r requirements-dev.txt          # Testing dependencies (dev only)
 
 # Run
 python app.py                         # Dev server :8080
