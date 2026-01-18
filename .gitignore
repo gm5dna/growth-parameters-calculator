@@ -28,6 +28,7 @@ wheels/
 .coverage
 htmlcov/
 *.cover
+test_screenshots/
 
 # IDEs
 .vscode/
