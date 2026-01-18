@@ -510,6 +510,58 @@ select:focus {
     font-size: 18px;
 }
 
+.previous-measurements-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+    align-items: center;
+}
+
+.csv-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-csv {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    background: #10b981;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-csv:hover {
+    background: #059669;
+    transform: translateY(-1px);
+}
+
+.btn-csv .material-symbols-outlined {
+    font-size: 16px;
+}
+
+@media (max-width: 600px) {
+    .previous-measurements-buttons {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .csv-buttons {
+        width: 100%;
+    }
+
+    .btn-csv {
+        flex: 1;
+    }
+}
+
 .height-ft-in {
     display: flex;
     gap: 15px;

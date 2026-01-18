@@ -150,10 +150,23 @@
                         </tbody>
                     </table>
                 </div>
-                <button type="button" class="btn-add-measurement" id="addPreviousMeasurementBtn">
-                    <span class="material-symbols-outlined">add</span>
-                    Add Previous Measurement
-                </button>
+                <div class="previous-measurements-buttons">
+                    <button type="button" class="btn-add-measurement" id="addPreviousMeasurementBtn">
+                        <span class="material-symbols-outlined">add</span>
+                        Add Previous Measurement
+                    </button>
+                    <div class="csv-buttons">
+                        <button type="button" class="btn-csv" id="importCsvBtn">
+                            <span class="material-symbols-outlined">upload</span>
+                            Import CSV
+                        </button>
+                        <button type="button" class="btn-csv" id="exportCsvBtn">
+                            <span class="material-symbols-outlined">download</span>
+                            Export CSV
+                        </button>
+                    </div>
+                    <input type="file" id="csvFileInput" accept=".csv" style="display: none;">
+                </div>
             </div>
 
             <div class="section-header advanced-only">Bone Age Assessment</div>

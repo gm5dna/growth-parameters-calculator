@@ -496,8 +496,137 @@ function getPreviousMeasurements() {
     return measurements;
 }
 
+function exportPreviousMeasurementsToCSV() {
+    const measurements = getPreviousMeasurements();
+
+    if (measurements.length === 0) {
+        showToast('No previous measurements to export', 'error');
+        return;
+    }
+
+    // Create CSV content
+    const headers = ['Date', 'Height (cm)', 'Weight (kg)', 'OFC (cm)'];
+    const csvRows = [headers.join(',')];
+
+    measurements.forEach(m => {
+        const row = [
+            m.date,
+            m.height !== null ? m.height : '',
+            m.weight !== null ? m.weight : '',
+            m.ofc !== null ? m.ofc : ''
+        ];
+        csvRows.push(row.join(','));
+    });
+
+    const csvContent = csvRows.join('\n');
+
+    // Create download link
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `previous-measurements-${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    showToast('CSV exported successfully', 'success');
+}
+
+function importPreviousMeasurementsFromCSV(file) {
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+        try {
+            const csvContent = e.target.result;
+            const rows = csvContent.split('\n').filter(row => row.trim());
+
+            if (rows.length < 2) {
+                showToast('CSV file is empty or invalid', 'error');
+                return;
+            }
+
+            // Clear existing table
+            document.getElementById('previousMeasurementsBody').innerHTML = '';
+            previousMeasurementRowCounter = 0;
+
+            // Parse CSV (skip header row)
+            let importedCount = 0;
+            for (let i = 1; i < rows.length; i++) {
+                const columns = rows[i].split(',').map(col => col.trim());
+
+                if (columns.length < 4) continue;
+
+                const date = columns[0];
+                const height = columns[1];
+                const weight = columns[2];
+                const ofc = columns[3];
+
+                // Validate date format (YYYY-MM-DD)
+                if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+                    continue;
+                }
+
+                // Add row to table
+                addPreviousMeasurementRow();
+
+                // Get the most recently added row
+                const rows = document.querySelectorAll('#previousMeasurementsBody tr');
+                const lastRow = rows[rows.length - 1];
+
+                // Populate fields
+                if (lastRow) {
+                    const dateInput = lastRow.querySelector('.prev-measurement-date');
+                    const heightInput = lastRow.querySelector('.prev-measurement-height');
+                    const weightInput = lastRow.querySelector('.prev-measurement-weight');
+                    const ofcInput = lastRow.querySelector('.prev-measurement-ofc');
+
+                    if (dateInput) dateInput.value = date;
+                    if (heightInput && height) heightInput.value = height;
+                    if (weightInput && weight) weightInput.value = weight;
+                    if (ofcInput && ofc) ofcInput.value = ofc;
+
+                    importedCount++;
+                }
+            }
+
+            if (importedCount > 0) {
+                showToast(`Successfully imported ${importedCount} measurement(s)`, 'success');
+            } else {
+                showToast('No valid measurements found in CSV', 'error');
+            }
+        } catch (error) {
+            console.error('Error importing CSV:', error);
+            showToast('Failed to import CSV: ' + error.message, 'error');
+        }
+    };
+
+    reader.onerror = function() {
+        showToast('Failed to read CSV file', 'error');
+    };
+
+    reader.readAsText(file);
+}
+
 // Add event listener for Add Previous Measurement button
 document.getElementById('addPreviousMeasurementBtn').addEventListener('click', addPreviousMeasurementRow);
+
+// Add event listeners for CSV import/export
+document.getElementById('exportCsvBtn').addEventListener('click', exportPreviousMeasurementsToCSV);
+
+document.getElementById('importCsvBtn').addEventListener('click', () => {
+    document.getElementById('csvFileInput').click();
+});
+
+document.getElementById('csvFileInput').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+        importPreviousMeasurementsFromCSV(file);
+        // Reset file input so the same file can be imported again
+        e.target.value = '';
+    }
+});
 
 // Reset button functionality
 document.getElementById('resetBtn').addEventListener('click', () => {

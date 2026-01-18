@@ -457,6 +457,110 @@ class GrowthReportPDF:
 
         return elements
 
+    def _create_previous_measurements_section(self):
+        """Create previous measurements table section"""
+        elements = []
+
+        # Get previous measurements from results
+        previous_measurements = self.results.get('previous_measurements', [])
+
+        # Skip section if no previous measurements
+        if not previous_measurements or len(previous_measurements) == 0:
+            return elements
+
+        # Add page break before previous measurements section
+        elements.append(PageBreak())
+
+        # Section heading
+        heading = Paragraph("PREVIOUS MEASUREMENTS", self.styles['SectionHeading'])
+        elements.append(heading)
+        elements.append(Spacer(1, 0.3*cm))
+
+        # Build table header
+        table_data = [['Date', 'Age (years)', 'Height (cm)', 'Weight (kg)', 'OFC (cm)']]
+
+        # Add each previous measurement
+        for measurement in previous_measurements:
+            date = measurement.get('date', 'N/A')
+            age = measurement.get('age', 'N/A')
+
+            # Height data
+            height_data = measurement.get('height')
+            if height_data and isinstance(height_data, dict):
+                height_value = height_data.get('value', 'N/A')
+                height_centile = height_data.get('centile', 'N/A')
+                height_sds = height_data.get('sds', 'N/A')
+                height_text = f"{height_value}\n({height_centile}%, {height_sds} SDS)" if height_value != 'N/A' else '-'
+            else:
+                height_text = '-'
+
+            # Weight data
+            weight_data = measurement.get('weight')
+            if weight_data and isinstance(weight_data, dict):
+                weight_value = weight_data.get('value', 'N/A')
+                weight_centile = weight_data.get('centile', 'N/A')
+                weight_sds = weight_data.get('sds', 'N/A')
+                weight_text = f"{weight_value}\n({weight_centile}%, {weight_sds} SDS)" if weight_value != 'N/A' else '-'
+            else:
+                weight_text = '-'
+
+            # OFC data
+            ofc_data = measurement.get('ofc')
+            if ofc_data and isinstance(ofc_data, dict):
+                ofc_value = ofc_data.get('value', 'N/A')
+                ofc_centile = ofc_data.get('centile', 'N/A')
+                ofc_sds = ofc_data.get('sds', 'N/A')
+                ofc_text = f"{ofc_value}\n({ofc_centile}%, {ofc_sds} SDS)" if ofc_value != 'N/A' else '-'
+            else:
+                ofc_text = '-'
+
+            table_data.append([
+                date,
+                str(age),
+                height_text,
+                weight_text,
+                ofc_text
+            ])
+
+        # Create table
+        prev_measurements_table = Table(table_data, colWidths=[2.5*cm, 2.5*cm, 4*cm, 4*cm, 4*cm])
+        prev_measurements_table.setStyle(TableStyle([
+            # Header row
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1e40af')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 9),
+            ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
+            ('VALIGN', (0, 0), (-1, 0), 'MIDDLE'),
+
+            # Data rows
+            ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+            ('FONTSIZE', (0, 1), (-1, -1), 8),
+            ('ALIGN', (0, 1), (1, -1), 'CENTER'),
+            ('ALIGN', (2, 1), (-1, -1), 'LEFT'),
+            ('VALIGN', (0, 1), (-1, -1), 'TOP'),
+
+            # Grid
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#f9fafb')]),
+
+            # Padding
+            ('LEFTPADDING', (0, 0), (-1, -1), 6),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 6),
+            ('TOPPADDING', (0, 0), (-1, -1), 6),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+        ]))
+
+        elements.append(prev_measurements_table)
+        elements.append(Spacer(1, 0.5*cm))
+
+        # Add note about centiles and SDS
+        note_text = "<i>Note: Values shown as measurement (centile%, SDS). '-' indicates measurement not taken.</i>"
+        note = Paragraph(note_text, self.styles['Normal'])
+        elements.append(note)
+
+        return elements
+
     def _create_footer(self):
         """Create report footer"""
         elements = []
@@ -502,6 +606,7 @@ class GrowthReportPDF:
         story.extend(self._create_additional_parameters_section())
         story.extend(self._create_warnings_section())
         story.extend(self._create_charts_section())
+        story.extend(self._create_previous_measurements_section())
         story.extend(self._create_footer())
 
         # Build PDF
