@@ -312,18 +312,30 @@ function displayResults(results) {
     const heightVelocityValue = document.getElementById('height-velocity');
     const heightVelocityMessage = document.getElementById('height-velocity-message');
 
-    if (results.height_velocity !== null) {
-        if (results.height_velocity.value !== null) {
+    if (results.height_velocity !== null && results.height_velocity !== undefined) {
+        if (results.height_velocity.value !== null && results.height_velocity.value !== undefined) {
             heightVelocityValue.textContent = `${results.height_velocity.value} cm/year`;
             heightVelocityMessage.textContent = '';
             heightVelocityMessage.style.display = 'none';
+            heightVelocityItem.style.display = 'block';
         } else if (results.height_velocity.message) {
             heightVelocityValue.textContent = 'Not calculated';
             heightVelocityMessage.textContent = results.height_velocity.message;
             heightVelocityMessage.style.display = 'block';
+            heightVelocityItem.style.display = 'block';
+        } else {
+            // Edge case: height_velocity object exists but has no value or message
+            // Clear and hide to prevent phantom display
+            heightVelocityValue.textContent = '';
+            heightVelocityMessage.textContent = '';
+            heightVelocityMessage.style.display = 'none';
+            heightVelocityItem.style.display = 'none';
         }
-        heightVelocityItem.style.display = 'block';
     } else {
+        // No height velocity data - clear content and hide
+        heightVelocityValue.textContent = '';
+        heightVelocityMessage.textContent = '';
+        heightVelocityMessage.style.display = 'none';
         heightVelocityItem.style.display = 'none';
     }
 
