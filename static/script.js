@@ -815,6 +815,102 @@ document.getElementById('resetBtn').addEventListener('click', () => {
     };
 });
 
+// Demo Mode functionality
+async function loadDemoData() {
+    try {
+        showToast('Generating demo data...', 'info');
+
+        const response = await fetch('/generate-demo-data');
+        const result = await response.json();
+
+        if (!result.success) {
+            showToast('Failed to generate demo data: ' + result.error, 'error');
+            return;
+        }
+
+        const data = result.data;
+
+        // Populate basic fields
+        document.querySelector(`input[name="sex"][value="${data.sex}"]`).checked = true;
+        document.getElementById('birth_date').value = data.birth_date;
+        document.getElementById('measurement_date').value = data.measurement_date;
+        document.getElementById('height').value = data.height;
+        document.getElementById('weight').value = data.weight;
+        if (data.ofc) {
+            document.getElementById('ofc').value = data.ofc;
+        }
+
+        // Set reference
+        document.getElementById('reference').value = data.reference;
+
+        // Populate gestation if present
+        if (data.gestation_weeks) {
+            document.getElementById('gestation_weeks').value = data.gestation_weeks;
+            if (data.gestation_days) {
+                document.getElementById('gestation_days').value = data.gestation_days;
+            }
+        }
+
+        // Populate parental heights
+        document.getElementById('maternal_height_cm').value = data.maternal_height;
+        document.getElementById('paternal_height_cm').value = data.paternal_height;
+
+        // Clear and populate previous measurements table
+        document.getElementById('previousMeasurementsBody').innerHTML = '';
+        previousMeasurementRowCounter = 0;
+
+        data.previous_measurements.forEach(pm => {
+            addPreviousMeasurementRow();
+            const rows = document.querySelectorAll('#previousMeasurementsBody tr');
+            const lastRow = rows[rows.length - 1];
+
+            if (lastRow) {
+                const dateInput = lastRow.querySelector('.prev-measurement-date');
+                const heightInput = lastRow.querySelector('.prev-measurement-height');
+                const weightInput = lastRow.querySelector('.prev-measurement-weight');
+                const ofcInput = lastRow.querySelector('.prev-measurement-ofc');
+
+                if (dateInput) dateInput.value = pm.date;
+                if (heightInput && pm.height) heightInput.value = pm.height;
+                if (weightInput && pm.weight) weightInput.value = pm.weight;
+                if (ofcInput && pm.ofc) ofcInput.value = pm.ofc;
+            }
+        });
+
+        // Clear and populate bone age assessments table
+        document.getElementById('boneAgeBody').innerHTML = '';
+        boneAgeRowCounter = 0;
+
+        data.bone_age_assessments.forEach(ba => {
+            addBoneAgeRow();
+            const rows = document.querySelectorAll('#boneAgeBody tr');
+            const lastRow = rows[rows.length - 1];
+
+            if (lastRow) {
+                const dateInput = lastRow.querySelector('.bone-age-date');
+                const decimalInput = lastRow.querySelector('.bone-age-decimal');
+                const standardSelect = lastRow.querySelector('.bone-age-standard');
+
+                if (dateInput) dateInput.value = ba.date;
+                if (decimalInput) decimalInput.value = ba.bone_age;
+                if (standardSelect) standardSelect.value = ba.standard;
+            }
+        });
+
+        showToast('Demo data loaded! Click Calculate to see results.', 'success');
+
+        // Scroll to top of form
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    } catch (error) {
+        console.error('Error loading demo data:', error);
+        showToast('Failed to load demo data: ' + error.message, 'error');
+    }
+}
+
+// Add event listener for demo button
+document.getElementById('demoBtn').addEventListener('click', loadDemoData);
+
 // Toggle between cm and ft/in inputs for parental heights (independent for each parent)
 function toggleMaternalHeightUnits() {
     const units = document.querySelector('input[name="maternal_height_units"]:checked')?.value;

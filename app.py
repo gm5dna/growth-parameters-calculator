@@ -4,6 +4,7 @@ from rcpchgrowth.chart_functions import create_chart
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 import math
+import random
 
 # Import from our modules
 from constants import ErrorCodes
@@ -693,6 +694,184 @@ def get_chart_data():
         return jsonify({
             'success': False,
             'error': f'Chart data error: {str(e)}'
+        }), 400
+
+@app.route('/generate-demo-data', methods=['GET'])
+def generate_demo_data():
+    """
+    Generate realistic demo data using rcpchgrowth library
+    Returns populated form data that can be used to demonstrate the app
+    """
+    try:
+        # Random sex
+        sex = random.choice(['male', 'female'])
+
+        # Random age between 2 and 15 years
+        age_years = random.uniform(2, 15)
+
+        # Calculate birth date from age
+        measurement_date = datetime.now().date()
+        birth_date = measurement_date - relativedelta(years=int(age_years), days=int((age_years % 1) * 365.25))
+
+        # Random reference (mostly uk-who, occasionally others)
+        reference = random.choices(
+            ['uk-who', 'turner', 'trisomy-21'],
+            weights=[0.85, 0.1, 0.05]
+        )[0]
+
+        # Generate measurements from realistic centiles
+        # Pick centiles that are slightly varied to make it interesting
+        height_centile_sds = random.uniform(-2, 2)  # -2 to +2 SDS range
+        weight_centile_sds = height_centile_sds + random.uniform(-0.5, 0.5)  # Correlated but slightly different
+        ofc_centile_sds = random.uniform(-1.5, 1.5)
+
+        # Use measurement_from_sds to generate realistic measurements
+        height_measurement = measurement_from_sds(
+            measurement_method='height',
+            requested_sds=height_centile_sds,
+            sex=sex,
+            decimal_age=age_years,
+            reference=reference
+        )
+        height = round(height_measurement, 1)
+
+        weight_measurement = measurement_from_sds(
+            measurement_method='weight',
+            requested_sds=weight_centile_sds,
+            sex=sex,
+            decimal_age=age_years,
+            reference=reference
+        )
+        weight = round(weight_measurement, 1)
+
+        # OFC for younger children
+        ofc = None
+        if age_years < 5:
+            ofc_measurement = measurement_from_sds(
+                measurement_method='ofc',
+                requested_sds=ofc_centile_sds,
+                sex=sex,
+                decimal_age=age_years,
+                reference=reference
+            )
+            ofc = round(ofc_measurement, 1)
+
+        # Generate 2-4 previous measurements
+        num_previous = random.randint(2, 4)
+        previous_measurements = []
+
+        for i in range(num_previous):
+            # Go back 6-18 months for each measurement
+            months_ago = (i + 1) * random.randint(6, 18)
+            prev_age = age_years - (months_ago / 12)
+
+            if prev_age > 0:  # Only if positive age
+                prev_date = measurement_date - relativedelta(months=months_ago)
+
+                # Generate measurements with slight growth trajectory
+                prev_height_sds = height_centile_sds + random.uniform(-0.2, 0.2)
+                prev_weight_sds = weight_centile_sds + random.uniform(-0.3, 0.3)
+
+                prev_height = round(measurement_from_sds(
+                    measurement_method='height',
+                    requested_sds=prev_height_sds,
+                    sex=sex,
+                    decimal_age=prev_age,
+                    reference=reference
+                ), 1)
+
+                prev_weight = round(measurement_from_sds(
+                    measurement_method='weight',
+                    requested_sds=prev_weight_sds,
+                    sex=sex,
+                    decimal_age=prev_age,
+                    reference=reference
+                ), 1)
+
+                prev_ofc = None
+                if age_years < 5 and ofc:
+                    prev_ofc_sds = ofc_centile_sds + random.uniform(-0.2, 0.2)
+                    prev_ofc = round(measurement_from_sds(
+                        measurement_method='ofc',
+                        requested_sds=prev_ofc_sds,
+                        sex=sex,
+                        decimal_age=prev_age,
+                        reference=reference
+                    ), 1)
+
+                previous_measurements.append({
+                    'date': prev_date.isoformat(),
+                    'height': prev_height,
+                    'weight': prev_weight,
+                    'ofc': prev_ofc
+                })
+
+        # Sort previous measurements by date (oldest first)
+        previous_measurements.sort(key=lambda x: x['date'])
+
+        # Generate parental heights
+        # Use population averages with some variation
+        maternal_height = round(random.gauss(163, 6), 1)  # Female average ~163cm
+        paternal_height = round(random.gauss(176, 7), 1)  # Male average ~176cm
+
+        # Bone age assessment (30% chance)
+        bone_age_assessments = []
+        if random.random() < 0.3 and age_years >= 3:
+            # Bone age can be delayed or advanced
+            bone_age_offset = random.uniform(-2, 2)
+            bone_age = max(0, age_years + bone_age_offset)
+
+            # Assessment date within ±2 weeks of measurement
+            assessment_date = measurement_date + relativedelta(days=random.randint(-14, 14))
+
+            # Randomly choose standard(s)
+            standards = ['greulich-pyle', 'tw3']
+            num_standards = random.choice([1, 2])  # Sometimes both
+
+            for standard in random.sample(standards, num_standards):
+                # TW3 might be slightly different from GP
+                ba_variation = random.uniform(-0.3, 0.3) if len(bone_age_assessments) > 0 else 0
+                assessment_bone_age = round(bone_age + ba_variation, 1)
+
+                bone_age_assessments.append({
+                    'date': assessment_date.isoformat(),
+                    'bone_age': assessment_bone_age,
+                    'standard': standard
+                })
+
+        # Gestation data for younger children (20% chance of being preterm)
+        gestation_weeks = None
+        gestation_days = None
+        if age_years < 3 and random.random() < 0.2:
+            gestation_weeks = random.randint(28, 36)
+            gestation_days = random.randint(0, 6)
+
+        # Build response
+        demo_data = {
+            'sex': sex,
+            'birth_date': birth_date.isoformat(),
+            'measurement_date': measurement_date.isoformat(),
+            'height': height,
+            'weight': weight,
+            'ofc': ofc,
+            'previous_measurements': previous_measurements,
+            'bone_age_assessments': bone_age_assessments,
+            'maternal_height': maternal_height,
+            'paternal_height': paternal_height,
+            'gestation_weeks': gestation_weeks,
+            'gestation_days': gestation_days,
+            'reference': reference
+        }
+
+        return jsonify({
+            'success': True,
+            'data': demo_data
+        })
+
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': f'Demo data generation error: {str(e)}'
         }), 400
 
 @app.route('/export-pdf', methods=['POST'])
