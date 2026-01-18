@@ -1265,6 +1265,9 @@ select:focus {
     top: 20px;
     right: 20px;
     z-index: 1000;
+    display: flex;
+    gap: 10px;
+    align-items: center;
 }
 
 .theme-toggle-btn {
@@ -1307,6 +1310,39 @@ select:focus {
     position: absolute;
 }
 
+/* Help Link */
+.help-link {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: var(--container-bg);
+    border: 2px solid var(--border-color);
+    border-radius: 25px;
+    color: var(--text-primary);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.help-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    background: var(--button-primary);
+    color: white;
+    border-color: var(--button-primary);
+}
+
+.help-link .material-symbols-outlined {
+    font-size: 20px;
+}
+
+.help-text {
+    display: inline;
+}
+
 @media (max-width: 600px) {
     .theme-toggle {
         top: 10px;
@@ -1321,5 +1357,18 @@ select:focus {
 
     .theme-icon {
         font-size: 20px;
+    }
+
+    .help-link {
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+
+    .help-text {
+        display: none;
+    }
+
+    .help-link .material-symbols-outlined {
+        font-size: 18px;
     }
 }

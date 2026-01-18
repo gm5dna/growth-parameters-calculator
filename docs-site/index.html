@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Growth Parameters Calculator - User Guide</title>
+    <meta name="description" content="Comprehensive user guide for the Growth Parameters Calculator, a clinical tool for pediatric growth assessment.">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/x-icon" href="../static/favicon.ico">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Growth Parameters Calculator</h1>
+            <p class="subtitle">User Guide &amp; Documentation</p>
+            <nav>
+                <a href="https://growth-parameters-calculator.onrender.com" class="btn-primary">Open Calculator</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Quick Start -->
+        <section id="quick-start" class="doc-section">
+            <h2>Quick Start</h2>
+            <p>The Growth Parameters Calculator is a clinical tool for calculating pediatric growth parameters using validated growth references from the RCPCH (Royal College of Paediatrics and Child Health).</p>
+
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>Enter Patient Information</h3>
+                        <p>Select sex, enter dates of birth and measurement, and choose the appropriate growth reference.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>Add Measurements</h3>
+                        <p>Enter available measurements: weight, height/length, head circumference (OFC).</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>Calculate &amp; Review</h3>
+                        <p>Click Calculate to see centiles, SDS values, and growth charts. Export to PDF if needed.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features -->
+        <section id="features" class="doc-section">
+            <h2>Key Features</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>📊 Growth Charts</h3>
+                    <p>Interactive charts showing measurements plotted against UK-WHO, Turner, or Trisomy-21 references.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>👶 Preterm Correction</h3>
+                    <p>Automatic gestational age correction for preterm infants based on clinical guidelines.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>📈 Height Velocity</h3>
+                    <p>Calculate growth velocity when previous height measurements are available.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>👨‍👩‍👧 Mid-Parental Height</h3>
+                    <p>Predict adult height based on parental heights with target ranges.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>💊 GH Dosing</h3>
+                    <p>Growth hormone dose calculations based on body surface area.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>📄 PDF Export</h3>
+                    <p>Generate professional PDF reports with charts and measurements.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Measurements Guide -->
+        <section id="measurements" class="doc-section">
+            <h2>Measurements Guide</h2>
+
+            <div class="measurement-info">
+                <h3>Weight</h3>
+                <p><strong>Units:</strong> Kilograms (kg)</p>
+                <p><strong>Precision:</strong> 1-2 decimal places recommended</p>
+                <p><strong>Example:</strong> 12.5 kg</p>
+            </div>
+
+            <div class="measurement-info">
+                <h3>Height / Length</h3>
+                <p><strong>Units:</strong> Centimeters (cm)</p>
+                <p><strong>Note:</strong> Length (lying down) for infants &lt;2 years; standing height for older children</p>
+                <p><strong>Example:</strong> 85.3 cm</p>
+            </div>
+
+            <div class="measurement-info">
+                <h3>Head Circumference (OFC)</h3>
+                <p><strong>Units:</strong> Centimeters (cm)</p>
+                <p><strong>Measurement:</strong> Maximum circumference measured around the widest part of the head</p>
+                <p><strong>Example:</strong> 48.2 cm</p>
+            </div>
+
+            <div class="measurement-info">
+                <h3>Body Mass Index (BMI)</h3>
+                <p><strong>Calculation:</strong> Automatically calculated from weight and height</p>
+                <p><strong>Formula:</strong> BMI = weight(kg) / [height(m)]²</p>
+                <p><strong>Interpretation:</strong> Provides age-adjusted centiles for nutritional status</p>
+            </div>
+        </section>
+
+        <!-- Understanding Results -->
+        <section id="results" class="doc-section">
+            <h2>Understanding Results</h2>
+
+            <div class="info-box">
+                <h3>Centiles</h3>
+                <p>Centiles show where a measurement falls in relation to a reference population:</p>
+                <ul>
+                    <li><strong>50th centile:</strong> Median value - 50% of children are above, 50% below</li>
+                    <li><strong>25th-75th centile:</strong> Normal range - includes ~50% of healthy children</li>
+                    <li><strong>9th-91st centile:</strong> Wider normal range - includes ~82% of children</li>
+                    <li><strong>&lt;0.4th or &gt;99.6th:</strong> Extreme values requiring clinical review</li>
+                </ul>
+            </div>
+
+            <div class="info-box">
+                <h3>Standard Deviation Scores (SDS / Z-scores)</h3>
+                <p>SDS values express how many standard deviations a measurement is from the mean:</p>
+                <ul>
+                    <li><strong>0 SDS:</strong> Exactly at the mean (50th centile)</li>
+                    <li><strong>+1 SDS:</strong> ~84th centile</li>
+                    <li><strong>+2 SDS:</strong> ~98th centile</li>
+                    <li><strong>-1 SDS:</strong> ~16th centile</li>
+                    <li><strong>-2 SDS:</strong> ~2nd centile</li>
+                </ul>
+                <p><em>Values beyond ±2 SDS warrant further investigation.</em></p>
+            </div>
+
+            <div class="info-box warning">
+                <h3>⚠️ Advisory Warnings</h3>
+                <p>The calculator provides warnings for extreme SDS values:</p>
+                <ul>
+                    <li><strong>±4 to ±8 SDS:</strong> Advisory warning - verify measurement accuracy</li>
+                    <li><strong>&gt;±8 SDS:</strong> Hard rejection - measurement likely erroneous</li>
+                    <li><strong>BMI ±15 SDS:</strong> Higher threshold due to BMI variability</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Preterm Infants -->
+        <section id="preterm" class="doc-section">
+            <h2>Preterm Infants</h2>
+
+            <div class="info-box">
+                <h3>Gestational Age Correction</h3>
+                <p>For babies born preterm (&lt;37 weeks gestation), measurements are automatically corrected based on their expected due date (EDD):</p>
+
+                <h4>Correction Duration:</h4>
+                <ul>
+                    <li><strong>32-36 weeks gestation:</strong> Correction until age 1 year</li>
+                    <li><strong>&lt;32 weeks gestation:</strong> Correction until age 2 years</li>
+                </ul>
+
+                <h4>How It Works:</h4>
+                <p>The calculator adjusts the child's age based on their due date rather than birth date. Both chronological and corrected ages are displayed in results.</p>
+
+                <h4>Example:</h4>
+                <div class="example">
+                    <p><strong>Baby born:</strong> 30 weeks gestation (10 weeks early)</p>
+                    <p><strong>Chronological age at 6 months:</strong> 6 months</p>
+                    <p><strong>Corrected age:</strong> 3.7 months (6 months - 10 weeks)</p>
+                    <p><strong>Measurements plotted at:</strong> 3.7 months on growth charts</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Advanced Features -->
+        <section id="advanced" class="doc-section">
+            <h2>Advanced Features</h2>
+
+            <div class="feature-detail">
+                <h3>Height Velocity</h3>
+                <p>Calculate yearly growth rate when previous height measurements are available.</p>
+                <p><strong>Requirements:</strong></p>
+                <ul>
+                    <li>Minimum interval: 4 months between measurements</li>
+                    <li>Both current and previous heights required</li>
+                    <li>Previous measurement date must be before current date</li>
+                </ul>
+                <p><strong>Clinical Use:</strong> Monitor growth patterns, assess growth hormone therapy, identify growth faltering.</p>
+            </div>
+
+            <div class="feature-detail">
+                <h3>Mid-Parental Height (MPH)</h3>
+                <p>Predict adult height based on parental heights.</p>
+                <p><strong>Calculation:</strong></p>
+                <ul>
+                    <li><strong>Boys:</strong> [(Mother's height + Father's height) / 2] + 6.5 cm</li>
+                    <li><strong>Girls:</strong> [(Mother's height + Father's height) / 2] - 6.5 cm</li>
+                </ul>
+                <p><strong>Target Range:</strong> MPH ± 8.5 cm (approximately ±2 SDS)</p>
+                <p><strong>Interpretation:</strong> Most children reach adult height within this range. Values outside may indicate pathology.</p>
+            </div>
+
+            <div class="feature-detail">
+                <h3>Body Surface Area (BSA)</h3>
+                <p>Used for medication dosing and clinical calculations.</p>
+                <p><strong>Methods:</strong></p>
+                <ul>
+                    <li><strong>Boyd formula:</strong> Used when both weight and height available (most accurate)</li>
+                    <li><strong>cBNF lookup:</strong> Used when only weight available (based on British National Formulary tables)</li>
+                </ul>
+            </div>
+
+            <div class="feature-detail">
+                <h3>Growth Hormone Dosing</h3>
+                <p>Standard GH dose calculation: 7 mg/m²/week</p>
+                <p><strong>Displays:</strong></p>
+                <ul>
+                    <li>Daily dose (mg/day)</li>
+                    <li>Dose per body surface area (mg/m²/week)</li>
+                    <li>Weight-based dose (mcg/kg/day)</li>
+                </ul>
+                <p class="note"><strong>Note:</strong> This is a reference calculation. Actual GH doses should be prescribed by specialists based on individual patient needs.</p>
+            </div>
+
+            <div class="feature-detail">
+                <h3>BMI Percentage of Median</h3>
+                <p>Shows BMI as percentage of the median (50th centile) value.</p>
+                <p><strong>Clinical Interpretation:</strong></p>
+                <ul>
+                    <li><strong>&lt;70%:</strong> Severe malnutrition</li>
+                    <li><strong>70-80%:</strong> Moderate malnutrition</li>
+                    <li><strong>80-90%:</strong> Mild malnutrition</li>
+                    <li><strong>90-110%:</strong> Normal nutritional status</li>
+                    <li><strong>&gt;120%:</strong> Overweight/obesity</li>
+                </ul>
+                <p class="note"><em>Available in Advanced Mode only</em></p>
+            </div>
+        </section>
+
+        <!-- Growth References -->
+        <section id="references" class="doc-section">
+            <h2>Growth References</h2>
+
+            <div class="reference-card">
+                <h3>UK-WHO (Default)</h3>
+                <p><strong>Age range:</strong> 0-20 years</p>
+                <p><strong>Description:</strong> Composite reference combining WHO standards (0-4 years) with UK 1990 data (4-20 years)</p>
+                <p><strong>Use for:</strong> General pediatric population in the UK</p>
+            </div>
+
+            <div class="reference-card">
+                <h3>Turner Syndrome</h3>
+                <p><strong>Age range:</strong> 1-20 years</p>
+                <p><strong>Description:</strong> Specific growth charts for girls with Turner syndrome</p>
+                <p><strong>Use for:</strong> Confirmed Turner syndrome diagnosis</p>
+            </div>
+
+            <div class="reference-card">
+                <h3>Trisomy 21 (Down Syndrome)</h3>
+                <p><strong>Age range:</strong> 0-18 years</p>
+                <p><strong>Description:</strong> UK-specific growth charts for children with Down syndrome</p>
+                <p><strong>Use for:</strong> Confirmed Trisomy 21 diagnosis</p>
+            </div>
+
+            <div class="reference-card">
+                <h3>CDC (Coming Soon)</h3>
+                <p><strong>Description:</strong> US Centers for Disease Control growth charts</p>
+                <p><strong>Use for:</strong> US populations, extended BMI calculations for obesity</p>
+            </div>
+        </section>
+
+        <!-- Tips & Best Practices -->
+        <section id="tips" class="doc-section">
+            <h2>Tips &amp; Best Practices</h2>
+
+            <div class="tip-box">
+                <h3>📏 Accurate Measurements</h3>
+                <ul>
+                    <li>Use calibrated equipment</li>
+                    <li>Measure at consistent times of day (height can vary)</li>
+                    <li>For length: ensure infant is lying straight, knees extended</li>
+                    <li>For standing height: shoes off, heels against wall</li>
+                    <li>OFC: measure at widest circumference (glabella to occiput)</li>
+                </ul>
+            </div>
+
+            <div class="tip-box">
+                <h3>🎯 Choosing the Right Reference</h3>
+                <ul>
+                    <li>Use UK-WHO for general population</li>
+                    <li>Use syndrome-specific charts only for confirmed diagnoses</li>
+                    <li>Don't switch references unnecessarily - use consistently for serial measurements</li>
+                </ul>
+            </div>
+
+            <div class="tip-box">
+                <h3>📊 Interpreting Charts</h3>
+                <ul>
+                    <li>Growth pattern (trajectory) is more important than single measurements</li>
+                    <li>Crossing centiles up or down may indicate pathology</li>
+                    <li>Consider parental heights - genetic potential affects growth</li>
+                    <li>Use corrected age for preterm infants as appropriate</li>
+                </ul>
+            </div>
+
+            <div class="tip-box">
+                <h3>💾 Saving Results</h3>
+                <ul>
+                    <li><strong>PDF Export:</strong> Generate professional reports with charts</li>
+                    <li><strong>Copy to Clipboard:</strong> Quick copy of results for clinical notes</li>
+                    <li><strong>Screenshots:</strong> Use browser screenshot tools for quick reference</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Mode Switching -->
+        <section id="modes" class="doc-section">
+            <h2>Simple vs Advanced Mode</h2>
+
+            <div class="mode-comparison">
+                <div class="mode-card">
+                    <h3>🌙 Simple Mode</h3>
+                    <p>Streamlined interface showing essential measurements only.</p>
+                    <p><strong>Displays:</strong></p>
+                    <ul>
+                        <li>Basic measurements (weight, height, BMI, OFC)</li>
+                        <li>Centiles and SDS values</li>
+                        <li>Growth charts</li>
+                    </ul>
+                    <p><strong>Best for:</strong> Quick assessments, routine checks</p>
+                </div>
+
+                <div class="mode-card">
+                    <h3>☀️ Advanced Mode</h3>
+                    <p>Full feature set with additional clinical parameters.</p>
+                    <p><strong>Additional features:</strong></p>
+                    <ul>
+                        <li>Height velocity calculations</li>
+                        <li>Body surface area</li>
+                        <li>Growth hormone dosing</li>
+                        <li>Mid-parental height</li>
+                        <li>BMI percentage of median</li>
+                    </ul>
+                    <p><strong>Best for:</strong> Specialist clinics, complex cases</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dark Mode -->
+        <section id="dark-mode" class="doc-section">
+            <h2>Dark Mode</h2>
+            <p>The calculator includes a dark mode theme that's easier on the eyes in low-light environments.</p>
+            <ul>
+                <li>Toggle using the sun/moon icon in the top-right corner</li>
+                <li>Preference is saved automatically to your browser</li>
+                <li>Charts adapt to dark mode for better visibility</li>
+            </ul>
+        </section>
+
+        <!-- Clinical Disclaimer -->
+        <section id="disclaimer" class="doc-section warning-section">
+            <h2>⚠️ Clinical Disclaimer</h2>
+            <div class="disclaimer-box">
+                <p><strong>This calculator is a clinical decision support tool and should not replace clinical judgment.</strong></p>
+                <ul>
+                    <li>All calculations should be verified and interpreted by qualified healthcare professionals</li>
+                    <li>Growth assessment requires clinical context including examination, history, and investigations</li>
+                    <li>Extreme values or crossing centiles warrant further investigation</li>
+                    <li>This tool is designed for healthcare professionals with appropriate training</li>
+                    <li>Not intended for self-diagnosis or patient use without medical supervision</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Support & Feedback -->
+        <section id="support" class="doc-section">
+            <h2>Support &amp; Feedback</h2>
+            <p>This tool is under active development. We welcome feedback and suggestions.</p>
+            <div class="support-links">
+                <a href="https://github.com/gm5dna/growth-parameters-calculator/issues" class="support-link" target="_blank">
+                    <strong>Report an Issue</strong>
+                    <p>Bug reports and feature requests</p>
+                </a>
+                <a href="https://growth.rcpch.ac.uk" class="support-link" target="_blank">
+                    <strong>RCPCH Growth Charts</strong>
+                    <p>Official RCPCH growth reference documentation</p>
+                </a>
+            </div>
+        </section>
+
+        <!-- Credits -->
+        <section id="credits" class="doc-section">
+            <h2>Credits &amp; Acknowledgments</h2>
+            <p>This calculator uses the <strong>rcpchgrowth Python library</strong> developed by the Royal College of Paediatrics and Child Health (RCPCH) Digital Growth Charts project.</p>
+            <p><strong>Growth References:</strong></p>
+            <ul>
+                <li>UK-WHO: Combined WHO Child Growth Standards and UK90 reference data</li>
+                <li>Turner Syndrome: Lyon et al., Archives of Disease in Childhood 1985</li>
+                <li>Trisomy 21: UK Down Syndrome Medical Interest Group</li>
+            </ul>
+            <p><strong>Technology Stack:</strong></p>
+            <ul>
+                <li>Backend: Flask + rcpchgrowth library</li>
+                <li>Frontend: Vanilla JavaScript + Chart.js</li>
+                <li>Deployment: Render</li>
+            </ul>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Growth Parameters Calculator | <a href="https://growth-parameters-calculator.onrender.com">Open Calculator</a></p>
+            <p class="small">Built with the RCPCH Digital Growth Charts API</p>
+        </div>
+    </footer>
+</body>
+</html>
