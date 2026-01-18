@@ -3,8 +3,9 @@
 ## Quick Reference
 
 **What:** Pediatric growth calculator using RCPCH's rcpchgrowth library
-**Stack:** Flask 3.0.0 + Vanilla JS SPA + Chart.js
+**Stack:** Flask 3.0.0 + Vanilla JS SPA + Chart.js + Material Design Icons
 **Deploy:** https://growth-parameters-calculator.onrender.com
+**Python:** 3.12.8 (specified in runtime.txt for Render)
 **Docs:** See `docs/` folder - comprehensive guides in `docs/README.md`
 
 ## Commands
@@ -28,22 +29,26 @@ pytest --cov=. --cov-report=html      # With coverage
 ## Project Structure
 
 ```
-app.py          # Flask routes, orchestration
-constants.py    # Config, thresholds, error codes
-validation.py   # Input validation (ValidationError)
-calculations.py # Age, BSA, velocity, GH dose
-models.py       # rcpchgrowth Measurement factory
-utils.py        # MPH, centile data, responses
-pdf_utils.py    # PDF generation (ReportLab)
+app.py                # Flask routes, orchestration
+constants.py          # Config, thresholds, error codes
+validation.py         # Input validation (ValidationError)
+calculations.py       # Age, BSA, velocity, GH dose
+models.py             # rcpchgrowth Measurement factory
+utils.py              # MPH, centile data, responses
+pdf_utils.py          # PDF generation (ReportLab)
+requirements.txt      # Production dependencies (Render uses this)
+requirements-dev.txt  # Development/testing dependencies
+runtime.txt           # Python version for Render (3.12.8)
 
 static/
-  script.js     # Frontend logic, Chart.js, dark mode
-  validation.js # Client validation
-  style.css     # Responsive styles, theme system
+  script.js           # Frontend logic, Chart.js, dark mode
+  validation.js       # Client validation
+  style.css           # Responsive styles, theme system
+  clipboard.js        # Copy to clipboard functionality
 templates/
-  index.html    # SPA shell
-tests/          # pytest test suite
-docs/           # Full documentation
+  index.html          # SPA shell with Material Icons
+tests/                # pytest test suite
+docs/                 # Full documentation
 ```
 
 ## Key Patterns
@@ -68,6 +73,24 @@ docs/           # Full documentation
 - Correction ages: 1yr (moderate preterm), 2yr (extreme <32wk)
 - GH dose standard: 7 mg/m²/week
 
+## Deployment (Render)
+
+**Auto-deploy:** Pushes to `main` trigger automatic Render deployment
+
+**Key Files:**
+- `runtime.txt` - Pins Python to 3.12.8 (required: greenlet doesn't support 3.14)
+- `requirements.txt` - Production dependencies only (no testing tools)
+- `requirements-dev.txt` - Testing dependencies (playwright, pytest) - NOT deployed
+
+**Why Python 3.12?**
+Playwright requires greenlet, which doesn't yet support Python 3.14's internal API changes.
+By separating testing dependencies and pinning Python to 3.12.8, we avoid build failures.
+
+**Troubleshooting:**
+- If greenlet errors appear: Check runtime.txt exists and specifies Python 3.12.x
+- If deployment fails: Ensure testing deps (playwright/pytest) are NOT in requirements.txt
+- Check Render logs for specific build/runtime errors
+
 ## Development Workflow
 
 **After completing tasks:** Test with `pytest`, then commit and push changes.
@@ -76,20 +99,24 @@ docs/           # Full documentation
 pytest                                # Test first
 git add .                             # Stage changes
 git commit -m "Descriptive message"   # Commit
-git push origin main                  # Push
+git push origin main                  # Push (triggers Render deployment)
 ```
 
 **Commit when:** Feature complete, refactoring done, docs updated
 **Don't commit:** Broken code, debug statements, commented code
 
+**Note:** Only production code needs testing before commit. Testing dependencies
+are in requirements-dev.txt and won't affect Render deployments.
+
 ## Completed Features
 
-- ✅ Dark mode with system detection
+- ✅ Dark mode with system detection (Material Design icons)
 - ✅ PDF export with charts
-- ✅ Copy results to clipboard
+- ✅ Copy results to clipboard (clinical formatting)
 - ✅ Mobile responsive design
-- ✅ Growth chart visualization
+- ✅ Growth chart visualization (Chart.js)
 - ✅ PWA offline support
+- ✅ Render deployment optimized (Python 3.12.8, split dependencies)
 
 ## Next Priority Features
 
