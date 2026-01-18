@@ -21,8 +21,9 @@
 - **`TECHNICAL.md`** - Architecture & implementation details
 - **`PROJECT_DESIGN.md`** - Design decisions & API reference
 - **`USER_GUIDE.md`** - Step-by-step usage instructions
-- **`DEPLOYMENT.md`** - Production deployment guide
 - **`PROJECT_STRUCTURE.md`** - Codebase organization
+
+**Note:** Deployment info is in `/PROJECT.md` (Render.com auto-deploy)
 
 ### Test Reports
 
@@ -38,10 +39,10 @@
 3. Dive into `TECHNICAL.md` or `PROJECT_DESIGN.md` as needed
 
 **For Developers:**
-1. Start with `/PROJECT.md` (overview, features, backlog)
+1. Start with `/PROJECT.md` (overview, features, backlog, deployment)
 2. Read `TECHNICAL.md` (architecture)
-3. Check `DEPLOYMENT.md` (production setup)
-4. Review `PROJECT_DESIGN.md` (design decisions)
+3. Review `PROJECT_DESIGN.md` (design decisions)
+4. Check `PROJECT_STRUCTURE.md` (codebase organization)
 
 **For Users:**
 1. Visit https://gm5dna.github.io/growth-parameters-calculator/
