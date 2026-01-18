@@ -59,8 +59,12 @@ class TestPretermCalculations:
             'gestation_days': 0,
             'weight': 8.0,
             'height': 70.0,
-            'previous_height': 65.0,
-            'previous_date': '2025-11-01',  # ~2.5 months ago
+            'previous_measurements': [
+                {
+                    'date': '2025-11-01',  # ~2.5 months ago
+                    'height': 65.0
+                }
+            ],
             'reference': 'uk-who'
         }
 
@@ -93,8 +97,12 @@ class TestPretermCalculations:
             'gestation_days': 0,
             'weight': 10.0,
             'height': 77.0,
-            'previous_height': 72.0,
-            'previous_date': '2025-09-01',  # ~4.5 months ago
+            'previous_measurements': [
+                {
+                    'date': '2025-09-01',  # ~4.5 months ago
+                    'height': 72.0
+                }
+            ],
             'reference': 'uk-who'
         }
 
@@ -179,8 +187,7 @@ class TestHeightVelocityScenarios:
             'measurement_date': '2026-01-18',
             'weight': 20.0,
             'height': 115.0,
-            'previous_height': 110.0,
-            # Missing previous_date
+            # No previous_measurements provided
             'reference': 'uk-who'
         }
 
@@ -201,8 +208,12 @@ class TestHeightVelocityScenarios:
             'birth_date': '2020-01-01',
             'measurement_date': '2026-01-18',
             'height': 115.0,
-            'previous_height': 113.0,
-            'previous_date': '2025-12-01',  # ~1.5 months ago
+            'previous_measurements': [
+                {
+                    'date': '2025-12-01',  # ~1.5 months ago
+                    'height': 113.0
+                }
+            ],
             'reference': 'uk-who'
         }
 
@@ -225,8 +236,12 @@ class TestHeightVelocityScenarios:
             'birth_date': '2020-01-01',
             'measurement_date': '2026-01-18',
             'height': 115.0,
-            'previous_height': 110.0,
-            'previous_date': '2026-02-01',  # Future date
+            'previous_measurements': [
+                {
+                    'date': '2026-02-01',  # Future date
+                    'height': 110.0
+                }
+            ],
             'reference': 'uk-who'
         }
 
@@ -249,8 +264,12 @@ class TestHeightVelocityScenarios:
             'birth_date': '2020-01-01',
             'measurement_date': '2026-01-18',
             'height': 120.0,
-            'previous_height': 117.0,
-            'previous_date': '2025-07-18',  # 6 months ago
+            'previous_measurements': [
+                {
+                    'date': '2025-07-18',  # 6 months ago
+                    'height': 117.0
+                }
+            ],
             'reference': 'uk-who'
         }
 
@@ -275,8 +294,12 @@ class TestHeightVelocityScenarios:
             'birth_date': '2018-01-01',
             'measurement_date': '2026-01-18',
             'height': 130.0,
-            'previous_height': 125.0,
-            'previous_date': '2025-01-18',  # 1 year ago
+            'previous_measurements': [
+                {
+                    'date': '2025-01-18',  # 1 year ago
+                    'height': 125.0
+                }
+            ],
             'reference': 'uk-who'
         }
 
@@ -618,8 +641,12 @@ class TestCompleteCalculationWorkflow:
             'weight': 28.0,
             'height': 130.0,
             'ofc': 53.0,
-            'previous_height': 125.0,
-            'previous_date': '2025-01-18',
+            'previous_measurements': [
+                {
+                    'date': '2025-01-18',
+                    'height': 125.0
+                }
+            ],
             'maternal_height': 168.0,
             'paternal_height': 182.0,
             'reference': 'uk-who'

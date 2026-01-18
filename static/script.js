@@ -166,8 +166,7 @@ document.getElementById('growthForm').addEventListener('submit', async (e) => {
         weight: weight,
         height: height,
         ofc: ofc,
-        previous_date: document.getElementById('previous_date').value,
-        previous_height: document.getElementById('previous_height').value,
+        previous_measurements: getPreviousMeasurements(),
         bone_age: document.getElementById('bone_age')?.value,
         bone_age_assessment_date: document.getElementById('bone_age_assessment_date')?.value,
         maternal_height: maternalHeightCm,
@@ -406,15 +405,8 @@ function displayResults(results) {
         ofc: results.ofc
     };
 
-    // Store previous measurements (currently only height) with centile/SDS from backend
-    const previousHeight = document.getElementById('previous_height').value;
-    const previousDate = document.getElementById('previous_date').value;
-    currentPatientData.previousMeasurements = {
-        height: previousHeight ? parseFloat(previousHeight) : null,
-        date: previousDate || null,
-        centile: results.previous_height ? results.previous_height.centile : null,
-        sds: results.previous_height ? results.previous_height.sds : null
-    };
+    // Store all previous measurements with their centile/SDS data from backend
+    currentPatientData.previousMeasurements = results.previous_measurements || [];
 
     // Store corrected age measurements if gestation correction was applied
     currentPatientData.weight_corrected = results.weight_corrected || null;
@@ -440,6 +432,73 @@ function showError(message) {
     errorDiv.classList.add('show');
 }
 
+// Previous Measurements Table Management
+let previousMeasurementRowCounter = 0;
+
+function addPreviousMeasurementRow() {
+    const tbody = document.getElementById('previousMeasurementsBody');
+    const rowId = `prev-row-${previousMeasurementRowCounter++}`;
+
+    const row = document.createElement('tr');
+    row.id = rowId;
+    row.innerHTML = `
+        <td>
+            <input type="date" class="prev-measurement-date" data-row-id="${rowId}" />
+        </td>
+        <td>
+            <input type="number" class="prev-measurement-height" step="0.1" min="0" placeholder="e.g., 120.5" data-row-id="${rowId}" />
+        </td>
+        <td>
+            <input type="number" class="prev-measurement-weight" step="0.1" min="0" placeholder="e.g., 25.0" data-row-id="${rowId}" />
+        </td>
+        <td>
+            <input type="number" class="prev-measurement-ofc" step="0.1" min="0" placeholder="e.g., 50.0" data-row-id="${rowId}" />
+        </td>
+        <td>
+            <button type="button" class="btn-remove-measurement" onclick="removePreviousMeasurementRow('${rowId}')">
+                <span class="material-symbols-outlined">delete</span>
+                Remove
+            </button>
+        </td>
+    `;
+
+    tbody.appendChild(row);
+}
+
+function removePreviousMeasurementRow(rowId) {
+    const row = document.getElementById(rowId);
+    if (row) {
+        row.remove();
+    }
+}
+
+function getPreviousMeasurements() {
+    const rows = document.querySelectorAll('#previousMeasurementsBody tr');
+    const measurements = [];
+
+    rows.forEach(row => {
+        const date = row.querySelector('.prev-measurement-date')?.value;
+        const height = row.querySelector('.prev-measurement-height')?.value;
+        const weight = row.querySelector('.prev-measurement-weight')?.value;
+        const ofc = row.querySelector('.prev-measurement-ofc')?.value;
+
+        // Only include row if at least date and one measurement is provided
+        if (date && (height || weight || ofc)) {
+            measurements.push({
+                date: date,
+                height: height ? parseFloat(height) : null,
+                weight: weight ? parseFloat(weight) : null,
+                ofc: ofc ? parseFloat(ofc) : null
+            });
+        }
+    });
+
+    return measurements;
+}
+
+// Add event listener for Add Previous Measurement button
+document.getElementById('addPreviousMeasurementBtn').addEventListener('click', addPreviousMeasurementRow);
+
 // Reset button functionality
 document.getElementById('resetBtn').addEventListener('click', () => {
     // Reset the form
@@ -457,6 +516,10 @@ document.getElementById('resetBtn').addEventListener('click', () => {
     document.getElementById('maternal-height-ft').style.display = 'none';
     document.getElementById('paternal-height-cm').style.display = 'block';
     document.getElementById('paternal-height-ft').style.display = 'none';
+
+    // Clear previous measurements table
+    document.getElementById('previousMeasurementsBody').innerHTML = '';
+    previousMeasurementRowCounter = 0;
 
     // Hide and reset charts
     document.getElementById('charts-section').classList.remove('show');
@@ -1011,27 +1074,25 @@ function preparePatientData(measurementMethod) {
         });
     }
 
-    // Add previous measurement (currently only available for height)
-    if (measurementMethod === 'height' && currentPatientData.previousMeasurements.height && currentPatientData.previousMeasurements.date) {
-        // Calculate previous age in decimal years
-        const birthDate = new Date(currentPatientData.birthDate);
-        const previousDate = new Date(currentPatientData.previousMeasurements.date);
-
-        // Calculate age at previous measurement
-        const diffTime = previousDate - birthDate;
-        const diffYears = diffTime / (1000 * 60 * 60 * 24 * 365.25);
-
-        // Only add if previous age is valid (positive and less than current)
-        if (diffYears > 0 && diffYears < currentPatientData.age) {
-            patientPoints.push({
-                x: diffYears,
-                y: currentPatientData.previousMeasurements.height,
-                label: 'Previous',
-                isCurrent: false,
-                centile: currentPatientData.previousMeasurements.centile,
-                sds: currentPatientData.previousMeasurements.sds
-            });
-        }
+    // Add all previous measurements for the current measurement type
+    if (currentPatientData.previousMeasurements && currentPatientData.previousMeasurements.length > 0) {
+        currentPatientData.previousMeasurements.forEach(prevMeasurement => {
+            // Check if this previous measurement has data for the current measurement type
+            const prevData = prevMeasurement[measurementMethod];
+            if (prevData && prevData.value !== null && prevMeasurement.age) {
+                // Only add if previous age is valid (positive and less than current)
+                if (prevMeasurement.age > 0 && prevMeasurement.age < currentPatientData.age) {
+                    patientPoints.push({
+                        x: prevMeasurement.age,
+                        y: prevData.value,
+                        label: 'Previous',
+                        isPrevious: true,
+                        centile: prevData.centile,
+                        sds: prevData.sds
+                    });
+                }
+            }
+        });
     }
 
     // Add bone age height point (only for height measurements)
@@ -1135,7 +1196,7 @@ function renderGrowthChart(canvas, centiles, patientData, measurementMethod) {
         const currentPoints = patientData.filter(p => p.isCurrent);
         const correctedPoints = patientData.filter(p => p.isCorrected);
         const boneAgePoints = patientData.filter(p => p.isBoneAge);
-        const previousPoints = patientData.filter(p => !p.isCurrent && !p.isCorrected && !p.isBoneAge);
+        const previousPoints = patientData.filter(p => p.isPrevious);
 
         // Add dotted line connecting corrected and chronological points (if both exist)
         if (correctedPoints.length > 0 && currentPoints.length > 0) {

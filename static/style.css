@@ -413,6 +413,103 @@ select:focus {
     color: var(--text-primary);
 }
 
+/* Previous Measurements Table */
+.previous-measurements-table-container {
+    margin: 15px 0;
+    overflow-x: auto;
+}
+
+.previous-measurements-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--container-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+}
+
+.previous-measurements-table thead {
+    background: var(--input-bg);
+}
+
+.previous-measurements-table th {
+    padding: 12px;
+    text-align: left;
+    font-weight: 600;
+    color: var(--text-primary);
+    border-bottom: 2px solid var(--border-color);
+}
+
+.previous-measurements-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.previous-measurements-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.previous-measurements-table input[type="date"],
+.previous-measurements-table input[type="number"] {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 14px;
+    background: var(--input-bg);
+    color: var(--text-primary);
+}
+
+.previous-measurements-table input[type="number"] {
+    min-width: 80px;
+}
+
+.btn-remove-measurement {
+    padding: 4px 8px;
+    background: #ef4444;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.btn-remove-measurement:hover {
+    background: #dc2626;
+}
+
+.btn-remove-measurement .material-symbols-outlined {
+    font-size: 16px;
+}
+
+.btn-add-measurement {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 10px;
+}
+
+.btn-add-measurement:hover {
+    background: #5568d3;
+    transform: translateY(-1px);
+}
+
+.btn-add-measurement .material-symbols-outlined {
+    font-size: 18px;
+}
+
 .height-ft-in {
     display: flex;
     gap: 15px;

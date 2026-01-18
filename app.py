@@ -59,9 +59,8 @@ def calculate():
                 'error': 'At least one measurement (weight, height, or OFC) is required.'
             }), 400
 
-        # Optional previous height data
-        previous_height = float(data.get('previous_height', 0)) if data.get('previous_height') else None
-        previous_date = datetime.strptime(data['previous_date'], '%Y-%m-%d').date() if data.get('previous_date') else None
+        # Optional previous measurements data
+        previous_measurements = data.get('previous_measurements', [])
 
         # Optional parental heights
         maternal_height = float(data.get('maternal_height', 0)) if data.get('maternal_height') else None
@@ -192,30 +191,153 @@ def calculate():
                     gestation_days=gestation_days or 0
                 )
 
-        # Calculate height velocity and previous height centile/SDS if previous data available
+        # Process previous measurements and calculate height velocity
         height_velocity = None
         previous_height_data = None
-        if height and previous_height and previous_date:
-            height_velocity = calculate_height_velocity(height, previous_height, measurement_date, previous_date)
+        processed_previous_measurements = []
 
-            # Calculate centile and SDS for previous height measurement
-            previous_height_measurement = Measurement(
-                sex=sex,
-                birth_date=birth_date,
-                observation_date=previous_date,
-                measurement_method='height',
-                observation_value=previous_height,
-                reference=reference
-            )
+        if previous_measurements:
+            # Process each previous measurement
+            for prev_measurement in previous_measurements:
+                try:
+                    prev_date = datetime.strptime(prev_measurement['date'], '%Y-%m-%d').date()
+                    prev_height = prev_measurement.get('height')
+                    prev_weight = prev_measurement.get('weight')
+                    prev_ofc = prev_measurement.get('ofc')
 
-            previous_height_calc = previous_height_measurement.measurement['measurement_calculated_values']
-            previous_height_sds = float(previous_height_calc['corrected_sds']) if previous_height_calc['corrected_sds'] else None
+                    processed_measurement = {
+                        'date': prev_date.isoformat(),
+                        'age': None,
+                        'height': None,
+                        'weight': None,
+                        'ofc': None
+                    }
 
-            previous_height_data = {
-                'value': previous_height,
-                'centile': round(float(previous_height_calc['corrected_centile']), 2) if previous_height_calc['corrected_centile'] else None,
-                'sds': round(previous_height_sds, 2) if previous_height_sds is not None else None
-            }
+                    # Calculate age at previous measurement
+                    prev_age_decimal, _ = calculate_age_in_years(birth_date, prev_date)
+                    processed_measurement['age'] = round(prev_age_decimal, 2)
+
+                    # Process height
+                    if prev_height:
+                        prev_height_measurement = Measurement(
+                            sex=sex,
+                            birth_date=birth_date,
+                            observation_date=prev_date,
+                            measurement_method='height',
+                            observation_value=float(prev_height),
+                            reference=reference
+                        )
+                        prev_height_calc = prev_height_measurement.measurement['measurement_calculated_values']
+                        prev_height_sds = float(prev_height_calc['corrected_sds']) if prev_height_calc['corrected_sds'] else None
+
+                        processed_measurement['height'] = {
+                            'value': float(prev_height),
+                            'centile': round(float(prev_height_calc['corrected_centile']), 2) if prev_height_calc['corrected_centile'] else None,
+                            'sds': round(prev_height_sds, 2) if prev_height_sds is not None else None
+                        }
+
+                    # Process weight
+                    if prev_weight:
+                        prev_weight_measurement = Measurement(
+                            sex=sex,
+                            birth_date=birth_date,
+                            observation_date=prev_date,
+                            measurement_method='weight',
+                            observation_value=float(prev_weight),
+                            reference=reference
+                        )
+                        prev_weight_calc = prev_weight_measurement.measurement['measurement_calculated_values']
+                        prev_weight_sds = float(prev_weight_calc['corrected_sds']) if prev_weight_calc['corrected_sds'] else None
+
+                        processed_measurement['weight'] = {
+                            'value': float(prev_weight),
+                            'centile': round(float(prev_weight_calc['corrected_centile']), 2) if prev_weight_calc['corrected_centile'] else None,
+                            'sds': round(prev_weight_sds, 2) if prev_weight_sds is not None else None
+                        }
+
+                    # Process OFC
+                    if prev_ofc:
+                        prev_ofc_measurement = Measurement(
+                            sex=sex,
+                            birth_date=birth_date,
+                            observation_date=prev_date,
+                            measurement_method='ofc',
+                            observation_value=float(prev_ofc),
+                            reference=reference
+                        )
+                        prev_ofc_calc = prev_ofc_measurement.measurement['measurement_calculated_values']
+                        prev_ofc_sds = float(prev_ofc_calc['corrected_sds']) if prev_ofc_calc['corrected_sds'] else None
+
+                        processed_measurement['ofc'] = {
+                            'value': float(prev_ofc),
+                            'centile': round(float(prev_ofc_calc['corrected_centile']), 2) if prev_ofc_calc['corrected_centile'] else None,
+                            'sds': round(prev_ofc_sds, 2) if prev_ofc_sds is not None else None
+                        }
+
+                    processed_previous_measurements.append(processed_measurement)
+
+                except (ValueError, KeyError) as e:
+                    # Skip invalid previous measurements
+                    continue
+
+            # Calculate height velocity using most recent previous height measurement > 4 months prior
+            if height:
+                # Get all height measurements from previous measurements
+                all_height_measurements = [
+                    pm for pm in processed_previous_measurements
+                    if pm['height'] is not None
+                ]
+
+                if all_height_measurements:
+                    # Check for error conditions
+                    error_message = None
+
+                    # Check if any measurements are in the future
+                    for pm in all_height_measurements:
+                        pm_date = datetime.strptime(pm['date'], '%Y-%m-%d').date()
+                        if pm_date >= measurement_date:
+                            error_message = f"Previous measurement date must be before current measurement date"
+                            break
+
+                    if not error_message:
+                        # Filter height measurements that are >4 months (122 days) prior to current measurement
+                        valid_height_measurements = [
+                            pm for pm in all_height_measurements
+                            if (measurement_date - datetime.strptime(pm['date'], '%Y-%m-%d').date()).days > 122
+                        ]
+
+                        if valid_height_measurements:
+                            # Sort by date (most recent first)
+                            valid_height_measurements.sort(
+                                key=lambda x: datetime.strptime(x['date'], '%Y-%m-%d').date(),
+                                reverse=True
+                            )
+
+                            # Use most recent valid measurement
+                            most_recent = valid_height_measurements[0]
+                            most_recent_date = datetime.strptime(most_recent['date'], '%Y-%m-%d').date()
+                            most_recent_height = most_recent['height']['value']
+
+                            # Calculate height velocity
+                            height_velocity = calculate_height_velocity(
+                                height,
+                                most_recent_height,
+                                measurement_date,
+                                most_recent_date
+                            )
+
+                            # Store the previous height data used for velocity calculation
+                            previous_height_data = most_recent['height']
+                        else:
+                            # All previous measurements are < 4 months
+                            error_message = "Height velocity requires at least 4 months between measurements"
+
+                    # If we have an error message, return it as height_velocity
+                    if error_message:
+                        height_velocity = {
+                            'value': None,
+                            'message': error_message
+                        }
 
         # Calculate height for bone age if available and within +/- 1 month of measurement
         bone_age_height_data = None
@@ -472,6 +594,7 @@ def calculate():
             'ofc_corrected': ofc_corrected_data,
             'height_velocity': height_velocity,
             'previous_height': previous_height_data,
+            'previous_measurements': processed_previous_measurements,
             'bone_age_height': bone_age_height_data,
             'bsa': bsa,
             'bsa_method': bsa_method,
