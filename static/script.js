@@ -360,9 +360,10 @@ function displayResults(results) {
         bsaItem.style.display = 'none';
     }
 
-    // Display GH dose with interactive adjuster
+    // Display GH dose with interactive adjuster (only if child is on GH treatment)
     const ghDoseItem = document.getElementById('gh-dose-item');
-    if (results.gh_dose !== null && results.bsa !== null && results.weight !== null) {
+    const onGhTreatment = document.getElementById('on_gh_treatment')?.checked || false;
+    if (results.gh_dose !== null && results.bsa !== null && results.weight !== null && onGhTreatment) {
         // Store BSA and weight for recalculation
         window.currentBSA = results.bsa;
         window.currentWeight = results.weight.value;
