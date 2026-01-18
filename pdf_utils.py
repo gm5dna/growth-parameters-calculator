@@ -164,13 +164,28 @@ class GrowthReportPDF:
 
         # Get age from results
         age_text = 'N/A'
-        if 'age' in self.results:
-            age_data = self.results['age']
-            if 'corrected_decimal_age' in age_data:
-                age_years = age_data['corrected_decimal_age']
-                age_text = f"{age_years:.2f} years"
-                if 'years' in age_data and 'months' in age_data and 'days' in age_data:
-                    age_text += f" ({age_data['years']}y {age_data['months']}m {age_data['days']}d)"
+        age_years = self.results.get('age_years')
+        age_calendar = self.results.get('age_calendar')
+
+        if age_years is not None:
+            age_text = f"{age_years:.2f} years"
+            if age_calendar and isinstance(age_calendar, dict):
+                years = age_calendar.get('years', 0)
+                months = age_calendar.get('months', 0)
+                days = age_calendar.get('days', 0)
+                age_text += f" ({years}y {months}m {days}d)"
+
+        # If gestation correction was applied, show corrected age
+        if self.results.get('gestation_correction_applied'):
+            corrected_age_years = self.results.get('corrected_age_years')
+            corrected_age_calendar = self.results.get('corrected_age_calendar')
+            if corrected_age_years is not None:
+                age_text += f"\nCorrected Age: {corrected_age_years:.2f} years"
+                if corrected_age_calendar and isinstance(corrected_age_calendar, dict):
+                    years = corrected_age_calendar.get('years', 0)
+                    months = corrected_age_calendar.get('months', 0)
+                    days = corrected_age_calendar.get('days', 0)
+                    age_text += f" ({years}y {months}m {days}d)"
 
         patient_table_data = [
             ['Sex:', sex_display],
@@ -208,46 +223,44 @@ class GrowthReportPDF:
         # Build measurements table
         table_data = [['Parameter', 'Value', 'Centile', 'SDS']]
 
-        measurements = self.results.get('measurements', {})
-
-        # Weight
-        if 'weight' in measurements:
-            w = measurements['weight']
+        # Weight - access directly from results, not from measurements sub-dict
+        weight = self.results.get('weight')
+        if weight and isinstance(weight, dict):
             table_data.append([
                 'Weight',
-                f"{w.get('value', 'N/A')} kg",
-                f"{w.get('centile', 'N/A')}%",
-                f"{w.get('sds', 'N/A')}"
+                f"{weight.get('value', 'N/A')} kg",
+                f"{weight.get('centile', 'N/A')}%",
+                f"{weight.get('sds', 'N/A')}"
             ])
 
         # Height
-        if 'height' in measurements:
-            h = measurements['height']
+        height = self.results.get('height')
+        if height and isinstance(height, dict):
             table_data.append([
                 'Height',
-                f"{h.get('value', 'N/A')} cm",
-                f"{h.get('centile', 'N/A')}%",
-                f"{h.get('sds', 'N/A')}"
+                f"{height.get('value', 'N/A')} cm",
+                f"{height.get('centile', 'N/A')}%",
+                f"{height.get('sds', 'N/A')}"
             ])
 
         # BMI
-        if 'bmi' in measurements:
-            b = measurements['bmi']
+        bmi = self.results.get('bmi')
+        if bmi and isinstance(bmi, dict):
             table_data.append([
                 'BMI',
-                f"{b.get('value', 'N/A')}",
-                f"{b.get('centile', 'N/A')}%",
-                f"{b.get('sds', 'N/A')}"
+                f"{bmi.get('value', 'N/A')}",
+                f"{bmi.get('centile', 'N/A')}%",
+                f"{bmi.get('sds', 'N/A')}"
             ])
 
         # OFC
-        if 'ofc' in measurements:
-            o = measurements['ofc']
+        ofc = self.results.get('ofc')
+        if ofc and isinstance(ofc, dict):
             table_data.append([
                 'OFC',
-                f"{o.get('value', 'N/A')} cm",
-                f"{o.get('centile', 'N/A')}%",
-                f"{o.get('sds', 'N/A')}"
+                f"{ofc.get('value', 'N/A')} cm",
+                f"{ofc.get('centile', 'N/A')}%",
+                f"{ofc.get('sds', 'N/A')}"
             ])
 
         # Create table
@@ -291,38 +304,44 @@ class GrowthReportPDF:
         params_list = []
 
         # Height velocity
-        if 'height_velocity' in self.results:
-            hv = self.results['height_velocity']
-            if hv.get('height_velocity_cm_year'):
+        height_velocity = self.results.get('height_velocity')
+        if height_velocity and isinstance(height_velocity, dict):
+            hv_cm = height_velocity.get('height_velocity_cm_year')
+            if hv_cm is not None:
                 has_params = True
-                params_list.append(f"Height Velocity: {hv['height_velocity_cm_year']:.2f} cm/year")
+                params_list.append(f"Height Velocity: {hv_cm:.2f} cm/year")
 
-        # BSA
-        if 'bsa' in self.results:
-            bsa_data = self.results['bsa']
-            if bsa_data.get('boyd'):
-                has_params = True
-                params_list.append(f"BSA (Boyd): {bsa_data['boyd']:.2f} m²")
-            if bsa_data.get('dubois'):
-                params_list.append(f"BSA (Dubois): {bsa_data['dubois']:.2f} m²")
-            if bsa_data.get('mosteller'):
-                params_list.append(f"BSA (Mosteller): {bsa_data['mosteller']:.2f} m²")
+        # BSA - stored as float value with separate method field
+        bsa = self.results.get('bsa')
+        bsa_method = self.results.get('bsa_method')
+        if bsa is not None and isinstance(bsa, (int, float)):
+            has_params = True
+            method_str = f" ({bsa_method})" if bsa_method else ""
+            params_list.append(f"BSA{method_str}: {bsa:.2f} m²")
 
-        # GH Dose
-        if 'gh_dose' in self.results:
-            gh = self.results['gh_dose']
-            if gh.get('daily_dose_mg'):
+        # GH Dose - stored as dict with various fields
+        gh_dose = self.results.get('gh_dose')
+        if gh_dose and isinstance(gh_dose, dict):
+            daily_dose = gh_dose.get('daily_dose_mg')
+            if daily_dose is not None:
                 has_params = True
-                params_list.append(f"GH Dose: {gh['daily_dose_mg']:.2f} mg/day")
+                params_list.append(f"GH Dose: {daily_dose:.2f} mg/day")
+                # Optionally include other formats
+                weekly_dose = gh_dose.get('weekly_dose_mg_m2')
+                if weekly_dose:
+                    params_list.append(f"  ({weekly_dose:.1f} mg/m²/week)")
 
-        # MPH
-        if 'mph' in self.results:
-            mph = self.results['mph']
-            if mph.get('mph_cm'):
+        # MPH - stored under 'mid_parental_height' key
+        mph = self.results.get('mid_parental_height')
+        if mph and isinstance(mph, dict):
+            mph_value = mph.get('mid_parental_height')
+            if mph_value is not None:
                 has_params = True
-                mph_text = f"Mid-Parental Height: {mph['mph_cm']:.1f} cm"
-                if mph.get('target_range_min') and mph.get('target_range_max'):
-                    mph_text += f" (Target Range: {mph['target_range_min']:.1f}-{mph['target_range_max']:.1f} cm)"
+                mph_text = f"Mid-Parental Height: {mph_value:.1f} cm"
+                target_min = mph.get('target_range_lower')
+                target_max = mph.get('target_range_upper')
+                if target_min is not None and target_max is not None:
+                    mph_text += f" (Target Range: {target_min:.1f}-{target_max:.1f} cm)"
                 params_list.append(mph_text)
 
         if not has_params:
