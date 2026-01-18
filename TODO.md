@@ -39,7 +39,7 @@ See `documentation/feature-plans/FEATURES_BACKLOG.md` for comprehensive list.
 - [ ] Parental OFC Plotting (for benign familial macrocephaly assessment)
 - [ ] Bone Age Assessment
 - [ ] Event Annotations (tag measurements with clinical events)
-- [ ] Library Age Functions (use rcpchgrowth built-in age calculations)
+- [x] Library Age Functions (use rcpchgrowth built-in age calculations - completed)
 
 ### Medium Term
 - [ ] Serial Measurements & Trajectory Tracking

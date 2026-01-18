@@ -3,6 +3,7 @@ Calculation functions for growth parameters
 """
 import math
 from dateutil.relativedelta import relativedelta
+from rcpchgrowth import chronological_decimal_age, corrected_decimal_age
 from constants import (
     DAYS_PER_YEAR, MONTHS_PER_YEAR,
     FULL_TERM_WEEKS, FULL_TERM_DAYS, DAYS_PER_WEEK,
@@ -14,7 +15,7 @@ from constants import (
 
 def calculate_age_in_years(birth_date, measurement_date):
     """
-    Calculate age in decimal years and calendar age
+    Calculate age in decimal years and calendar age using rcpchgrowth library
 
     Args:
         birth_date: Date of birth
@@ -23,19 +24,15 @@ def calculate_age_in_years(birth_date, measurement_date):
     Returns:
         tuple: (decimal_years, calendar_age_dict)
     """
+    # Use rcpchgrowth library for decimal age calculation
+    decimal_years = chronological_decimal_age(birth_date, measurement_date)
+
+    # Calculate calendar age using relativedelta for structured output
     delta = relativedelta(measurement_date, birth_date)
-    years = delta.years
-    months = delta.months
-    days = delta.days
-
-    # Convert to decimal years using constants
-    decimal_years = years + (months / MONTHS_PER_YEAR) + (days / DAYS_PER_YEAR)
-
-    # Calendar age
     calendar_age = {
-        'years': years,
-        'months': months,
-        'days': days
+        'years': delta.years,
+        'months': delta.months,
+        'days': delta.days
     }
 
     return decimal_years, calendar_age
@@ -75,7 +72,7 @@ def should_apply_gestation_correction(gestation_weeks, gestation_days, chronolog
 
 def calculate_corrected_age(birth_date, measurement_date, gestation_weeks, gestation_days):
     """
-    Calculate corrected age based on due date (EDD)
+    Calculate corrected age based on gestational age using rcpchgrowth library
 
     Args:
         birth_date: Date of birth
@@ -86,15 +83,28 @@ def calculate_corrected_age(birth_date, measurement_date, gestation_weeks, gesta
     Returns:
         tuple: (corrected_decimal_years, corrected_calendar_age_dict)
     """
-    # Calculate expected due date
+    # Use rcpchgrowth library for corrected decimal age calculation
+    corrected_decimal_years = corrected_decimal_age(
+        birth_date,
+        measurement_date,
+        gestation_weeks,
+        gestation_days or 0
+    )
+
+    # Calculate corrected birth date (EDD) for calendar age
     total_gestation_days = (gestation_weeks * DAYS_PER_WEEK) + (gestation_days or 0)
     days_adjustment = FULL_TERM_DAYS - total_gestation_days
-
-    # Corrected "birth" date is the estimated due date
     corrected_birth_date = birth_date + relativedelta(days=days_adjustment)
 
-    # Calculate age from corrected birth date
-    return calculate_age_in_years(corrected_birth_date, measurement_date)
+    # Calculate calendar age from corrected birth date
+    delta = relativedelta(measurement_date, corrected_birth_date)
+    corrected_calendar_age = {
+        'years': delta.years,
+        'months': delta.months,
+        'days': delta.days
+    }
+
+    return corrected_decimal_years, corrected_calendar_age
 
 
 def calculate_boyd_bsa(weight_kg, height_cm):
