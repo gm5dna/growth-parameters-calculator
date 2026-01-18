@@ -56,7 +56,7 @@ See `documentation/feature-plans/FEATURES_BACKLOG.md` for comprehensive list.
 - [ ] Offline calculation caching
 
 ### Chart Improvements
-- [ ] Download chart as PNG/SVG
+- [x] Download chart as PNG (completed)
 - [ ] Print-optimized chart layout
 - [ ] Touch gestures (pinch-to-zoom on chart)
 
