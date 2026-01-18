@@ -22,6 +22,9 @@
 
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
+    <!-- Material Icons -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+
     <!-- Chart.js Library -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
@@ -29,8 +32,8 @@
     <!-- Dark Mode Toggle -->
     <div class="theme-toggle">
         <button class="theme-toggle-btn" id="themeToggle" aria-label="Toggle dark mode" title="Toggle dark mode">
-            <span class="theme-icon" id="sunIcon">☀️</span>
-            <span class="theme-icon hidden" id="moonIcon">🌙</span>
+            <span class="material-symbols-outlined theme-icon" id="sunIcon">light_mode</span>
+            <span class="material-symbols-outlined theme-icon hidden" id="moonIcon">dark_mode</span>
         </button>
     </div>
 
