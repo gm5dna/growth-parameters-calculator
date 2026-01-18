@@ -540,6 +540,7 @@ select:focus {
 .csv-buttons {
     display: flex;
     gap: 8px;
+    margin-left: auto;
 }
 
 .btn-csv {
@@ -574,6 +575,7 @@ select:focus {
 
     .csv-buttons {
         width: 100%;
+        margin-left: 0;
     }
 
     .btn-csv {
