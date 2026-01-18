@@ -434,8 +434,18 @@ function showError(message) {
 
 // Previous Measurements Table Management
 let previousMeasurementRowCounter = 0;
+let previousMeasurementsExpanded = false;
+
+function expandPreviousMeasurementsSection() {
+    if (!previousMeasurementsExpanded) {
+        document.getElementById('previous-measurements-collapsed').style.display = 'none';
+        document.getElementById('previous-measurements-expanded').style.display = 'block';
+        previousMeasurementsExpanded = true;
+    }
+}
 
 function addPreviousMeasurementRow() {
+    expandPreviousMeasurementsSection();
     const tbody = document.getElementById('previousMeasurementsBody');
     const rowId = `prev-row-${previousMeasurementRowCounter++}`;
 
@@ -547,6 +557,9 @@ function importPreviousMeasurementsFromCSV(file) {
                 return;
             }
 
+            // Expand section before importing
+            expandPreviousMeasurementsSection();
+
             // Clear existing table
             document.getElementById('previousMeasurementsBody').innerHTML = '';
             previousMeasurementRowCounter = 0;
@@ -611,6 +624,7 @@ function importPreviousMeasurementsFromCSV(file) {
 
 // Add event listener for Add Previous Measurement button
 document.getElementById('addPreviousMeasurementBtn').addEventListener('click', addPreviousMeasurementRow);
+document.getElementById('addPreviousMeasurementBtnExpanded').addEventListener('click', addPreviousMeasurementRow);
 
 // Add event listeners for CSV import/export
 document.getElementById('exportCsvBtn').addEventListener('click', exportPreviousMeasurementsToCSV);
@@ -630,8 +644,18 @@ document.getElementById('csvFileInput').addEventListener('change', (e) => {
 
 // Bone Age Assessment Management
 let boneAgeRowCounter = 0;
+let boneAgeExpanded = false;
+
+function expandBoneAgeSection() {
+    if (!boneAgeExpanded) {
+        document.getElementById('bone-age-collapsed').style.display = 'none';
+        document.getElementById('bone-age-expanded').style.display = 'block';
+        boneAgeExpanded = true;
+    }
+}
 
 function addBoneAgeRow() {
+    expandBoneAgeSection();
     const tbody = document.getElementById('boneAgeBody');
     const rowId = `bone-age-row-${boneAgeRowCounter++}`;
 
@@ -757,6 +781,7 @@ function getBoneAgeAssessments() {
 
 // Add event listener for Add Bone Age button
 document.getElementById('addBoneAgeBtn').addEventListener('click', addBoneAgeRow);
+document.getElementById('addBoneAgeBtnExpanded').addEventListener('click', addBoneAgeRow);
 
 // Reset button functionality
 document.getElementById('resetBtn').addEventListener('click', () => {
@@ -783,6 +808,16 @@ document.getElementById('resetBtn').addEventListener('click', () => {
     // Clear bone age table
     document.getElementById('boneAgeBody').innerHTML = '';
     boneAgeRowCounter = 0;
+
+    // Collapse previous measurements section
+    document.getElementById('previous-measurements-collapsed').style.display = 'block';
+    document.getElementById('previous-measurements-expanded').style.display = 'none';
+    previousMeasurementsExpanded = false;
+
+    // Collapse bone age section
+    document.getElementById('bone-age-collapsed').style.display = 'block';
+    document.getElementById('bone-age-expanded').style.display = 'none';
+    boneAgeExpanded = false;
 
     // Hide and reset charts
     document.getElementById('charts-section').classList.remove('show');

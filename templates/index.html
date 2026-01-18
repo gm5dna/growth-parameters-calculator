@@ -131,9 +131,18 @@
                 </div>
             </div>
 
-            <div class="section-header advanced-only">Previous Measurements (Optional)</div>
+            <!-- Previous Measurements: Collapsed State -->
+            <div class="advanced-only" id="previous-measurements-collapsed">
+                <button type="button" class="btn-add-measurement" id="addPreviousMeasurementBtn">
+                    <span class="material-symbols-outlined">add</span>
+                    Add Previous Measurement
+                </button>
+            </div>
 
-            <div class="advanced-only" id="previous-measurements-section">
+            <!-- Previous Measurements: Expanded State -->
+            <div class="advanced-only" id="previous-measurements-expanded" style="display: none;">
+                <div class="section-header">Previous Measurements (Optional)</div>
+
                 <div class="previous-measurements-table-container">
                     <table class="previous-measurements-table" id="previousMeasurementsTable">
                         <thead>
@@ -151,9 +160,9 @@
                     </table>
                 </div>
                 <div class="previous-measurements-buttons">
-                    <button type="button" class="btn-add-measurement" id="addPreviousMeasurementBtn">
+                    <button type="button" class="btn-add-measurement" id="addPreviousMeasurementBtnExpanded">
                         <span class="material-symbols-outlined">add</span>
-                        Add Previous Measurement
+                        Add Another Measurement
                     </button>
                     <div class="csv-buttons">
                         <button type="button" class="btn-csv" id="importCsvBtn">
@@ -169,10 +178,19 @@
                 </div>
             </div>
 
-            <div class="section-header advanced-only">Bone Age Assessment</div>
-            <small class="hint advanced-only" style="display: block; margin: -8px 0 12px 0;">To plot on growth chart, assessment date should be within ±1 month of chronological measurement date</small>
+            <!-- Bone Age: Collapsed State -->
+            <div class="advanced-only" id="bone-age-collapsed">
+                <button type="button" class="btn-add-measurement" id="addBoneAgeBtn">
+                    <span class="material-symbols-outlined">add</span>
+                    Add Bone Age Assessment
+                </button>
+            </div>
 
-            <div class="advanced-only" id="bone-age-section">
+            <!-- Bone Age: Expanded State -->
+            <div class="advanced-only" id="bone-age-expanded" style="display: none;">
+                <div class="section-header">Bone Age Assessment</div>
+                <small class="hint" style="display: block; margin: -8px 0 12px 0;">To plot on growth chart, assessment date should be within ±1 month of chronological measurement date</small>
+
                 <div class="bone-age-table-container">
                     <table class="bone-age-table" id="boneAgeTable">
                         <thead>
@@ -188,9 +206,9 @@
                         </tbody>
                     </table>
                 </div>
-                <button type="button" class="btn-add-measurement" id="addBoneAgeBtn">
+                <button type="button" class="btn-add-measurement" id="addBoneAgeBtnExpanded">
                     <span class="material-symbols-outlined">add</span>
-                    Add Bone Age Assessment
+                    Add Another Assessment
                 </button>
             </div>
 
