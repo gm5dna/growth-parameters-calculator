@@ -242,7 +242,18 @@ function displayResults(results) {
     // Format calendar age display
     const calendarAge = results.age_calendar;
     const ageElement = document.getElementById('age');
-    ageElement.innerHTML = `${calendarAge.years}y ${calendarAge.months}m ${calendarAge.days}d<br><span style="font-size: 0.8em; color: #666;">(${results.age_years} years)</span>`;
+
+    let ageDisplay = `${calendarAge.years}y ${calendarAge.months}m ${calendarAge.days}d<br><span style="font-size: 0.8em; color: #666;">(${results.age_years} years)</span>`;
+
+    // If gestation correction was applied, show corrected age as well
+    if (results.gestation_correction_applied && results.corrected_age_calendar) {
+        const correctedAge = results.corrected_age_calendar;
+        ageDisplay += `<br><br><span style="font-size: 0.85em; color: #667eea; font-weight: 600;">Corrected Age:</span><br>`;
+        ageDisplay += `${correctedAge.years}y ${correctedAge.months}m ${correctedAge.days}d`;
+        ageDisplay += `<br><span style="font-size: 0.8em; color: #666;">(${results.corrected_age_years} years)</span>`;
+    }
+
+    ageElement.innerHTML = ageDisplay;
 
     // Display weight if provided
     const weightItem = document.getElementById('weight-item');
